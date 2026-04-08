@@ -256,6 +256,24 @@
   .history-restore { background: var(--pr); color: #fff; border: none; border-radius: 4px; padding: 2px 8px; font-size: 10px; cursor: pointer; }
   .history-restore:hover { background: #5a32a3; }
 
+  /* Regen guided prompt */
+  .regen-prompt {
+    position: absolute; top: -50px; left: 0; right: 0; z-index: 15;
+    background: #1a1a2e; border-radius: 8px; padding: 8px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.3); display: flex; gap: 6px;
+  }
+  .regen-prompt input {
+    flex: 1; background: #2a2a3e; color: #fff; border: 1px solid #444;
+    border-radius: 5px; padding: 6px 10px; font-size: 12px;
+  }
+  .regen-prompt input:focus { outline: none; border-color: var(--pr); }
+  .regen-prompt input::placeholder { color: #666; }
+  .regen-prompt button {
+    background: var(--pr); color: #fff; border: none; border-radius: 5px;
+    padding: 6px 12px; font-size: 11px; cursor: pointer; white-space: nowrap;
+  }
+  .regen-prompt button:hover { background: #5a32a3; }
+
   /* FAQ add/remove buttons */
   .faq-add-btn {
     display: flex; align-items: center; justify-content: center;
@@ -749,6 +767,7 @@ function renderEditor() {
         <button onclick="moveBloc(this,-1)" title="Monter">&#8593;</button>
         <button onclick="moveBloc(this,1)" title="Descendre">&#8595;</button>
         <button onclick="regenBloc(this)" title="Régénérer ce bloc">&#128260;</button>
+        <button onclick="regenBlocGuided(this)" title="Régénérer avec instruction">&#128161;</button>
         <button onclick="dupeBloc(this)" title="Dupliquer ce bloc">&#128203;</button>
         <button onclick="saveBlocAsPreset(this)" title="Enregistrer comme preset">&#128190;</button>
         <button onclick="deleteBloc(this)" title="Supprimer">&#10005;</button>
@@ -2659,6 +2678,133 @@ function regenBloc(btn) {
   })();
 
   // Switch sur l'onglet historique
+  switchRightTab('history');
+}
+
+// === REGEN GUIDÉ ===
+function regenBlocGuided(btn) {
+  var bloc = btn.closest('.bloc');
+
+  // Vérifier si un prompt est déjà ouvert
+  var existing = bloc.querySelector('.regen-prompt');
+  if (existing) { existing.remove(); return; }
+
+  // Créer le prompt input
+  var promptDiv = document.createElement('div');
+  promptDiv.className = 'regen-prompt';
+
+  var input = document.createElement('input');
+  input.type = 'text';
+  input.placeholder = 'Ex: "parle des collectivités", "insiste sur le ROI", "ajoute un lien vers les accessoires"...';
+
+  var sendBtn = document.createElement('button');
+  sendBtn.textContent = 'Régénérer';
+
+  var cancelBtn = document.createElement('button');
+  cancelBtn.textContent = '×';
+  cancelBtn.style.cssText = 'background:#444;padding:6px 8px';
+
+  cancelBtn.addEventListener('click', function() { promptDiv.remove(); });
+
+  sendBtn.addEventListener('click', function() {
+    var instruction = input.value.trim();
+    if (!instruction) { toast('Écrivez une instruction'); return; }
+    promptDiv.remove();
+    launchGuidedRegen(bloc, instruction);
+  });
+
+  input.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') sendBtn.click();
+    if (e.key === 'Escape') promptDiv.remove();
+  });
+
+  promptDiv.appendChild(input);
+  promptDiv.appendChild(sendBtn);
+  promptDiv.appendChild(cancelBtn);
+  bloc.style.position = 'relative';
+  bloc.appendChild(promptDiv);
+  input.focus();
+}
+
+function launchGuidedRegen(bloc, instruction) {
+  var content = bloc.querySelector('.bloc-content');
+  if (!content) return;
+
+  var h2 = content.querySelector('.ws-h2');
+  var h2Text = h2 ? h2.textContent : 'Bloc';
+
+  // Sauvegarder dans l'historique
+  addToHistory(h2Text, content.innerHTML);
+
+  var token = getToken();
+  if (!token) { showTokenModal(); return; }
+
+  var slug = currentFile ? currentFile.replace('pages/','').replace('.html','') : '';
+  if (!slug) { toast('Pas de page active'); return; }
+
+  var originalHtml = content.innerHTML;
+  content.innerHTML = '<p style="color:var(--pr);font-style:italic">Régénération guidée en cours : "' + instruction + '"...</p>';
+
+  (async function() {
+    try {
+      var getRes = await fetch('https://api.github.com/repos/' + REPO + '/contents/jobs.json?ref=' + BRANCH + '&_=' + Date.now(), {
+        headers: { 'Authorization': 'token ' + token }, cache: 'no-store'
+      });
+      var getData = await getRes.json();
+      var jobsContent = JSON.parse(decodeURIComponent(escape(atob(getData.content.replace(/\n/g, '')))));
+
+      var jobId = 'regen-g-' + Date.now();
+      jobsContent.jobs.push({
+        id: jobId,
+        url: slug,
+        slug: slug,
+        type: 'regen-bloc',
+        status: 'pending',
+        h2: h2Text,
+        instruction: instruction,
+        createdAt: new Date().toISOString()
+      });
+
+      var encoded = btoa(unescape(encodeURIComponent(JSON.stringify(jobsContent, null, 2))));
+      var putRes = await fetch('https://api.github.com/repos/' + REPO + '/contents/jobs.json', {
+        method: 'PUT',
+        headers: { 'Authorization': 'token ' + token, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: 'regen guided: ' + h2Text, content: encoded, sha: getData.sha, branch: BRANCH })
+      });
+
+      if (putRes.ok) {
+        toast('Régénération guidée lancée');
+        var pollRegen = setInterval(async function() {
+          try {
+            var r = await fetch('https://api.github.com/repos/' + REPO + '/contents/jobs.json?ref=' + BRANCH + '&_=' + Date.now(), {
+              headers: { 'Authorization': 'token ' + token }, cache: 'no-store'
+            });
+            var d = await r.json();
+            var jobs = JSON.parse(decodeURIComponent(escape(atob(d.content.replace(/\n/g, ''))))).jobs;
+            var j = jobs.find(function(x) { return x.id === jobId; });
+            if (j && j.status === 'done' && j.result) {
+              clearInterval(pollRegen);
+              content.innerHTML = '<h2 class="ws-h2">' + h2Text + '</h2>\n' + j.result;
+              setupImageDropTargets();
+              setupFaqButtons();
+              highlightBlacklistedWords();
+              markDirty();
+              toast('Bloc régénéré avec instruction');
+            } else if (j && j.status === 'error') {
+              clearInterval(pollRegen);
+              content.innerHTML = originalHtml;
+              toast('Erreur régénération');
+            }
+          } catch(e) {}
+        }, 10000);
+        setTimeout(function() { clearInterval(pollRegen); if (content.innerHTML.includes('en cours')) content.innerHTML = originalHtml; }, 300000);
+      }
+    } catch(e) {
+      content.innerHTML = originalHtml;
+      toast('Erreur: ' + e.message);
+    }
+  })();
+
   switchRightTab('history');
 }
 
