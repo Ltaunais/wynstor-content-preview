@@ -249,9 +249,10 @@
       "url": "65-couper-et-decouper",
       "slug": "65-couper-et-decouper",
       "type": "regen-bloc",
-      "status": "pending",
+      "status": "processing",
       "h2": "Comment choisir la bonne cisaille ?",
-      "createdAt": "2026-04-08T15:25:54.168Z"
+      "createdAt": "2026-04-08T15:25:54.168Z",
+      "startedAt": "2026-04-08T15:25:55.907Z"
     }
   ]
 }
