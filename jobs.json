@@ -212,10 +212,11 @@
       "url": "65-couper-et-decouper",
       "slug": "65-couper-et-decouper",
       "type": "reword",
-      "status": "pending",
+      "status": "processing",
       "sentence": "Pour compléter votre installation, pensez aux accessoires de coupe : lames de rechange, bâtons de coupe et tapis de protection prolongent la durée de vie de vos machines. Retrouvez l'ensemble de ces équipements dans la rubrique Couper et découper de votre catalogue Wynstor.",
       "bannedWord": "machines",
-      "createdAt": "2026-04-08T15:13:45.696Z"
+      "createdAt": "2026-04-08T15:13:45.696Z",
+      "startedAt": "2026-04-08T15:14:11.699Z"
     },
     {
       "id": "reword-1775661228850",
