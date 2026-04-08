@@ -799,7 +799,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // === DIRTY STATE + AUTO-SAVE ===
 let autoSaveTimer = null;
-const AUTO_SAVE_DELAY = 500; // 500ms debounce pour grouper les frappes rapides
+let autoSaveEnabled = false; // désactivé jusqu'au premier clic utilisateur
+const AUTO_SAVE_DELAY = 800;
+
+// Activer l'auto-save seulement après une vraie interaction utilisateur
+document.addEventListener('keydown', () => { autoSaveEnabled = true; }, { once: true });
+document.addEventListener('mousedown', () => {
+  setTimeout(() => { autoSaveEnabled = true; }, 500);
+}, { once: true });
 
 function markDirty() {
   dirty = true;
@@ -807,15 +814,15 @@ function markDirty() {
   document.getElementById('saveStatus').style.color = 'var(--warn)';
   updateStats();
 
-  // Auto-save : relancer le timer à chaque modif
+  // Auto-save seulement si activé (= après interaction réelle) et token présent
+  if (!autoSaveEnabled || !getToken()) return;
+
   clearTimeout(autoSaveTimer);
-  if (getToken()) {
-    autoSaveTimer = setTimeout(() => {
-      document.getElementById('saveStatus').textContent = 'Auto-save...';
-      document.getElementById('saveStatus').style.color = 'var(--pr)';
-      saveToGithub();
-    }, AUTO_SAVE_DELAY);
-  }
+  autoSaveTimer = setTimeout(() => {
+    document.getElementById('saveStatus').textContent = 'Auto-save...';
+    document.getElementById('saveStatus').style.color = 'var(--pr)';
+    saveToGithub();
+  }, AUTO_SAVE_DELAY);
 }
 
 // === COLLECT HTML ===
