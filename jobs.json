@@ -150,7 +150,7 @@
       "url": "65-couper-et-decouper",
       "slug": "65-couper-et-decouper",
       "type": "redaction",
-      "status": "processing",
+      "status": "done",
       "createdAt": "2026-04-08T14:42:58.248Z",
       "structure": {
         "h2s": [
@@ -167,7 +167,8 @@
           "Quels accessoires prévoir pour entretenir son matériel de coupe et garantir des découpes nettes dans la durée ?"
         ]
       },
-      "startedAt": "2026-04-08T14:43:21.376Z"
+      "startedAt": "2026-04-08T14:43:21.376Z",
+      "finishedAt": "2026-04-08T14:47:31.705Z"
     }
   ]
 }
