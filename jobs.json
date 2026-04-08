@@ -85,8 +85,9 @@
       "id": "job-1775657072306",
       "url": "65-couper-et-decouper",
       "slug": "65-couper-et-decouper",
-      "status": "pending",
-      "createdAt": "2026-04-08T14:04:32.306Z"
+      "status": "processing",
+      "createdAt": "2026-04-08T14:04:32.306Z",
+      "startedAt": "2026-04-08T14:04:45.014Z"
     }
   ]
 }
