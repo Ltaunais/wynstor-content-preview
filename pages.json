@@ -6,6 +6,13 @@
       "name": "Couper et découper",
       "level": "N0",
       "status": "draft"
+    },
+    {
+      "id": "4",
+      "file": "pages/4-agrafer.html",
+      "name": "Agrafer",
+      "level": "N1",
+      "status": "draft"
     }
   ]
 }
