@@ -237,9 +237,10 @@
       "url": "65-couper-et-decouper",
       "slug": "65-couper-et-decouper",
       "type": "regen-bloc",
-      "status": "pending",
+      "status": "processing",
       "h2": "Pourquoi utiliser une cisaille ?",
-      "createdAt": "2026-04-08T15:20:57.418Z"
+      "createdAt": "2026-04-08T15:20:57.418Z",
+      "startedAt": "2026-04-08T15:21:12.072Z"
     }
   ]
 }
