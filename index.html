@@ -2049,6 +2049,8 @@ async function uploadFiles(files) {
   const status = document.getElementById('mediaUploadStatus');
   status.style.display = 'block';
 
+  const REMBG_API = 'http://77.42.21.108:3456/rembg';
+
   // Demander si détourage
   const doRmbg = confirm('Détourer le fond des images avant upload ?');
 
@@ -2057,22 +2059,23 @@ async function uploadFiles(files) {
     if (!file.type.startsWith('image/')) continue;
 
     if (doRmbg) {
-      status.textContent = 'Détourage ' + (i+1) + '/' + files.length + ' : ' + file.name + '...';
+      status.textContent = 'Détourage ' + (i+1) + '/' + files.length + ' : ' + file.name + ' (rembg Python)...';
       try {
-        // Convertir le fichier en URL pour le détourage
-        const fileUrl = URL.createObjectURL(file);
-        const resultUrl = await window.removeBackground(fileUrl);
-        URL.revokeObjectURL(fileUrl);
-        // Convertir le blob URL en fichier
-        const response = await fetch(resultUrl);
-        const blob = await response.blob();
-        const newName = file.name.replace(/\.[^.]+$/, '-nobg.png');
-        file = new File([blob], newName, { type: 'image/png' });
-        URL.revokeObjectURL(resultUrl);
+        const formData = new FormData();
+        formData.append('image', file);
+        const rmbgRes = await fetch(REMBG_API, { method: 'POST', body: formData });
+        if (rmbgRes.ok) {
+          const data = await rmbgRes.json();
+          // L'image détourée est déjà uploadée sur Magento par le serveur
+          addMediaThumb(data);
+          toast('Détouré et uploadé : ' + data.filename);
+          continue; // Passer au fichier suivant, pas besoin d'upload PHP
+        } else {
+          toast('Erreur détourage serveur, upload normal', 3000);
+        }
       } catch(e) {
-        console.error('[rmbg] error:', e);
-        toast('Erreur détourage: ' + e.message, 3000);
-        // Continue avec l'image originale
+        console.error('[rembg] error:', e);
+        toast('Détourage indisponible, upload normal', 3000);
       }
     }
 
