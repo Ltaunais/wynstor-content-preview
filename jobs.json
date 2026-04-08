@@ -199,11 +199,13 @@
       "url": "65-couper-et-decouper",
       "slug": "65-couper-et-decouper",
       "type": "reword",
-      "status": "processing",
+      "status": "done",
       "sentence": "Vous hésitez entre plusieurs types de machines pour vos travaux de coupe ? Chaque équipement répond à un usage précis dans votre environnement de bureau. Les massicots tranchent des piles de feuilles en une seule pression grâce à leur lame verticale. Vous les installez sur un plan de travail dédié et réalisez des coupes droites sur de gros volumes, ce qui en fait le choix logique pour les services reprographie ou les secrétariats à forte activité.",
       "bannedWord": "machines",
       "createdAt": "2026-04-08T15:13:26.312Z",
-      "startedAt": "2026-04-08T15:13:41.691Z"
+      "startedAt": "2026-04-08T15:13:41.691Z",
+      "result": "Vous hésitez entre plusieurs types d'équipements pour vos travaux de coupe ? Chaque équipement répond à un usage précis dans votre environnement de bureau. Les massicots tranchent des piles de feuilles en une seule pression grâce à leur lame verticale. Vous les installez sur un plan de travail dédié et réalisez des coupes droites sur de gros volumes, ce qui en fait le choix logique pour les services reprographie ou les secrétariats à forte activité.",
+      "finishedAt": "2026-04-08T15:13:53.892Z"
     },
     {
       "id": "reword-1775661225696",
