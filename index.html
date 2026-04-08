@@ -432,6 +432,30 @@
   .toast.visible { display: block; animation: fadeIn 0.2s; }
   @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
+  /* === CORBEILLE DRAG === */
+  .trash-zone {
+    display: none;
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 999;
+    background: rgba(220,53,69,0.9);
+    color: #fff;
+    border-radius: 12px;
+    padding: 14px 32px;
+    font-size: 13px;
+    font-weight: 600;
+    gap: 8px;
+    align-items: center;
+    box-shadow: 0 8px 32px rgba(220,53,69,0.3);
+    backdrop-filter: blur(8px);
+    transition: background 0.2s, transform 0.2s;
+    pointer-events: auto;
+  }
+  .trash-zone.visible { display: flex; animation: fadeIn 0.2s; }
+  .trash-zone.dragover { background: rgba(220,53,69,1); transform: translateX(-50%) scale(1.05); }
+
   /* === GRILLE SOUS-CATÉGORIES (homepage N0) === */
   .subcats-section { margin-bottom: 16px; }
   .subcats-section h2 { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--gray); margin-bottom: 10px; }
@@ -3835,6 +3859,89 @@ async function savePagesJson() {
     toast('Erreur GitHub: ' + e.message, 3000);
   }
 }
+
+// === CORBEILLE DRAG ===
+(function() {
+  var trashZone = document.createElement('div');
+  trashZone.className = 'trash-zone';
+  trashZone.id = 'trashZone';
+  var trashIcon = document.createElement('span');
+  trashIcon.textContent = '\ud83d\uddd1\ufe0f';
+  trashIcon.style.fontSize = '18px';
+  var trashLabel = document.createElement('span');
+  trashLabel.textContent = 'Supprimer de Magento';
+  trashZone.appendChild(trashIcon);
+  trashZone.appendChild(trashLabel);
+  document.body.appendChild(trashZone);
+
+  var dragCount = 0;
+  var draggedUrl = null;
+
+  document.addEventListener('dragstart', function(e) {
+    var url = e.dataTransfer.getData('application/x-media-url') || '';
+    if (!url) {
+      var thumb = e.target.closest('.media-thumb');
+      if (thumb) {
+        var img = thumb.querySelector('img');
+        if (img) draggedUrl = img.src || img.dataset.url;
+      }
+    } else {
+      draggedUrl = url;
+    }
+    if (draggedUrl) {
+      setTimeout(function() { trashZone.classList.add('visible'); }, 100);
+    }
+  });
+
+  document.addEventListener('dragend', function() {
+    trashZone.classList.remove('visible', 'dragover');
+    draggedUrl = null;
+    dragCount = 0;
+  });
+
+  trashZone.addEventListener('dragover', function(e) {
+    e.preventDefault();
+    trashZone.classList.add('dragover');
+  });
+
+  trashZone.addEventListener('dragleave', function() {
+    trashZone.classList.remove('dragover');
+  });
+
+  trashZone.addEventListener('drop', function(e) {
+    e.preventDefault();
+    trashZone.classList.remove('visible', 'dragover');
+
+    var url = e.dataTransfer.getData('application/x-media-url') || e.dataTransfer.getData('text/plain') || draggedUrl;
+    if (!url || !url.includes('/media/')) { toast('Pas une image Magento'); return; }
+
+    var filename = url.split('/').pop();
+    if (!filename) return;
+
+    toast('Suppression: ' + filename + '...');
+    var token = getToken();
+    if (!token) { toast('Token requis'); return; }
+
+    fetch(getMediaApiUrl().split('?')[0] + '?action=delete&file=' + encodeURIComponent(filename) + '&token=' + encodeURIComponent(token), {
+      method: 'DELETE',
+      headers: { 'Authorization': 'Bearer ' + token }
+    }).then(function(res) {
+      if (res.ok) {
+        toast('Supprimé: ' + filename);
+        // Retirer le thumb de la galerie
+        var gallery = document.getElementById('mediaGallery');
+        gallery.querySelectorAll('.media-thumb img').forEach(function(img) {
+          if (img.src && img.src.includes(filename)) {
+            img.closest('.media-thumb').remove();
+          }
+        });
+      } else {
+        toast('Erreur suppression', 3000);
+      }
+    }).catch(function() { toast('Erreur réseau', 3000); });
+    draggedUrl = null;
+  });
+})();
 
 // Warn before leaving with unsaved changes
 window.addEventListener('beforeunload', e => { if (dirty) { e.preventDefault(); e.returnValue = ''; } });
