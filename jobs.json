@@ -243,6 +243,15 @@
       "startedAt": "2026-04-08T15:21:12.072Z",
       "result": "<p>Vous recevez un bon de commande à retailler, un dossier à ajuster avant reliure ou une pile de documents à recouper au bon format : la cisaille vous donne une coupe nette, sans effort, directement à votre poste de travail. Contrairement au massicot, elle se manipule à une main et se range dans un tiroir ou sur une étagère. Vous gagnez en réactivité sans mobiliser un plan de travail dédié.</p>\n\n<p>Au quotidien, la cisaille convient aussi bien à la découpe feuille par feuille qu'au recadrage rapide de supports imprimés ou plastifiés. Si vous traitez des formats courants (A4, A3), explorez les {{widget type=\"Magento\\Catalog\\Block\\Category\\Widget\\Link\" anchor_text=\"cisailles papier\" id_path=\"category/218\"}} adaptées à chaque dimension. Pour des travaux plus intensifs sur des grammages épais ou des matériaux rigides, tournez-vous vers les {{widget type=\"Magento\\Catalog\\Block\\Category\\Widget\\Link\" anchor_text=\"cisailles d'atelier\" id_path=\"category/150\"}}, conçues pour encaisser des cadences soutenues.</p>\n\n<p>Vous hésitez entre cisaille et rogneuse ? La cisaille tranche d'un geste franc grâce à sa lame à levier, tandis que la {{widget type=\"Magento\\Catalog\\Block\\Category\\Widget\\Link\" anchor_text=\"rogneuse\" id_path=\"category/144\"}} guide une lame rotative le long d'un rail. Le choix dépend du volume à traiter et de la précision recherchée : la cisaille reste le réflexe le plus rapide quand vous devez recouper quelques feuilles entre deux tâches.</p>",
       "finishedAt": "2026-04-08T15:22:21.763Z"
+    },
+    {
+      "id": "regen-1775661954168",
+      "url": "65-couper-et-decouper",
+      "slug": "65-couper-et-decouper",
+      "type": "regen-bloc",
+      "status": "pending",
+      "h2": "Comment choisir la bonne cisaille ?",
+      "createdAt": "2026-04-08T15:25:54.168Z"
     }
   ]
 }
