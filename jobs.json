@@ -231,6 +231,15 @@
       "createdAt": "2026-04-08T15:13:48.850Z",
       "result": "Orientez-vous vers une coupeuse capable de gérer des volumes importants en continu, puis complétez avec une rogneuse pour les travaux de finition qui demandent une coupe au millimètre. Deux équipements aux fonctions complémentaires couvrent la totalité des besoins d'un atelier reprographie sans encombrer l'espace de travail.",
       "finishedAt": "2026-04-08T15:14:33.267Z"
+    },
+    {
+      "id": "regen-1775661657418",
+      "url": "65-couper-et-decouper",
+      "slug": "65-couper-et-decouper",
+      "type": "regen-bloc",
+      "status": "pending",
+      "h2": "Pourquoi utiliser une cisaille ?",
+      "createdAt": "2026-04-08T15:20:57.418Z"
     }
   ]
 }
