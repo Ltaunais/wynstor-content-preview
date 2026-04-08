@@ -31,8 +31,9 @@
       "id": "job-1775653523074",
       "url": "152-agrafes",
       "slug": "152-agrafes",
-      "status": "pending",
-      "createdAt": "2026-04-08T13:05:23.074Z"
+      "status": "processing",
+      "createdAt": "2026-04-08T13:05:23.074Z",
+      "startedAt": "2026-04-08T13:05:26.870Z"
     }
   ]
 }
