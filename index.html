@@ -539,6 +539,7 @@ function renderEditor() {
       <div class="bloc-toolbar">
         <button onclick="moveBloc(this,-1)" title="Monter">&#8593;</button>
         <button onclick="moveBloc(this,1)" title="Descendre">&#8595;</button>
+        <button onclick="saveBlocAsPreset(this)" title="Enregistrer comme preset">&#128190;</button>
         <button onclick="deleteBloc(this)" title="Supprimer">&#10005;</button>
       </div>
       <div class="bloc-content" contenteditable="true" oninput="markDirty()">${b.trim()}</div>
@@ -590,6 +591,19 @@ function moveBloc(btn, dir) {
   markDirty();
 }
 
+function saveBlocAsPreset(btn) {
+  const bloc = btn.closest('.bloc');
+  const content = bloc.querySelector('.bloc-content');
+  if (!content) return;
+
+  const name = prompt('Nom du preset :');
+  if (!name || !name.trim()) return;
+
+  // Capturer le HTML avec les styles inline appliqués
+  const html = content.innerHTML;
+  saveCustomBlock(name.trim(), html);
+}
+
 function deleteBloc(btn) {
   if (!confirm('Supprimer ce bloc ?')) return;
   const bloc = btn.closest('.bloc');
@@ -605,6 +619,106 @@ let pendingInsertBar = null;
 // Favoris stockés dans favorites.json sur GitHub
 let favoritesCache = [];
 let favoritesSha = null;
+
+// === CUSTOM BLOCKS (presets utilisateur stockés sur GitHub) ===
+let customBlocksCache = [];
+let customBlocksSha = null;
+
+async function loadCustomBlocks() {
+  const token = getToken();
+  try {
+    const res = await fetch(`https://api.github.com/repos/${REPO}/contents/custom-blocks.json?ref=${BRANCH}&_=${Date.now()}`, {
+      headers: token ? { 'Authorization': `token ${token}` } : {},
+      cache: 'no-store'
+    });
+    if (res.ok) {
+      const data = await res.json();
+      customBlocksSha = data.sha;
+      const content = JSON.parse(decodeURIComponent(escape(atob(data.content.replace(/\n/g, '')))));
+      customBlocksCache = content.blocks || [];
+    }
+  } catch(e) {
+    try {
+      const res = await fetch('custom-blocks.json?_=' + Date.now(), { cache: 'no-store' });
+      const data = await res.json();
+      customBlocksCache = data.blocks || [];
+    } catch(e2) { customBlocksCache = []; }
+  }
+  // Injecter les custom blocks dans blocksData pour qu'ils apparaissent dans le picker
+  updateCustomBlocksInPicker();
+}
+
+function updateCustomBlocksInPicker() {
+  // Retirer l'ancienne catégorie "Mes blocs" si elle existe
+  if (blocksData) {
+    blocksData.categories = blocksData.categories.filter(c => c.name !== 'Mes blocs');
+    // Ajouter la catégorie avec les custom blocks
+    if (customBlocksCache.length > 0) {
+      blocksData.categories.unshift({
+        name: 'Mes blocs',
+        blocks: customBlocksCache
+      });
+      // Mettre à jour TEMPLATES
+      customBlocksCache.forEach(b => { TEMPLATES[b.id] = b.html; });
+    }
+  }
+}
+
+async function saveCustomBlock(name, html) {
+  const id = 'custom-' + Date.now();
+  const block = { id, name, desc: 'Bloc personnalisé', html };
+  customBlocksCache.push(block);
+
+  // Sauvegarder sur GitHub
+  const token = getToken();
+  if (token) {
+    try {
+      const content = JSON.stringify({ blocks: customBlocksCache }, null, 2);
+      const encoded = btoa(unescape(encodeURIComponent(content)));
+      const body = { message: 'add custom block: ' + name, content: encoded, branch: BRANCH };
+      if (customBlocksSha) body.sha = customBlocksSha;
+      const res = await fetch(`https://api.github.com/repos/${REPO}/contents/custom-blocks.json`, {
+        method: 'PUT',
+        headers: { 'Authorization': `token ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      if (res.ok) {
+        const data = await res.json();
+        customBlocksSha = data.content.sha;
+        toast('Bloc enregistré : ' + name);
+      }
+    } catch(e) { console.error('[custom] save error:', e); }
+  }
+  // Mettre à jour le picker
+  updateCustomBlocksInPicker();
+  TEMPLATES[id] = html;
+}
+
+async function deleteCustomBlock(id) {
+  customBlocksCache = customBlocksCache.filter(b => b.id !== id);
+  delete TEMPLATES[id];
+
+  const token = getToken();
+  if (token) {
+    try {
+      const content = JSON.stringify({ blocks: customBlocksCache }, null, 2);
+      const encoded = btoa(unescape(encodeURIComponent(content)));
+      const body = { message: 'delete custom block', content: encoded, branch: BRANCH };
+      if (customBlocksSha) body.sha = customBlocksSha;
+      const res = await fetch(`https://api.github.com/repos/${REPO}/contents/custom-blocks.json`, {
+        method: 'PUT',
+        headers: { 'Authorization': `token ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      if (res.ok) {
+        const data = await res.json();
+        customBlocksSha = data.content.sha;
+        toast('Bloc supprimé');
+      }
+    } catch(e) { console.error('[custom] delete error:', e); }
+  }
+  updateCustomBlocksInPicker();
+}
 
 async function loadFavorites() {
   const token = getToken();
@@ -805,6 +919,22 @@ function renderPickerGrid(filterCat) {
     desc.className = 'bp-card-desc';
     desc.textContent = block.desc;
     info.appendChild(desc);
+
+    // Bouton supprimer pour les custom blocks
+    if (block.id && block.id.startsWith('custom-')) {
+      const delBtn = document.createElement('button');
+      delBtn.style.cssText = 'position:absolute;bottom:6px;right:6px;background:var(--bad);color:#fff;border:none;border-radius:4px;padding:2px 8px;font-size:10px;cursor:pointer;z-index:2';
+      delBtn.textContent = 'Supprimer';
+      delBtn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        if (confirm('Supprimer ce preset ?')) {
+          await deleteCustomBlock(block.id);
+          renderPickerGrid(filterCat);
+        }
+      });
+      card.appendChild(delBtn);
+    }
+
     card.appendChild(info);
 
     gridDiv.appendChild(card);
@@ -1017,6 +1147,7 @@ function updateStats() {
 // === INIT ===
 async function initApp() {
   await loadBlocks();
+  await loadCustomBlocks();
   await loadFavorites();
   try {
     const res = await fetch('pages.json');
