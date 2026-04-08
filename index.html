@@ -873,36 +873,39 @@ function applySource() {
 let isSaving = false;
 let saveQueued = false;
 
+async function fetchCurrentSha(token) {
+  try {
+    const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${currentFile}?ref=${BRANCH}`, {
+      headers: { 'Authorization': `token ${token}` }
+    });
+    if (res.ok) {
+      const data = await res.json();
+      return data.sha;
+    }
+  } catch(e) {}
+  return null;
+}
+
 async function saveToGithub() {
   const token = getToken();
   if (!token) { showTokenModal(); return; }
 
-  // Si un save est déjà en cours, mettre en queue
+  // Si un save est déjà en cours, mettre en queue (1 seul)
   if (isSaving) { saveQueued = true; return; }
   isSaving = true;
-
-  const content = collectHtml();
-  const encoded = btoa(unescape(encodeURIComponent(content)));
 
   document.getElementById('saveStatus').textContent = 'Sauvegarde...';
   document.getElementById('saveStatus').style.color = 'var(--pr)';
 
   try {
-    // Si pas de SHA, récupérer le SHA actuel d'abord
-    if (!currentSha && currentFile) {
-      try {
-        const getRes = await fetch(`https://api.github.com/repos/${REPO}/contents/${currentFile}?ref=${BRANCH}`, {
-          headers: { 'Authorization': `token ${token}` }
-        });
-        if (getRes.ok) {
-          const getData = await getRes.json();
-          currentSha = getData.sha;
-        }
-      } catch(e) { /* nouveau fichier, pas de SHA */ }
-    }
+    // Toujours récupérer le SHA frais avant d'écrire
+    currentSha = await fetchCurrentSha(token);
+
+    const content = collectHtml();
+    const encoded = btoa(unescape(encodeURIComponent(content)));
 
     const body = {
-      message: `update: ${currentFile} — ${new Date().toISOString().split('T')[0]}`,
+      message: `update: ${currentFile}`,
       content: encoded,
       branch: BRANCH
     };
@@ -921,17 +924,6 @@ async function saveToGithub() {
       dirty = false;
       document.getElementById('saveStatus').textContent = 'Sauvegardé';
       document.getElementById('saveStatus').style.color = 'var(--ok)';
-    } else if (res.status === 409) {
-      // Conflit SHA : re-fetch le SHA et réessayer
-      const getRes = await fetch(`https://api.github.com/repos/${REPO}/contents/${currentFile}?ref=${BRANCH}`, {
-        headers: { 'Authorization': `token ${token}` }
-      });
-      if (getRes.ok) {
-        const getData = await getRes.json();
-        currentSha = getData.sha;
-      }
-      isSaving = false;
-      return saveToGithub(); // retry avec le bon SHA
     } else {
       const err = await res.json();
       document.getElementById('saveStatus').textContent = 'Erreur';
@@ -946,10 +938,10 @@ async function saveToGithub() {
 
   isSaving = false;
 
-  // Si un save était en queue pendant celui-ci, le lancer
+  // Si un save était en queue, lancer le dernier
   if (saveQueued) {
     saveQueued = false;
-    saveToGithub();
+    setTimeout(saveToGithub, 300);
   }
 }
 
