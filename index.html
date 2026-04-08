@@ -112,6 +112,54 @@
   }
   .color-preset:hover { border-color: #fff; }
 
+  /* === BLOCK PICKER MODAL === */
+  .block-picker-overlay {
+    display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+    z-index: 10000; align-items: center; justify-content: center;
+    backdrop-filter: blur(3px);
+  }
+  .block-picker-overlay.visible { display: flex; }
+  .block-picker {
+    background: var(--card); border-radius: 16px; width: 780px; max-width: 95vw;
+    max-height: 85vh; display: flex; flex-direction: column; box-shadow: 0 16px 48px rgba(0,0,0,0.3);
+    overflow: hidden;
+  }
+  .bp-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 24px; border-bottom: 1px solid var(--border);
+  }
+  .bp-header h3 { font-size: 16px; font-weight: 600; }
+  .bp-close { background: none; border: none; font-size: 22px; cursor: pointer; color: var(--gray); padding: 4px 8px; border-radius: 6px; }
+  .bp-close:hover { background: var(--border); }
+  .bp-body { display: flex; flex: 1; overflow: hidden; }
+  .bp-cats { width: 180px; border-right: 1px solid var(--border); padding: 12px 0; overflow-y: auto; flex-shrink: 0; }
+  .bp-cat-btn {
+    display: block; width: 100%; text-align: left; padding: 8px 20px;
+    background: none; border: none; font-size: 13px; cursor: pointer; color: #333;
+  }
+  .bp-cat-btn:hover { background: #f8f9fa; }
+  .bp-cat-btn.active { background: var(--pr); color: #fff; font-weight: 600; }
+  .bp-grid { flex: 1; padding: 16px; overflow-y: auto; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-content: start; }
+  .bp-card {
+    border: 1px solid var(--border); border-radius: 10px; overflow: hidden;
+    cursor: pointer; transition: all 0.15s;
+  }
+  .bp-card:hover { border-color: var(--pr); box-shadow: 0 4px 12px rgba(111,66,193,0.15); transform: translateY(-2px); }
+  .bp-card-preview {
+    height: 100px; background: #f8f9fa; overflow: hidden; padding: 8px;
+    display: flex; align-items: center; justify-content: center;
+    pointer-events: none; transform: scale(0.45); transform-origin: top center;
+    min-height: 200px; margin-top: -50px; margin-bottom: -50px;
+  }
+  .bp-card-info { padding: 10px 12px; border-top: 1px solid var(--border); }
+  .bp-card-name { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
+  .bp-card-desc { font-size: 11px; color: var(--gray); }
+
+  @media (max-width: 768px) {
+    .bp-cats { display: none; }
+    .bp-grid { grid-template-columns: 1fr; }
+  }
+
   .editor .ws-h2 { font-size: 18px; font-weight: 600; color: #212529; margin: 0 0 8px; padding-bottom: 6px; border-bottom: 2px solid var(--pr); }
   .editor p { font-size: 14px; line-height: 1.75; margin-bottom: 8px; color: #333; }
   .editor .ws-faq { margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border); }
@@ -214,6 +262,20 @@
   <div class="templates" id="templatesPanel">
     <h2>Blocs</h2>
     <div id="blocksContainer">Chargement...</div>
+  </div>
+</div>
+
+<!-- BLOCK PICKER MODAL -->
+<div class="block-picker-overlay" id="blockPickerOverlay">
+  <div class="block-picker">
+    <div class="bp-header">
+      <h3>Insérer un bloc</h3>
+      <button class="bp-close" onclick="closeBlockPicker()">&times;</button>
+    </div>
+    <div class="bp-body">
+      <div class="bp-cats" id="bpCats"></div>
+      <div class="bp-grid" id="bpGrid"></div>
+    </div>
   </div>
 </div>
 
@@ -511,36 +573,111 @@ function deleteBloc(btn) {
   markDirty();
 }
 
-// === INSERT TEMPLATE ===
+// === BLOCK PICKER (modal catalogue) ===
+let pendingInsertBar = null;
+
 function showInsertMenu(btn) {
-  const insertBar = btn.closest('.insert-bar');
-  // Create a simple template picker
-  const existing = document.querySelector('.insert-picker');
-  if (existing) existing.remove();
+  pendingInsertBar = btn.closest('.insert-bar');
+  openBlockPicker();
+}
 
-  const picker = document.createElement('div');
-  picker.className = 'insert-picker';
-  picker.style.cssText = 'background:#fff;border:1px solid var(--border);border-radius:8px;padding:8px;position:absolute;z-index:50;box-shadow:0 4px 12px rgba(0,0,0,0.15);display:flex;flex-wrap:wrap;gap:4px;max-width:400px';
+function openBlockPicker() {
+  if (!blocksData) return;
+  const overlay = document.getElementById('blockPickerOverlay');
+  const catsDiv = document.getElementById('bpCats');
+  const gridDiv = document.getElementById('bpGrid');
 
-  Object.entries(TEMPLATES).forEach(([key, html]) => {
-    const b = document.createElement('button');
-    b.className = 'btn';
-    b.style.fontSize = '11px';
-    b.textContent = key.replace(/-/g, ' ');
-    b.onclick = () => { insertTemplate(insertBar, key); picker.remove(); };
-    picker.appendChild(b);
+  // Build categories
+  catsDiv.textContent = '';
+  // Bouton "Tous"
+  const allBtn = document.createElement('button');
+  allBtn.className = 'bp-cat-btn active';
+  allBtn.textContent = 'Tous';
+  allBtn.addEventListener('click', () => {
+    catsDiv.querySelectorAll('.bp-cat-btn').forEach(b => b.classList.remove('active'));
+    allBtn.classList.add('active');
+    renderPickerGrid(null);
+  });
+  catsDiv.appendChild(allBtn);
+
+  blocksData.categories.forEach(cat => {
+    const btn = document.createElement('button');
+    btn.className = 'bp-cat-btn';
+    btn.textContent = cat.name;
+    btn.addEventListener('click', () => {
+      catsDiv.querySelectorAll('.bp-cat-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderPickerGrid(cat.name);
+    });
+    catsDiv.appendChild(btn);
   });
 
-  const cancel = document.createElement('button');
-  cancel.className = 'btn';
-  cancel.style.fontSize = '11px';
-  cancel.textContent = '✕';
-  cancel.onclick = () => picker.remove();
-  picker.appendChild(cancel);
-
-  insertBar.style.position = 'relative';
-  insertBar.appendChild(picker);
+  renderPickerGrid(null);
+  overlay.classList.add('visible');
 }
+
+function renderPickerGrid(filterCat) {
+  const gridDiv = document.getElementById('bpGrid');
+  gridDiv.textContent = '';
+
+  blocksData.categories.forEach(cat => {
+    if (filterCat && cat.name !== filterCat) return;
+
+    cat.blocks.forEach(block => {
+      const card = document.createElement('div');
+      card.className = 'bp-card';
+      card.addEventListener('click', () => {
+        insertTemplate(pendingInsertBar, block.id);
+        closeBlockPicker();
+      });
+
+      // Preview miniature du HTML
+      const preview = document.createElement('div');
+      preview.className = 'bp-card-preview';
+      // Render le HTML du bloc en miniature
+      const previewContent = document.createElement('div');
+      previewContent.style.cssText = 'width:100%;pointer-events:none';
+      let previewHtml = block.html
+        .replace(/\{\{widget[^}]*anchor_text="([^"]+)"[^}]*\}\}/g, '<span style="color:#6f42c1;text-decoration:underline">$1</span>')
+        .replace(/<script[\s\S]*?<\/script>/g, '');
+      previewContent.innerHTML = previewHtml;
+      preview.appendChild(previewContent);
+      card.appendChild(preview);
+
+      // Info
+      const info = document.createElement('div');
+      info.className = 'bp-card-info';
+
+      const name = document.createElement('div');
+      name.className = 'bp-card-name';
+      name.textContent = block.name;
+      info.appendChild(name);
+
+      const desc = document.createElement('div');
+      desc.className = 'bp-card-desc';
+      desc.textContent = block.desc;
+      info.appendChild(desc);
+
+      card.appendChild(info);
+      gridDiv.appendChild(card);
+    });
+  });
+}
+
+function closeBlockPicker() {
+  document.getElementById('blockPickerOverlay').classList.remove('visible');
+  pendingInsertBar = null;
+}
+
+// Fermer au clic sur l'overlay
+document.getElementById('blockPickerOverlay').addEventListener('click', (e) => {
+  if (e.target === document.getElementById('blockPickerOverlay')) closeBlockPicker();
+});
+
+// Fermer avec Escape
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeBlockPicker();
+});
 
 function insertTemplate(insertBar, tplKey) {
   const html = TEMPLATES[tplKey];
