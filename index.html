@@ -997,7 +997,7 @@ function setupImageDropTargets() {
           const formData = new FormData();
           formData.append('image', file);
           try {
-            const res = await fetch(MEDIA_API, {
+            const res = await fetch(getMediaApiUrl(), {
               method: 'POST',
               headers: { 'Authorization': 'Bearer ' + token },
               body: formData
@@ -3133,6 +3133,10 @@ function launchGuidedRegen(bloc, instruction) {
 })();
 
 // === PANNEAU MÉDIA ===
+function getMediaApiUrl() {
+  var token = getToken();
+  return 'https://dev3.wynstor.com/media/wysiwyg/smartwave/porto/category/upload.php' + (token ? '?token=' + encodeURIComponent(token) : '');
+}
 const MEDIA_API = 'https://dev3.wynstor.com/media/wysiwyg/smartwave/porto/category/upload.php';
 let mediaLoaded = false;
 
@@ -3216,7 +3220,7 @@ async function uploadFiles(files) {
     formData.append('image', file);
 
     try {
-      const res = await fetch(MEDIA_API, {
+      const res = await fetch(getMediaApiUrl(), {
         method: 'POST',
         headers: { 'Authorization': 'Bearer ' + token },
         body: formData
@@ -3242,7 +3246,7 @@ async function loadMediaGallery() {
   gallery.textContent = '';
 
   try {
-    const res = await fetch(MEDIA_API, {
+    const res = await fetch(getMediaApiUrl(), {
       headers: token ? { 'Authorization': 'Bearer ' + token } : {},
       cache: 'no-store'
     });
@@ -3299,7 +3303,7 @@ function addMediaThumb(img) {
       if (token) {
         const formData = new FormData();
         formData.append('image', file);
-        const upRes = await fetch(MEDIA_API, {
+        const upRes = await fetch(getMediaApiUrl(), {
           method: 'POST',
           headers: { 'Authorization': 'Bearer ' + token },
           body: formData
