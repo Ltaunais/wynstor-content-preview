@@ -89,6 +89,30 @@
       "createdAt": "2026-04-08T14:04:32.306Z",
       "startedAt": "2026-04-08T14:04:45.014Z",
       "finishedAt": "2026-04-08T14:06:02.525Z"
+    },
+    {
+      "id": "job-1775657588331",
+      "url": "COUPER ET DÉCOUPER",
+      "slug": "COUPER ET DÉCOUPER",
+      "type": "redaction",
+      "status": "pending",
+      "createdAt": "2026-04-08T14:13:08.331Z",
+      "structure": {
+        "h2s": [
+          "Vous devez couper des lots de feuilles au format exact avant reliure ou plastification",
+          "Vous préparez des documents rognés proprement pour vos présentations client",
+          "Vous coupez du papier au quotidien et cherchez un outil fiable sur votre poste de travail",
+          "Vous remplacez les lames ou tapis de coupe de votre matériel existant",
+          "Massicots vs cisailles vs rogneuses",
+          "Questions fréquentes"
+        ],
+        "faqs": [
+          "Question à définir ?",
+          "Question à définir ?",
+          "Nouvelle question ?",
+          "Question à définir ?"
+        ]
+      }
     }
   ]
 }
