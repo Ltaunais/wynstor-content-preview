@@ -371,6 +371,14 @@
       "startedAt": "2026-04-08T15:43:08.567Z",
       "result": "Repérer la marque et le modèle de votre appareil",
       "finishedAt": "2026-04-08T15:43:24.293Z"
+    },
+    {
+      "id": "job-1775668692689",
+      "url": "4-agrafer",
+      "slug": "4-agrafer",
+      "type": "analyse",
+      "status": "pending",
+      "createdAt": "2026-04-08T17:18:12.689Z"
     }
   ]
 }
