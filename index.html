@@ -10,7 +10,14 @@
   body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #212529; background: var(--bg); }
 
   /* === LAYOUT 3 COLONNES === */
-  .layout { display: grid; grid-template-columns: 240px 1fr 260px; min-height: 100vh; }
+  .layout { display: grid; grid-template-columns: 240px 1fr 5px var(--media-width, 360px); min-height: 100vh; }
+
+  /* Resize handle */
+  .resize-handle {
+    width: 5px; cursor: col-resize; background: transparent; position: relative; z-index: 20;
+    transition: background 0.15s; margin: 0 -2px;
+  }
+  .resize-handle:hover, .resize-handle.dragging { background: var(--pr); }
 
   /* === SIDEBAR GAUCHE : PAGES === */
   .sidebar { background: var(--card); border-right: 1px solid var(--border); padding: 16px; position: sticky; top: 0; height: 100vh; overflow-y: auto; }
@@ -286,6 +293,9 @@
     </div>
   </div>
 
+  <!-- RESIZE HANDLE -->
+  <div class="resize-handle" id="resizeHandle"></div>
+
   <!-- SIDEBAR DROITE : MÉDIA -->
   <div class="templates" id="templatesPanel">
     <h2>Média</h2>
@@ -298,7 +308,7 @@
     <!-- Upload status -->
     <div id="mediaUploadStatus" style="font-size:11px;color:var(--gray);margin-bottom:8px;display:none"></div>
     <!-- Galerie -->
-    <div id="mediaGallery" style="display:grid;grid-template-columns:1fr 1fr;gap:6px;max-height:calc(100vh - 220px);overflow-y:auto">
+    <div id="mediaGallery" style="display:grid;grid-template-columns:repeat(auto-fill, minmax(100px, 1fr));gap:6px;max-height:calc(100vh - 220px);overflow-y:auto">
     </div>
   </div>
 </div>
@@ -1383,6 +1393,41 @@ markDirty = function() {
   clearTimeout(previewTimer);
   previewTimer = setTimeout(updatePreviewIfOpen, 500);
 };
+
+// === RESIZE SIDEBAR MÉDIA ===
+(function() {
+  const handle = document.getElementById('resizeHandle');
+  const layout = document.querySelector('.layout');
+  let isResizing = false;
+
+  // Charger la largeur sauvegardée
+  const saved = localStorage.getItem('ws_media_width');
+  if (saved) layout.style.setProperty('--media-width', saved + 'px');
+
+  handle.addEventListener('mousedown', (e) => {
+    isResizing = true;
+    handle.classList.add('dragging');
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+    e.preventDefault();
+  });
+
+  document.addEventListener('mousemove', (e) => {
+    if (!isResizing) return;
+    const width = Math.max(200, Math.min(600, window.innerWidth - e.clientX));
+    layout.style.setProperty('--media-width', width + 'px');
+  });
+
+  document.addEventListener('mouseup', () => {
+    if (!isResizing) return;
+    isResizing = false;
+    handle.classList.remove('dragging');
+    document.body.style.cursor = '';
+    document.body.style.userSelect = '';
+    const width = parseInt(getComputedStyle(layout).getPropertyValue('--media-width'));
+    if (width) localStorage.setItem('ws_media_width', width);
+  });
+})();
 
 // === PANNEAU MÉDIA ===
 const MEDIA_API = 'https://dev3.wynstor.com/media/wysiwyg/smartwave/porto/category/upload.php';
