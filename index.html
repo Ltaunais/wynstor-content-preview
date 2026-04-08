@@ -1655,10 +1655,10 @@ function markDirty() {
 
 // === COLLECT HTML ===
 function cleanBlocHtml(blocHtml) {
-  // Widget markers → vrais widgets Magento
+  // Widget markers → vrais widgets Magento (template inline sans <li>)
   blocHtml = blocHtml.replace(
     /<span class="widget-link"[^>]*title="([^"]+)"[^>]*>([^<]+)<\/span>/g,
-    (_, path, text) => '{{widget type="Magento\\Catalog\\Block\\Category\\Widget\\Link" anchor_text="' + text + '" id_path="' + path + '"}}'
+    (_, path, text) => '{{widget type="Magento\\Catalog\\Block\\Category\\Widget\\Link" anchor_text="' + text + '" template="Magento_Catalog::category/widget/link/link_simple.phtml" id_path="' + path + '"}}'
   );
   // Unwrap img-drop-target wrappers
   blocHtml = blocHtml.replace(/<div class="img-drop-target"[^>]*>([\s\S]*?)<\/div>/g, '$1');
