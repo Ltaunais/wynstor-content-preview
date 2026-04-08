@@ -397,7 +397,7 @@
       "url": "4-agrafer",
       "slug": "4-agrafer",
       "type": "redaction",
-      "status": "pending",
+      "status": "processing",
       "createdAt": "2026-04-08T17:46:41.471Z",
       "structure": {
         "h2s": [
@@ -420,7 +420,8 @@
           "Comment choisir entre agrafeuse manuelle et agrafeuse électrique ?",
           "Nouvelle question ?Quelle agrafeuse pour un usage intensif au bureau ?"
         ]
-      }
+      },
+      "startedAt": "2026-04-08T17:46:43.147Z"
     }
   ]
 }
