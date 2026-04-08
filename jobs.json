@@ -4,9 +4,10 @@
       "id": "job-1775644867427",
       "url": "4-agrafer",
       "slug": "4-agrafer",
-      "status": "processing",
+      "status": "error",
       "createdAt": "2026-04-08T10:41:07.427Z",
-      "startedAt": "2026-04-08T10:43:12.929Z"
+      "startedAt": "2026-04-08T10:43:12.929Z",
+      "finishedAt": "2026-04-08T10:43:17.372Z"
     }
   ]
 }
