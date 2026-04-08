@@ -442,11 +442,13 @@
       "url": "4-agrafer",
       "slug": "4-agrafer",
       "type": "reword",
-      "status": "processing",
+      "status": "done",
       "sentence": "Dans un secrétariat de mairie ou un bureau de scolarité, les besoins varient d'un poste à l'autre. Équipez les agents d'accueil avec des agrafeuses de table stables, posées à demeure sur le plan de travail. Pour les salles de reprographie qui assemblent des livrets de rentrée ou des comptes rendus de séance, tournez-vous vers les agrafeuses de livrets capables de piquer en pli central. Les services courrier qui traitent de gros dossiers reliés gagneront à s'appuyer sur des agrafeuses grande capacité, conçues pour traverser des épaisseurs conséquentes sans effort.H3+IA",
       "bannedWord": "conçue",
       "createdAt": "2026-04-08T17:56:23.776Z",
-      "startedAt": "2026-04-08T17:56:25.494Z"
+      "startedAt": "2026-04-08T17:56:25.494Z",
+      "result": "Dans un secrétariat de mairie ou un bureau de scolarité, les besoins varient d'un poste à l'autre. Équipez les agents d'accueil avec des agrafeuses de table stables, posées à demeure sur le plan de travail. Pour les salles de reprographie qui assemblent des livrets de rentrée ou des comptes rendus de séance, tournez-vous vers les agrafeuses de livrets capables de piquer en pli central. Les services courrier qui traitent de gros dossiers reliés gagneront à s'appuyer sur des agrafeuses grande capacité, pensées pour traverser des épaisseurs conséquentes sans effort.H3+IA",
+      "finishedAt": "2026-04-08T17:56:35.555Z"
     },
     {
       "id": "reword-1775670994178",
