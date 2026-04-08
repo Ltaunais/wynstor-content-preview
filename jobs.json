@@ -150,7 +150,7 @@
       "url": "65-couper-et-decouper",
       "slug": "65-couper-et-decouper",
       "type": "redaction",
-      "status": "pending",
+      "status": "processing",
       "createdAt": "2026-04-08T14:42:58.248Z",
       "structure": {
         "h2s": [
@@ -166,7 +166,8 @@
           "Comment équiper un service reprographie qui découpe des documents toute la journée sans multiplier les appareils ?",
           "Quels accessoires prévoir pour entretenir son matériel de coupe et garantir des découpes nettes dans la durée ?"
         ]
-      }
+      },
+      "startedAt": "2026-04-08T14:43:21.376Z"
     }
   ]
 }
