@@ -215,6 +215,24 @@
   }
   #mediaDropZone.dragover { border-color: var(--pr); background: rgba(111,66,193,0.05); }
 
+  /* FAQ add/remove buttons */
+  .faq-add-btn {
+    display: flex; align-items: center; justify-content: center;
+    height: 20px; margin: 4px 0; opacity: 0; transition: opacity 0.15s; cursor: pointer;
+  }
+  .faq-item:hover + .faq-add-btn, .faq-add-btn:hover { opacity: 1; }
+  .faq-add-btn button {
+    background: var(--pr); color: #fff; border: none; border-radius: 50%;
+    width: 20px; height: 20px; font-size: 14px; cursor: pointer; line-height: 1;
+  }
+  .faq-item { position: relative; }
+  .faq-remove-btn {
+    position: absolute; top: 4px; right: 4px; background: var(--bad); color: #fff;
+    border: none; border-radius: 50%; width: 18px; height: 18px; font-size: 10px;
+    cursor: pointer; display: none; line-height: 1; z-index: 2;
+  }
+  .faq-item:hover .faq-remove-btn { display: flex; align-items: center; justify-content: center; }
+
   /* Image drop targets dans les blocs */
   .img-drop-target {
     position: relative; display: inline-block; cursor: pointer;
@@ -600,6 +618,7 @@ async function loadFile(filename) {
   renderMeta();
   renderEditor();
   setupImageDropTargets();
+  setupFaqButtons();
   updateStats();
   dirty = false;
   document.getElementById('saveStatus').textContent = '';
@@ -683,6 +702,51 @@ function renderEditor() {
   finalBar.className = 'insert-bar';
   finalBar.innerHTML = '<button onclick="showInsertMenu(this)" title="Insérer un bloc">+</button>';
   editor.appendChild(finalBar);
+}
+
+// === FAQ INTERACTIVE BUTTONS ===
+function setupFaqButtons() {
+  document.querySelectorAll('.bloc-content .faq-item').forEach(item => {
+    // Skip si déjà setup
+    if (item.querySelector('.faq-remove-btn')) return;
+
+    // Bouton supprimer sur chaque faq-item
+    const removeBtn = document.createElement('button');
+    removeBtn.className = 'faq-remove-btn';
+    removeBtn.textContent = '\u2715';
+    removeBtn.title = 'Supprimer cette question';
+    removeBtn.contentEditable = 'false';
+    removeBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      // Supprimer aussi le faq-add-btn qui suit
+      const nextAdd = item.nextElementSibling;
+      if (nextAdd && nextAdd.classList.contains('faq-add-btn')) nextAdd.remove();
+      item.remove();
+      markDirty();
+    });
+    item.appendChild(removeBtn);
+
+    // Bouton + après chaque faq-item
+    const addBar = document.createElement('div');
+    addBar.className = 'faq-add-btn';
+    addBar.contentEditable = 'false';
+    const addBtn = document.createElement('button');
+    addBtn.textContent = '+';
+    addBtn.title = 'Ajouter une question';
+    addBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const newItem = document.createElement('div');
+      newItem.className = 'faq-item';
+      newItem.innerHTML = '<h3 class="ws-h3">Nouvelle question\u00a0?</h3><p>R\u00e9ponse.</p>';
+      // Insérer après le addBar
+      addBar.after(newItem);
+      // Setup les boutons sur le nouveau item
+      setupFaqButtons();
+      markDirty();
+    });
+    addBar.appendChild(addBtn);
+    item.after(addBar);
+  });
 }
 
 // === IMAGE DROP TARGETS ===
@@ -1168,6 +1232,7 @@ function insertTemplate(insertBar, tplKey) {
   insertBar.after(newBloc);
   newBloc.after(newInsertBar);
   setupImageDropTargets();
+  setupFaqButtons();
   markDirty();
 }
 
@@ -1215,6 +1280,9 @@ function collectHtml() {
     );
     // Unwrap img-drop-target wrappers (garder juste le <img>)
     blocHtml = blocHtml.replace(/<div class="img-drop-target"[^>]*>([\s\S]*?)<\/div>/g, '$1');
+    // Retirer les boutons FAQ interactifs
+    blocHtml = blocHtml.replace(/<button class="faq-remove-btn"[^>]*>[^<]*<\/button>/g, '');
+    blocHtml = blocHtml.replace(/<div class="faq-add-btn"[^>]*>[\s\S]*?<\/div>/g, '');
     html += blocHtml.trim() + '\n\n';
   });
 
@@ -1857,6 +1925,7 @@ IMPORTANT :
       renderMeta();
       renderEditor();
       setupImageDropTargets();
+  setupFaqButtons();
       updateStats();
       markDirty();
 
