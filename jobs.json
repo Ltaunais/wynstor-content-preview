@@ -468,11 +468,13 @@
       "url": "4-agrafer",
       "slug": "4-agrafer",
       "type": "reword",
-      "status": "processing",
+      "status": "done",
       "sentence": "Le choix des agrafes compte autant que celui de la machine. Une agrafe trop courte ne traversera pas le bloc de feuilles ; une agrafe inadaptée se tordra dans le mécanisme. Vérifiez la compatibilité entre le calibre d'agrafes et votre agrafeuse avant toute commande. Vous trouverez aussi dans la rubrique accessoires les pièces de rechange et consommables pour maintenir votre équipement en état de fonctionnement quotidien.H3+IA",
       "bannedWord": "la machine",
       "createdAt": "2026-04-08T17:57:17.849Z",
-      "startedAt": "2026-04-08T17:57:19.662Z"
+      "startedAt": "2026-04-08T17:57:19.662Z",
+      "result": "Le choix des agrafes compte autant que celui de l'agrafeuse. Une agrafe trop courte ne traversera pas le bloc de feuilles ; une agrafe inadaptée se tordra dans le mécanisme. Vérifiez la compatibilité entre le calibre d'agrafes et votre agrafeuse avant toute commande. Vous trouverez aussi dans la rubrique accessoires les pièces de rechange et consommables pour maintenir votre équipement en état de fonctionnement quotidien.H3+IA",
+      "finishedAt": "2026-04-08T17:57:29.510Z"
     }
   ]
 }
