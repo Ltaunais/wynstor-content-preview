@@ -259,9 +259,10 @@
       "url": "65-couper-et-decouper",
       "slug": "65-couper-et-decouper",
       "type": "regen-bloc",
-      "status": "pending",
+      "status": "processing",
       "h2": "Pourquoi investir dans une cisaille ?",
-      "createdAt": "2026-04-08T15:26:39.522Z"
+      "createdAt": "2026-04-08T15:26:39.522Z",
+      "startedAt": "2026-04-08T15:26:40.945Z"
     }
   ]
 }
