@@ -175,11 +175,13 @@
       "url": "65-couper-et-decouper",
       "slug": "65-couper-et-decouper",
       "type": "regen-bloc",
-      "status": "processing",
+      "status": "done",
       "h2": "Massicots vs cisailles vs rogneuses",
       "instruction": "Parler de la longueur de coupe, et l'épasseur de chaque matériels",
       "createdAt": "2026-04-08T15:03:28.935Z",
-      "startedAt": "2026-04-08T15:03:54.687Z"
+      "startedAt": "2026-04-08T15:03:54.687Z",
+      "result": "<p>Vous comparez un {{widget type=\"Magento\\Catalog\\Block\\Category\\Widget\\Link\" anchor_text=\"massicot\" id_path=\"category/143\"}}, une {{widget type=\"Magento\\Catalog\\Block\\Category\\Widget\\Link\" anchor_text=\"cisaille\" id_path=\"category/142\"}} et une {{widget type=\"Magento\\Catalog\\Block\\Category\\Widget\\Link\" anchor_text=\"rogneuse\" id_path=\"category/144\"}} ? La longueur de coupe et l'épaisseur maximale acceptée varient considérablement d'un type d'appareil à l'autre. Le massicot, avec sa lame verticale qui s'abaisse sur toute la largeur, accepte les longueurs de coupe les plus importantes et tranche les piles les plus épaisses : vous posez une ramette entière, vous abaissez le levier, et la pile est débitée en une seule pression. C'est l'appareil à privilégier quand vous devez traiter des volumes importants au format A3 ou supérieur dans un service reprographie.</p>\n\n<p>La cisaille fonctionne avec une lame pivotante et accepte une épaisseur de coupe nettement inférieure à celle du massicot : vous coupez quelques feuilles à la fois, rarement plus. En revanche, sa longueur de coupe varie selon les modèles, et certaines cisailles de bureau atteignent des longueurs suffisantes pour travailler au format A3. Vous gagnez en maniabilité ce que vous perdez en capacité d'épaisseur. La rogneuse, elle, guide une lame circulaire sur un rail et coupe généralement une à quelques feuilles à la fois. Sa longueur de coupe dépend de la longueur du rail : les modèles compacts s'arrêtent au format A4, tandis que les versions plus longues montent jusqu'au A3 et au-delà. Consultez les fiches techniques de chaque référence pour vérifier que la longueur de coupe et l'épaisseur maximale correspondent à vos besoins réels.</p>\n\n<p>En résumé, si vous découpez des piles épaisses sur de grandes longueurs, orientez-vous vers un {{widget type=\"Magento\\Catalog\\Block\\Category\\Widget\\Link\" anchor_text=\"massicot\" id_path=\"category/143\"}}. Si vous travaillez feuille par feuille avec des finitions précises, une {{widget type=\"Magento\\Catalog\\Block\\Category\\Widget\\Link\" anchor_text=\"rogneuse\" id_path=\"category/144\"}} suffit. La {{widget type=\"Magento\\Catalog\\Block\\Category\\Widget\\Link\" anchor_text=\"cisaille\" id_path=\"category/142\"}} se place entre les deux, avec une capacité d'épaisseur modérée et une bonne amplitude de coupe selon le modèle choisi.</p>",
+      "finishedAt": "2026-04-08T15:04:25.481Z"
     }
   ]
 }
