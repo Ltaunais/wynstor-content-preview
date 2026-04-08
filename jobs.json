@@ -225,10 +225,12 @@
       "url": "65-couper-et-decouper",
       "slug": "65-couper-et-decouper",
       "type": "reword",
-      "status": "pending",
+      "status": "done",
       "sentence": "Orientez-vous vers une coupeuse capable de gérer des volumes importants en continu, puis complétez avec une rogneuse pour les travaux de finition qui demandent une coupe au millimètre. Deux machines aux fonctions complémentaires couvrent la totalité des besoins d'un atelier reprographie sans encombrer l'espace de travail.",
       "bannedWord": "machines",
-      "createdAt": "2026-04-08T15:13:48.850Z"
+      "createdAt": "2026-04-08T15:13:48.850Z",
+      "result": "Orientez-vous vers une coupeuse capable de gérer des volumes importants en continu, puis complétez avec une rogneuse pour les travaux de finition qui demandent une coupe au millimètre. Deux équipements aux fonctions complémentaires couvrent la totalité des besoins d'un atelier reprographie sans encombrer l'espace de travail.",
+      "finishedAt": "2026-04-08T15:14:32.403Z"
     }
   ]
 }
