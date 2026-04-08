@@ -12,22 +12,71 @@
 <link rel="stylesheet" href="https://dev3.wynstor.com/media/porto/configed_css/settings_default.css">
 <link rel="stylesheet" href="https://dev3.wynstor.com/media/porto/web/css/custom.css">
 <style>
-  body { background: #fff; }
+  body { background: #fff; margin: 0; }
+
+  /* === TOOLBAR CLAUDE === */
   .preview-bar { position: sticky; top: 0; z-index: 100; background: #212529; color: #fff; padding: 8px 20px; display: flex; align-items: center; justify-content: space-between; font-size: 13px; }
   .preview-bar .page-name { font-weight: 600; }
   .preview-bar .meta-info { font-size: 11px; opacity: 0.7; }
   .preview-bar button { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); color: #fff; padding: 5px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; }
   .preview-bar button:hover { background: rgba(255,255,255,0.25); }
-  .preview-wrapper { max-width: 1440px; margin: 0 auto; padding: 30px 15px; }
-  .preview-h1 { font-size: 28px; font-weight: 700; text-transform: uppercase; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #6f42c1; }
-  .preview-h1 em { font-style: normal; color: #6f42c1; }
-  .preview-intro { font-size: 1.1rem; line-height: 1.7; margin-bottom: 24px; color: #333; }
-  .preview-content { line-height: 1.75; }
-  /* Widget markers en preview */
-  .widget-preview { color: #6f42c1; text-decoration: underline; text-decoration-style: dotted; cursor: help; }
-  /* Responsive indicators */
   .viewport-btns { display: flex; gap: 4px; }
   .viewport-btns button.active { background: rgba(255,255,255,0.4); }
+
+  /* === HEADER WYNSTOR (simplifié fidèle) === */
+  .ws-topbar { background: #212529; color: #fff; font-size: 12px; padding: 6px 0; }
+  .ws-topbar-inner { max-width: 1440px; margin: 0 auto; padding: 0 15px; display: flex; justify-content: space-between; align-items: center; }
+  .ws-topbar a { color: rgba(255,255,255,0.7); text-decoration: none; }
+  .ws-topbar-left { display: flex; gap: 16px; }
+  .ws-topbar-right { display: flex; gap: 16px; }
+
+  .ws-header { background: #fff; border-bottom: 1px solid #e9ecef; padding: 12px 0; }
+  .ws-header-inner { max-width: 1440px; margin: 0 auto; padding: 0 15px; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+  .ws-logo img { height: 40px; }
+  .ws-search { flex: 1; max-width: 500px; }
+  .ws-search input { width: 100%; padding: 10px 16px; border: 2px solid #e9ecef; border-radius: 8px; font-size: 14px; }
+  .ws-search input:focus { outline: none; border-color: #6f42c1; }
+  .ws-header-actions { display: flex; gap: 16px; align-items: center; font-size: 13px; color: #6c757d; }
+  .ws-header-actions span { cursor: pointer; }
+
+  .ws-nav { background: #6f42c1; padding: 0; }
+  .ws-nav-inner { max-width: 1440px; margin: 0 auto; padding: 0 15px; display: flex; gap: 0; }
+  .ws-nav a { color: #fff; text-decoration: none; padding: 10px 16px; font-size: 13px; font-weight: 500; display: block; transition: background 0.15s; }
+  .ws-nav a:hover { background: rgba(255,255,255,0.15); }
+  .ws-nav a.active { background: rgba(0,0,0,0.15); }
+
+  /* === BREADCRUMB === */
+  .ws-breadcrumb { max-width: 1440px; margin: 0 auto; padding: 12px 15px; font-size: 12px; color: #6c757d; }
+  .ws-breadcrumb a { color: #6c757d; text-decoration: none; }
+  .ws-breadcrumb a:hover { color: #6f42c1; }
+  .ws-breadcrumb span { margin: 0 6px; }
+
+  /* === CONTENT === */
+  .preview-wrapper { max-width: 1440px; margin: 0 auto; padding: 0 15px 40px; }
+  .preview-h1 { font-size: 28px; font-weight: 700; text-transform: uppercase; margin: 0 0 20px; padding-bottom: 10px; }
+  .preview-h1 em { font-style: normal; color: #6f42c1; }
+  .preview-content { line-height: 1.75; }
+  .widget-preview { color: #6f42c1; text-decoration: underline; text-decoration-style: dotted; cursor: help; }
+
+  /* === FOOTER WYNSTOR (simplifié fidèle) === */
+  .ws-footer { background: #212529; color: rgba(255,255,255,0.7); padding: 40px 0 0; margin-top: 40px; }
+  .ws-footer-inner { max-width: 1440px; margin: 0 auto; padding: 0 15px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 32px; }
+  .ws-footer h3 { color: #fff; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px; }
+  .ws-footer ul { list-style: none; padding: 0; }
+  .ws-footer li { margin-bottom: 6px; font-size: 13px; }
+  .ws-footer a { color: rgba(255,255,255,0.6); text-decoration: none; }
+  .ws-footer a:hover { color: #fff; }
+  .ws-footer-bottom { border-top: 1px solid rgba(255,255,255,0.1); margin-top: 32px; padding: 16px 0; text-align: center; font-size: 12px; }
+
+  @media (max-width: 768px) {
+    .ws-header-inner { flex-wrap: wrap; }
+    .ws-search { max-width: 100%; order: 3; flex-basis: 100%; }
+    .ws-nav-inner { overflow-x: auto; }
+    .ws-footer-inner { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 480px) {
+    .ws-footer-inner { grid-template-columns: 1fr; }
+  }
 </style>
 </head>
 <body>
@@ -48,10 +97,105 @@
 </div>
 
 <div id="viewportWrapper" style="margin:0 auto;transition:max-width 0.3s">
+
+  <!-- HEADER WYNSTOR -->
+  <div class="ws-topbar">
+    <div class="ws-topbar-inner">
+      <div class="ws-topbar-left">
+        <span>Livraison offerte a partir de 200 EUR HT</span>
+        <span>|</span>
+        <span>Devis sous 24h</span>
+      </div>
+      <div class="ws-topbar-right">
+        <a href="#">04 99 54 50 00</a>
+        <a href="#">Mon compte</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="ws-header">
+    <div class="ws-header-inner">
+      <a class="ws-logo" href="#">
+        <img src="https://dev3.wynstor.com/static/version1775570575/frontend/Smartwave/porto_child/fr_FR/images/logo.svg" alt="Wynstor" height="40">
+      </a>
+      <div class="ws-search">
+        <input type="text" placeholder="Rechercher un produit, une marque..." disabled>
+      </div>
+      <div class="ws-header-actions">
+        <span>Mon compte</span>
+        <span>Devis (0)</span>
+        <span>Panier (0)</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="ws-nav">
+    <div class="ws-nav-inner">
+      <a href="#">Agrafer</a>
+      <a href="#" class="active">Couper et decouper</a>
+      <a href="#">Detruire et effacer</a>
+      <a href="#">Plastifier</a>
+      <a href="#">Relier</a>
+      <a href="#">Emballer</a>
+      <a href="#">Marques</a>
+    </div>
+  </div>
+
+  <!-- BREADCRUMB -->
+  <div class="ws-breadcrumb" id="previewBreadcrumb">
+    <a href="#">Accueil</a><span>/</span><span id="breadcrumbPage">Chargement...</span>
+  </div>
+
+  <!-- CONTENU -->
   <div class="preview-wrapper">
     <h1 class="preview-h1" id="previewH1"></h1>
     <div class="preview-content" id="previewContent">Chargement...</div>
   </div>
+
+  <!-- FOOTER WYNSTOR -->
+  <footer class="ws-footer">
+    <div class="ws-footer-inner">
+      <div>
+        <h3>Informations</h3>
+        <ul>
+          <li><a href="#">Qui sommes-nous ?</a></li>
+          <li><a href="#">Conditions generales de vente</a></li>
+          <li><a href="#">Mentions legales</a></li>
+          <li><a href="#">Politique de confidentialite</a></li>
+        </ul>
+      </div>
+      <div>
+        <h3>A propos de nous</h3>
+        <ul>
+          <li><a href="#">Notre histoire</a></li>
+          <li><a href="#">Nos engagements</a></li>
+          <li><a href="#">Blog</a></li>
+        </ul>
+      </div>
+      <div>
+        <h3>Aide et contact</h3>
+        <ul>
+          <li><a href="#">FAQ</a></li>
+          <li><a href="#">Nous contacter</a></li>
+          <li><a href="#">Suivi de commande</a></li>
+          <li>04 99 54 50 00</li>
+        </ul>
+      </div>
+      <div>
+        <h3>Les WynServices</h3>
+        <ul>
+          <li><a href="#">Livraison offerte des 200 EUR HT</a></li>
+          <li><a href="#">Devis personnalise sous 24h</a></li>
+          <li><a href="#">Conseil expert par telephone</a></li>
+          <li><a href="#">Paiement securise</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="ws-footer-bottom">
+      Wynstor.com - Grossiste en equipements de bureau depuis plus de 20 ans
+    </div>
+  </footer>
+
 </div>
 
 <script>
@@ -68,6 +212,7 @@ window.addEventListener('message', (e) => {
     document.getElementById('previewTitle').textContent = title || 'Preview';
     document.getElementById('previewMeta').textContent = meta ? ' — ' + meta : '';
     document.getElementById('previewH1').textContent = h1 || '';
+    document.getElementById('breadcrumbPage').textContent = h1 || '';
     
     // Process content
     let content = html
