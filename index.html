@@ -218,6 +218,17 @@
   /* Mots exclus */
   .excluded-word { background: rgba(240,61,61,0.15); text-decoration: line-through; text-decoration-color: var(--bad); cursor: help; }
 
+  /* Historique */
+  .history-item { border: 1px solid var(--border); border-radius: 8px; margin-bottom: 8px; overflow: hidden; }
+  .history-header { padding: 8px 10px; background: #f8f9fa; font-size: 11px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+  .history-header:hover { background: #f0f0f0; }
+  .history-h2 { font-weight: 600; color: #333; }
+  .history-date { color: var(--gray); font-size: 9px; }
+  .history-preview { display: none; padding: 10px; font-size: 12px; line-height: 1.5; color: var(--gray); max-height: 150px; overflow-y: auto; }
+  .history-preview.open { display: block; }
+  .history-restore { background: var(--pr); color: #fff; border: none; border-radius: 4px; padding: 2px 8px; font-size: 10px; cursor: pointer; }
+  .history-restore:hover { background: #5a32a3; }
+
   /* FAQ add/remove buttons */
   .faq-add-btn {
     display: flex; align-items: center; justify-content: center;
@@ -432,9 +443,13 @@
   <!-- RESIZE HANDLE -->
   <div class="resize-handle" id="resizeHandle"></div>
 
-  <!-- SIDEBAR DROITE : MÉDIA -->
+  <!-- SIDEBAR DROITE : MÉDIA + HISTORIQUE -->
   <div class="templates" id="templatesPanel">
-    <h2>Média</h2>
+    <div style="display:flex;gap:0;margin-bottom:12px;border-bottom:1px solid var(--border)">
+      <button class="right-tab active" onclick="switchRightTab('media')" id="rtMedia" style="flex:1;padding:8px;border:none;background:none;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1px;cursor:pointer;border-bottom:2px solid var(--pr);color:var(--pr)">Média</button>
+      <button class="right-tab" onclick="switchRightTab('history')" id="rtHistory" style="flex:1;padding:8px;border:none;background:none;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1px;cursor:pointer;border-bottom:2px solid transparent;color:var(--gray)">Historique</button>
+    </div>
+    <div id="rightPanelMedia">
     <!-- Drop zone -->
     <div id="mediaDropZone" style="border:2px dashed var(--border);border-radius:8px;padding:20px 12px;text-align:center;cursor:pointer;margin-bottom:12px;transition:all 0.2s">
       <div style="font-size:24px;margin-bottom:4px">&#128247;</div>
@@ -444,7 +459,13 @@
     <!-- Upload status -->
     <div id="mediaUploadStatus" style="font-size:11px;color:var(--gray);margin-bottom:8px;display:none"></div>
     <!-- Galerie -->
-    <div id="mediaGallery" style="display:grid;grid-template-columns:repeat(auto-fill, minmax(100px, 1fr));gap:6px;max-height:calc(100vh - 220px);overflow-y:auto">
+    <div id="mediaGallery" style="display:grid;grid-template-columns:repeat(auto-fill, minmax(100px, 1fr));gap:6px;max-height:calc(100vh - 260px);overflow-y:auto">
+    </div>
+    </div>
+    <!-- Panel Historique -->
+    <div id="rightPanelHistory" style="display:none">
+      <div style="font-size:11px;color:var(--gray);margin-bottom:8px">Versions précédentes des blocs régénérés</div>
+      <div id="historyList" style="max-height:calc(100vh - 200px);overflow-y:auto"></div>
     </div>
   </div>
 </div>
@@ -700,6 +721,8 @@ function renderEditor() {
       <div class="bloc-toolbar">
         <button onclick="moveBloc(this,-1)" title="Monter">&#8593;</button>
         <button onclick="moveBloc(this,1)" title="Descendre">&#8595;</button>
+        <button onclick="regenBloc(this)" title="Régénérer ce bloc">&#128260;</button>
+        <button onclick="dupeBloc(this)" title="Dupliquer ce bloc">&#128203;</button>
         <button onclick="saveBlocAsPreset(this)" title="Enregistrer comme preset">&#128190;</button>
         <button onclick="deleteBloc(this)" title="Supprimer">&#10005;</button>
       </div>
@@ -859,6 +882,45 @@ function moveBloc(btn, dir) {
     }
   }
   markDirty();
+}
+
+function dupeBloc(btn) {
+  const bloc = btn.closest('.bloc');
+  const content = bloc.querySelector('.bloc-content');
+  if (!content) return;
+
+  const newBloc = document.createElement('div');
+  newBloc.className = 'bloc';
+  newBloc.innerHTML = `
+    <div class="bloc-toolbar">
+      <button onclick="moveBloc(this,-1)" title="Monter">&#8593;</button>
+      <button onclick="moveBloc(this,1)" title="Descendre">&#8595;</button>
+      <button onclick="regenBloc(this)" title="Régénérer ce bloc">&#128260;</button>
+      <button onclick="dupeBloc(this)" title="Dupliquer ce bloc">&#128203;</button>
+      <button onclick="saveBlocAsPreset(this)" title="Enregistrer comme preset">&#128190;</button>
+      <button onclick="deleteBloc(this)" title="Supprimer">&#10005;</button>
+    </div>
+    <div class="bloc-content" contenteditable="true" oninput="markDirty()">${content.innerHTML}</div>
+  `;
+  const newBar = document.createElement('div');
+  newBar.className = 'insert-bar';
+  newBar.innerHTML = '<button onclick="showInsertMenu(this)" title="Insérer un bloc">+</button>';
+
+  // Insérer après le bloc actuel
+  const nextBar = bloc.nextElementSibling;
+  if (nextBar) {
+    nextBar.after(newBloc);
+    newBloc.after(newBar);
+  } else {
+    bloc.parentNode.appendChild(newBloc);
+    bloc.parentNode.appendChild(newBar);
+  }
+
+  setupImageDropTargets();
+  setupFaqButtons();
+  highlightBlacklistedWords();
+  markDirty();
+  toast('Bloc dupliqué');
 }
 
 function saveBlocAsPreset(btn) {
@@ -1559,6 +1621,7 @@ async function initApp() {
   await loadFavorites();
   await loadBlacklist();
   loadMediaGallery();
+  renderHistory();
   try {
     const res = await fetch('pages.json');
     pagesData = await res.json();
@@ -2212,6 +2275,190 @@ function pollJobStatus(jobId) {
       }
     } catch(e) {}
   }, 10000); // Poll toutes les 10 secondes
+}
+
+// === TABS DROITE (Média / Historique) ===
+function switchRightTab(tab) {
+  document.getElementById('rightPanelMedia').style.display = tab === 'media' ? '' : 'none';
+  document.getElementById('rightPanelHistory').style.display = tab === 'history' ? '' : 'none';
+  document.getElementById('rtMedia').style.borderBottomColor = tab === 'media' ? 'var(--pr)' : 'transparent';
+  document.getElementById('rtMedia').style.color = tab === 'media' ? 'var(--pr)' : 'var(--gray)';
+  document.getElementById('rtHistory').style.borderBottomColor = tab === 'history' ? 'var(--pr)' : 'transparent';
+  document.getElementById('rtHistory').style.color = tab === 'history' ? 'var(--pr)' : 'var(--gray)';
+}
+
+// === HISTORIQUE DES BLOCS ===
+let blocHistory = JSON.parse(localStorage.getItem('ws_bloc_history') || '[]');
+
+function addToHistory(h2Text, htmlContent) {
+  blocHistory.unshift({
+    h2: h2Text,
+    html: htmlContent,
+    date: new Date().toISOString()
+  });
+  // Garder max 50 entrées
+  if (blocHistory.length > 50) blocHistory = blocHistory.slice(0, 50);
+  localStorage.setItem('ws_bloc_history', JSON.stringify(blocHistory));
+  renderHistory();
+}
+
+function renderHistory() {
+  const list = document.getElementById('historyList');
+  if (!list) return;
+  list.textContent = '';
+
+  if (blocHistory.length === 0) {
+    list.textContent = 'Aucun historique';
+    list.style.cssText = 'font-size:12px;color:var(--gray);padding:8px';
+    return;
+  }
+
+  blocHistory.forEach(function(item, idx) {
+    const div = document.createElement('div');
+    div.className = 'history-item';
+
+    const header = document.createElement('div');
+    header.className = 'history-header';
+
+    const h2span = document.createElement('span');
+    h2span.className = 'history-h2';
+    h2span.textContent = item.h2 || 'Bloc';
+    header.appendChild(h2span);
+
+    const dateSpan = document.createElement('span');
+    dateSpan.className = 'history-date';
+    const d = new Date(item.date);
+    dateSpan.textContent = d.toLocaleDateString('fr') + ' ' + d.toLocaleTimeString('fr', {hour:'2-digit',minute:'2-digit'});
+    header.appendChild(dateSpan);
+
+    const preview = document.createElement('div');
+    preview.className = 'history-preview';
+
+    const previewText = document.createElement('div');
+    previewText.textContent = item.html.replace(/<[^>]+>/g, '').substring(0, 200) + '...';
+    preview.appendChild(previewText);
+
+    const restoreBtn = document.createElement('button');
+    restoreBtn.className = 'history-restore';
+    restoreBtn.textContent = 'Restaurer ce bloc';
+    restoreBtn.style.marginTop = '8px';
+    restoreBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      // Insérer en tant que nouveau bloc dans l'éditeur
+      const editor = document.getElementById('editor');
+      const lastInsertBar = editor.querySelector('.insert-bar:last-child') || editor.lastElementChild;
+      if (lastInsertBar) {
+        insertTemplate(lastInsertBar, null);
+        // Remplacer le contenu du dernier bloc ajouté
+        const blocs = editor.querySelectorAll('.bloc');
+        const lastBloc = blocs[blocs.length - 1];
+        if (lastBloc) {
+          const content = lastBloc.querySelector('.bloc-content');
+          if (content) content.innerHTML = item.html;
+        }
+      }
+      toast('Bloc restauré');
+      markDirty();
+    });
+    preview.appendChild(restoreBtn);
+
+    header.addEventListener('click', function() {
+      preview.classList.toggle('open');
+    });
+
+    div.appendChild(header);
+    div.appendChild(preview);
+    list.appendChild(div);
+  });
+}
+
+// === RÉGÉNÉRER UN BLOC ===
+function regenBloc(btn) {
+  const bloc = btn.closest('.bloc');
+  const content = bloc.querySelector('.bloc-content');
+  if (!content) return;
+
+  // Sauvegarder l'ancienne version dans l'historique
+  const h2 = content.querySelector('.ws-h2');
+  const h2Text = h2 ? h2.textContent : 'Bloc';
+  addToHistory(h2Text, content.innerHTML);
+
+  // Soumettre un mini-job de régénération
+  const token = getToken();
+  if (!token) { showTokenModal(); return; }
+
+  const slug = currentFile ? currentFile.replace('pages/','').replace('.html','') : '';
+  if (!slug) { toast('Pas de page active'); return; }
+
+  // Remplacer le contenu par un placeholder
+  const originalHtml = content.innerHTML;
+  content.innerHTML = '<p style="color:var(--pr);font-style:italic">Régénération en cours...</p>';
+
+  // Soumettre le job
+  (async function() {
+    try {
+      const getRes = await fetch('https://api.github.com/repos/' + REPO + '/contents/jobs.json?ref=' + BRANCH + '&_=' + Date.now(), {
+        headers: { 'Authorization': 'token ' + token }, cache: 'no-store'
+      });
+      const getData = await getRes.json();
+      const jobsContent = JSON.parse(decodeURIComponent(escape(atob(getData.content.replace(/\n/g, '')))));
+
+      const jobId = 'regen-' + Date.now();
+      jobsContent.jobs.push({
+        id: jobId,
+        url: slug,
+        slug: slug,
+        type: 'regen-bloc',
+        status: 'pending',
+        h2: h2Text,
+        createdAt: new Date().toISOString()
+      });
+
+      const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(jobsContent, null, 2))));
+      const putRes = await fetch('https://api.github.com/repos/' + REPO + '/contents/jobs.json', {
+        method: 'PUT',
+        headers: { 'Authorization': 'token ' + token, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: 'regen: ' + h2Text, content: encoded, sha: getData.sha, branch: BRANCH })
+      });
+
+      if (putRes.ok) {
+        toast('Régénération lancée : ' + h2Text);
+        // Poll pour le résultat
+        const pollRegen = setInterval(async function() {
+          try {
+            const r = await fetch('https://api.github.com/repos/' + REPO + '/contents/jobs.json?ref=' + BRANCH + '&_=' + Date.now(), {
+              headers: { 'Authorization': 'token ' + token }, cache: 'no-store'
+            });
+            const d = await r.json();
+            const jobs = JSON.parse(decodeURIComponent(escape(atob(d.content.replace(/\n/g, ''))))).jobs;
+            const j = jobs.find(function(x) { return x.id === jobId; });
+            if (j && j.status === 'done' && j.result) {
+              clearInterval(pollRegen);
+              content.innerHTML = '<h2 class="ws-h2">' + h2Text + '</h2>\n' + j.result;
+              setupImageDropTargets();
+              setupFaqButtons();
+              highlightBlacklistedWords();
+              markDirty();
+              toast('Bloc régénéré');
+            } else if (j && j.status === 'error') {
+              clearInterval(pollRegen);
+              content.innerHTML = originalHtml;
+              toast('Erreur régénération');
+            }
+          } catch(e) {}
+        }, 10000);
+
+        // Timeout 5 min
+        setTimeout(function() { clearInterval(pollRegen); if (content.innerHTML.includes('en cours')) content.innerHTML = originalHtml; }, 300000);
+      }
+    } catch(e) {
+      content.innerHTML = originalHtml;
+      toast('Erreur: ' + e.message);
+    }
+  })();
+
+  // Switch sur l'onglet historique
+  switchRightTab('history');
 }
 
 // === RESIZE SIDEBAR MÉDIA ===
