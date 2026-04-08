@@ -350,38 +350,35 @@
 
 <div class="layout">
   <!-- SIDEBAR GAUCHE -->
-  <div class="sidebar" style="display:flex;flex-direction:column">
-    <!-- Pages travaillées (haut, scrollable) -->
-    <div>
+  <div class="sidebar" style="display:flex;flex-direction:column;padding:0;overflow:hidden">
+    <!-- Zone scrollable : Pages + Config + Arbo -->
+    <div style="flex:1;overflow-y:auto;padding:16px">
+      <!-- Pages travaillées -->
       <h2>Pages</h2>
-      <ul class="file-list" id="fileList">
-        <!-- Chargé dynamiquement depuis pages.json -->
-      </ul>
+      <ul class="file-list" id="fileList"></ul>
+
+      <!-- Config -->
+      <div style="margin-top:16px">
+        <h2>Config</h2>
+        <button class="btn" style="width:100%;margin-bottom:6px" onclick="showTokenModal()">Token GitHub</button>
+      </div>
+
+      <!-- Arbo complète (toggle) -->
+      <div style="margin-top:12px;border-top:1px solid var(--border);padding-top:12px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+          <h2 style="margin:0;font-size:10px">Arborescence</h2>
+          <button class="btn" id="toggleTreeBtn" onclick="toggleTree()" style="font-size:9px;padding:2px 8px">Afficher</button>
+        </div>
+        <ul class="file-list" id="treeList" style="display:none"></ul>
+      </div>
     </div>
 
-    <!-- Config -->
-    <div style="margin-top:16px">
-      <h2>Config</h2>
-      <button class="btn" style="width:100%;margin-bottom:6px" onclick="showTokenModal()">Token GitHub</button>
-    </div>
-
-    <!-- Générer SEO (sticky en bas, z-index pour rester au-dessus de l'arbo) -->
-    <div style="position:sticky;bottom:0;background:var(--card);border-top:1px solid var(--border);padding:12px 0 4px;margin-top:auto;z-index:5;box-shadow:0 -4px 12px rgba(0,0,0,0.08)">
+    <!-- Générer SEO (fixe en bas, jamais caché) -->
+    <div style="flex-shrink:0;background:var(--card);border-top:1px solid var(--border);padding:12px 16px;box-shadow:0 -4px 12px rgba(0,0,0,0.08)">
       <h2>Générer SEO</h2>
       <input type="text" id="seoUrlInput" placeholder="/142-cisailles" style="width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:6px;font-size:12px;margin-bottom:6px">
       <button class="btn btn-primary" style="width:100%;margin-bottom:4px" onclick="submitSeoJob()">Lancer Claude Code</button>
-      <div id="seoJobStatus" style="font-size:11px;color:var(--gray);margin-bottom:8px;display:none"></div>
-    </div>
-
-    <!-- Arbo complète (en dessous, toggle) -->
-    <div style="margin-top:12px;border-top:1px solid var(--border);padding-top:12px">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-        <h2 style="margin:0;font-size:10px">Arborescence</h2>
-        <button class="btn" id="toggleTreeBtn" onclick="toggleTree()" style="font-size:9px;padding:2px 8px">Afficher</button>
-      </div>
-      <ul class="file-list" id="treeList" style="display:none">
-        <!-- Arbo complète -->
-      </ul>
+      <div id="seoJobStatus" style="font-size:11px;color:var(--gray);margin-bottom:4px;display:none"></div>
     </div>
   </div>
 
