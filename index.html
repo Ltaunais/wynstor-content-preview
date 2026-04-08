@@ -351,7 +351,10 @@
 <div class="layout">
   <!-- SIDEBAR GAUCHE -->
   <div class="sidebar">
-    <h2>Pages</h2>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+      <h2 style="margin:0">Pages</h2>
+      <button class="btn" id="toggleTreeBtn" onclick="toggleTree()" style="font-size:10px;padding:3px 8px">Arbo</button>
+    </div>
     <ul class="file-list" id="fileList">
       <!-- Chargé dynamiquement depuis pages.json -->
     </ul>
@@ -1327,6 +1330,62 @@ function updateStats() {
 }
 
 // === INIT ===
+let pagesData = null;
+let showFullTree = false;
+
+function renderPagesList() {
+  if (!pagesData) return;
+  const list = document.getElementById('fileList');
+  list.textContent = '';
+
+  const levels = { 'N0': 0, 'N1': 1, 'N2': 2, 'N3': 3, 'N4': 4 };
+  const statusIcons = { 'done': '\u2705', 'review': '\ud83d\udfe1', 'draft': '\u270f\ufe0f', 'todo': '' };
+
+  const filtered = showFullTree
+    ? pagesData.pages
+    : pagesData.pages.filter(p => p.status !== 'todo');
+
+  filtered.forEach((p) => {
+    const li = document.createElement('li');
+    const a = document.createElement('a');
+    a.href = '#';
+    a.dataset.file = p.file;
+    const indent = (levels[p.level] || 0) * 12;
+    a.style.paddingLeft = (10 + indent) + 'px';
+    if (p.status === 'todo') a.style.opacity = '0.4';
+
+    const catSpan = document.createElement('span');
+    catSpan.className = 'cat-id';
+    catSpan.textContent = p.id;
+    a.appendChild(catSpan);
+    a.appendChild(document.createTextNode(' ' + (statusIcons[p.status] || '') + ' ' + p.name));
+
+    a.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (p.status === 'todo') {
+        // Pas de contenu, proposer de générer
+        document.getElementById('seoUrlInput').value = p.id + '-' + p.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+        toast('Pas de contenu. Lancez la génération.');
+      } else {
+        loadFile(p.file);
+      }
+    });
+    li.appendChild(a);
+    list.appendChild(li);
+  });
+
+  // Update bouton
+  const btn = document.getElementById('toggleTreeBtn');
+  btn.textContent = showFullTree ? 'Masquer' : 'Arbo';
+  btn.style.background = showFullTree ? 'var(--pr)' : '';
+  btn.style.color = showFullTree ? '#fff' : '';
+}
+
+function toggleTree() {
+  showFullTree = !showFullTree;
+  renderPagesList();
+}
+
 async function initApp() {
   await loadBlocks();
   await loadCustomBlocks();
@@ -1334,35 +1393,12 @@ async function initApp() {
   loadMediaGallery();
   try {
     const res = await fetch('pages.json');
-    const data = await res.json();
-    const list = document.getElementById('fileList');
-    list.textContent = '';
+    pagesData = await res.json();
+    renderPagesList();
 
-    const levels = { 'N0': 0, 'N1': 1, 'N2': 2, 'N3': 3 };
-    const statusIcons = { 'done': '\u2705', 'review': '\ud83d\udfe1', 'draft': '\u270f\ufe0f' };
-
-    data.pages.forEach((p) => {
-      const li = document.createElement('li');
-      const a = document.createElement('a');
-      a.href = '#';
-      a.dataset.file = p.file;
-      const indent = (levels[p.level] || 0) * 12;
-      a.style.paddingLeft = (10 + indent) + 'px';
-
-      const catSpan = document.createElement('span');
-      catSpan.className = 'cat-id';
-      catSpan.textContent = p.id;
-      a.appendChild(catSpan);
-      a.appendChild(document.createTextNode(' ' + (statusIcons[p.status] || '') + ' ' + p.name));
-
-      a.addEventListener('click', (e) => { e.preventDefault(); loadFile(p.file); });
-      li.appendChild(a);
-      list.appendChild(li);
-    });
-
-    if (data.pages.length > 0) {
-      loadFile(data.pages[0].file);
-    }
+    // Charger la première page avec contenu
+    const firstDraft = pagesData.pages.find(p => p.status !== 'todo');
+    if (firstDraft) loadFile(firstDraft.file);
   } catch(e) {
     const list = document.getElementById('fileList');
     const li = document.createElement('li');
