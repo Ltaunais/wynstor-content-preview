@@ -475,6 +475,16 @@
       "startedAt": "2026-04-08T17:57:19.662Z",
       "result": "Le choix des agrafes compte autant que celui de l'agrafeuse. Une agrafe trop courte ne traversera pas le bloc de feuilles ; une agrafe inadaptée se tordra dans le mécanisme. Vérifiez la compatibilité entre le calibre d'agrafes et votre agrafeuse avant toute commande. Vous trouverez aussi dans la rubrique accessoires les pièces de rechange et consommables pour maintenir votre équipement en état de fonctionnement quotidien.H3+IA",
       "finishedAt": "2026-04-08T17:57:30.376Z"
+    },
+    {
+      "id": "reword-1775671073871",
+      "url": "4-agrafer",
+      "slug": "4-agrafer",
+      "type": "reword",
+      "status": "pending",
+      "sentence": "Vous complétez votre commande avec des accessoires — dégrafeuses, recharges spécifiques — pour que chaque poste reste opérationnel sans attendre la prochaine livraison. Regrouper vos achats sur un même fournisseur, c'est un bon de commande unique, une seule réception et moins de temps perdu en suivi administratif.H3+IA",
+      "bannedWord": "—",
+      "createdAt": "2026-04-08T17:57:53.871Z"
     }
   ]
 }
