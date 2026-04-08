@@ -1725,6 +1725,11 @@ function cleanBlocHtml(blocHtml) {
     }
   }
 
+  // Wrapper <section> autour des blocs H2 (pas FAQ, pas ws-faq)
+  if (blocHtml.indexOf('<h2') !== -1 && blocHtml.indexOf('faq-item') === -1 && blocHtml.indexOf('<section') === -1) {
+    blocHtml = '<section>' + blocHtml + '</section>';
+  }
+
   return blocHtml;
 }
 
