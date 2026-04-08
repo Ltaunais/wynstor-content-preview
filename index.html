@@ -797,12 +797,25 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-// === DIRTY STATE ===
+// === DIRTY STATE + AUTO-SAVE ===
+let autoSaveTimer = null;
+const AUTO_SAVE_DELAY = 3000; // 3 secondes après la dernière modif
+
 function markDirty() {
   dirty = true;
   document.getElementById('saveStatus').textContent = 'Modifications non sauvegardées';
   document.getElementById('saveStatus').style.color = 'var(--warn)';
   updateStats();
+
+  // Auto-save : relancer le timer à chaque modif
+  clearTimeout(autoSaveTimer);
+  if (getToken()) {
+    autoSaveTimer = setTimeout(() => {
+      document.getElementById('saveStatus').textContent = 'Auto-save...';
+      document.getElementById('saveStatus').style.color = 'var(--pr)';
+      saveToGithub();
+    }, AUTO_SAVE_DELAY);
+  }
 }
 
 // === COLLECT HTML ===
