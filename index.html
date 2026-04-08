@@ -1364,8 +1364,15 @@ function renderPagesList() {
     a.addEventListener('click', (e) => {
       e.preventDefault();
       if (p.status === 'todo') {
-        document.getElementById('seoUrlInput').value = p.file.replace('pages/','').replace('.html','');
-        toast('Pas de contenu. Lancez la génération.');
+        const slug = p.file.replace('pages/','').replace('.html','');
+        document.getElementById('seoUrlInput').value = slug;
+        document.getElementById('pageTitle').textContent = p.name;
+        document.getElementById('metaBar').innerHTML = '';
+        document.getElementById('editor').innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:300px;color:var(--gray);text-align:center;padding:40px"><div style="font-size:48px;margin-bottom:16px;opacity:0.3">&#128196;</div><div style="font-size:16px;font-weight:600;margin-bottom:8px;color:#333">' + p.name + '</div><div style="font-size:13px;margin-bottom:20px">Le contenu de cette cat\u00e9gorie n\'a pas encore \u00e9t\u00e9 g\u00e9n\u00e9r\u00e9.</div><div style="font-size:12px;color:var(--pr)">Entrez le slug dans &laquo; G\u00e9n\u00e9rer SEO &raquo; et cliquez &laquo; Lancer Claude Code &raquo;</div></div>';
+        document.getElementById('statsBar').innerHTML = '';
+        currentFile = p.file;
+        currentSha = null;
+        dirty = false;
       } else {
         loadFile(p.file);
       }
