@@ -13,7 +13,8 @@
       "file": "pages/152-agrafes.html",
       "name": "Agrafes pour tous usages",
       "level": "N1",
-      "status": "draft"
+      "status": "draft",
+      "design": "faceting"
     },
     {
       "id": "156",
