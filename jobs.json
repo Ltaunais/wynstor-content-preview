@@ -311,10 +311,11 @@
       "url": "65-couper-et-decouper",
       "slug": "65-couper-et-decouper",
       "type": "regen-bloc",
-      "status": "pending",
+      "status": "processing",
       "h2": "Identifiez d'abord la marque et le modèle de votre appareil,",
       "instruction": "Rédige un sous-paragraphe de 2-3 phrases pour le H3 \"Identifiez d'abord la marque et le modèle de votre appareil,\". Contexte du paragraphe original : \"Identifiez d'abord la marque et le modèle de votre appareil, qu'il s'agisse d'une cisaille, d'un massicot ou d'une rogneuse. Chaque constructeur conço\". Développe ce point spécifique.",
-      "createdAt": "2026-04-08T15:37:00.805Z"
+      "createdAt": "2026-04-08T15:37:00.805Z",
+      "startedAt": "2026-04-08T15:37:02.645Z"
     }
   ]
 }
