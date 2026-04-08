@@ -889,8 +889,12 @@ async function saveToGithub() {
   document.getElementById('saveStatus').style.color = 'var(--pr)';
 
   try {
-    // Toujours récupérer le SHA frais avant d'écrire
-    currentSha = await fetchCurrentSha(token);
+    // Récupérer le SHA seulement si on n'en a pas (premier save ou après reload)
+    // Après un save réussi, currentSha est déjà à jour via la réponse PUT
+    if (!currentSha) {
+      currentSha = await fetchCurrentSha(token);
+    }
+    console.log('[save] using SHA:', currentSha);
 
     const content = collectHtml();
     const encoded = btoa(unescape(encodeURIComponent(content)));
