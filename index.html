@@ -862,14 +862,18 @@ let saveQueued = false;
 
 async function fetchCurrentSha(token) {
   try {
-    const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${currentFile}?ref=${BRANCH}`, {
-      headers: { 'Authorization': `token ${token}` }
+    const url = `https://api.github.com/repos/${REPO}/contents/${currentFile}?ref=${BRANCH}&t=${Date.now()}`;
+    const res = await fetch(url, {
+      headers: { 'Authorization': `token ${token}`, 'If-None-Match': '' },
+      cache: 'no-store'
     });
     if (res.ok) {
       const data = await res.json();
+      console.log('[save] SHA fetched:', data.sha);
       return data.sha;
     }
-  } catch(e) {}
+    console.warn('[save] fetchSha status:', res.status);
+  } catch(e) { console.error('[save] fetchSha error:', e); }
   return null;
 }
 
@@ -897,6 +901,7 @@ async function saveToGithub() {
       branch: BRANCH
     };
     if (currentSha) body.sha = currentSha;
+    console.log('[save] PUT with SHA:', currentSha);
 
     const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${currentFile}`, {
       method: 'PUT',
