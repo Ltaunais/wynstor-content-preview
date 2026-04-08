@@ -350,23 +350,38 @@
 
 <div class="layout">
   <!-- SIDEBAR GAUCHE -->
-  <div class="sidebar">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-      <h2 style="margin:0">Pages</h2>
-      <button class="btn" id="toggleTreeBtn" onclick="toggleTree()" style="font-size:10px;padding:3px 8px">Arbo</button>
+  <div class="sidebar" style="display:flex;flex-direction:column">
+    <!-- Pages travaillées (haut, scrollable) -->
+    <div>
+      <h2>Pages</h2>
+      <ul class="file-list" id="fileList">
+        <!-- Chargé dynamiquement depuis pages.json -->
+      </ul>
     </div>
-    <ul class="file-list" id="fileList">
-      <!-- Chargé dynamiquement depuis pages.json -->
-    </ul>
-    <div style="margin-top:24px">
+
+    <!-- Config -->
+    <div style="margin-top:16px">
+      <h2>Config</h2>
+      <button class="btn" style="width:100%;margin-bottom:6px" onclick="showTokenModal()">Token GitHub</button>
+    </div>
+
+    <!-- Générer SEO (sticky en bas) -->
+    <div style="position:sticky;bottom:0;background:var(--card);border-top:1px solid var(--border);padding:12px 0 0;margin-top:auto">
       <h2>Générer SEO</h2>
       <input type="text" id="seoUrlInput" placeholder="/142-cisailles" style="width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:6px;font-size:12px;margin-bottom:6px">
       <button class="btn btn-primary" style="width:100%;margin-bottom:4px" onclick="submitSeoJob()">Lancer Claude Code</button>
-      <div id="seoJobStatus" style="font-size:11px;color:var(--gray);margin-bottom:12px;display:none"></div>
+      <div id="seoJobStatus" style="font-size:11px;color:var(--gray);margin-bottom:8px;display:none"></div>
     </div>
-    <div style="margin-top:12px">
-      <h2>Config</h2>
-      <button class="btn" style="width:100%;margin-bottom:6px" onclick="showTokenModal()">Token GitHub</button>
+
+    <!-- Arbo complète (en dessous, toggle) -->
+    <div style="margin-top:12px;border-top:1px solid var(--border);padding-top:12px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <h2 style="margin:0;font-size:10px">Arborescence</h2>
+        <button class="btn" id="toggleTreeBtn" onclick="toggleTree()" style="font-size:9px;padding:2px 8px">Afficher</button>
+      </div>
+      <ul class="file-list" id="treeList" style="display:none">
+        <!-- Arbo complète -->
+      </ul>
     </div>
   </div>
 
@@ -1335,17 +1350,11 @@ let showFullTree = false;
 
 function renderPagesList() {
   if (!pagesData) return;
-  const list = document.getElementById('fileList');
-  list.textContent = '';
 
   const levels = { 'N0': 0, 'N1': 1, 'N2': 2, 'N3': 3, 'N4': 4 };
   const statusIcons = { 'done': '\u2705', 'review': '\ud83d\udfe1', 'draft': '\u270f\ufe0f', 'todo': '' };
 
-  const filtered = showFullTree
-    ? pagesData.pages
-    : pagesData.pages.filter(p => p.status !== 'todo');
-
-  filtered.forEach((p) => {
+  function buildItem(p, targetList) {
     const li = document.createElement('li');
     const a = document.createElement('a');
     a.href = '#';
@@ -1363,27 +1372,42 @@ function renderPagesList() {
     a.addEventListener('click', (e) => {
       e.preventDefault();
       if (p.status === 'todo') {
-        // Pas de contenu, proposer de générer
-        document.getElementById('seoUrlInput').value = p.id + '-' + p.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+        document.getElementById('seoUrlInput').value = p.file.replace('pages/','').replace('.html','');
         toast('Pas de contenu. Lancez la génération.');
       } else {
         loadFile(p.file);
       }
     });
     li.appendChild(a);
-    list.appendChild(li);
-  });
+    targetList.appendChild(li);
+  }
 
-  // Update bouton
-  const btn = document.getElementById('toggleTreeBtn');
-  btn.textContent = showFullTree ? 'Masquer' : 'Arbo';
-  btn.style.background = showFullTree ? 'var(--pr)' : '';
-  btn.style.color = showFullTree ? '#fff' : '';
+  // Liste principale : pages travaillées uniquement
+  const mainList = document.getElementById('fileList');
+  mainList.textContent = '';
+  pagesData.pages.filter(p => p.status !== 'todo').forEach(p => buildItem(p, mainList));
+
+  if (mainList.children.length === 0) {
+    const li = document.createElement('li');
+    li.style.cssText = 'font-size:11px;color:var(--gray);padding:8px';
+    li.textContent = 'Aucune page travaillée';
+    mainList.appendChild(li);
+  }
+
+  // Arbo complète
+  const treeList = document.getElementById('treeList');
+  treeList.textContent = '';
+  pagesData.pages.forEach(p => buildItem(p, treeList));
 }
 
 function toggleTree() {
   showFullTree = !showFullTree;
-  renderPagesList();
+  const treeList = document.getElementById('treeList');
+  const btn = document.getElementById('toggleTreeBtn');
+  treeList.style.display = showFullTree ? '' : 'none';
+  btn.textContent = showFullTree ? 'Masquer' : 'Afficher';
+  btn.style.background = showFullTree ? 'var(--pr)' : '';
+  btn.style.color = showFullTree ? '#fff' : '';
 }
 
 async function initApp() {
