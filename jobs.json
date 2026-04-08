@@ -121,9 +121,10 @@
       "url": "COUPER ET DÉCOUPER",
       "slug": "COUPER ET DÉCOUPER",
       "type": "analyse",
-      "status": "processing",
+      "status": "error",
       "createdAt": "2026-04-08T14:22:30.252Z",
-      "startedAt": "2026-04-08T14:22:46.318Z"
+      "startedAt": "2026-04-08T14:22:46.318Z",
+      "finishedAt": "2026-04-08T14:24:04.344Z"
     }
   ]
 }
