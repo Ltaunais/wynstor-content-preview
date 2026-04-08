@@ -392,9 +392,12 @@
     <div style="flex-shrink:0;background:var(--card);border-top:1px solid var(--border);padding:12px 16px;box-shadow:0 -4px 12px rgba(0,0,0,0.08)">
       <h2>Générer SEO</h2>
       <input type="text" id="seoUrlInput" placeholder="/142-cisailles" style="width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:6px;font-size:12px;margin-bottom:6px">
-      <div style="display:flex;gap:4px;margin-bottom:4px">
+      <div style="display:flex;gap:4px;margin-bottom:4px" id="seoButtons">
         <button class="btn btn-primary" style="flex:1;font-size:11px" onclick="submitSeoJob('analyse')">1. Analyser</button>
         <button class="btn btn-ok" style="flex:1;font-size:11px" onclick="submitSeoJob('redaction')">2. Rédiger</button>
+      </div>
+      <div id="seoCancelBtn" style="display:none;margin-bottom:4px">
+        <button class="btn" style="width:100%;font-size:11px;background:var(--bad);color:#fff;border-color:var(--bad)" onclick="cancelSeoJob()">Annuler</button>
       </div>
       <div id="seoJobStatus" style="font-size:11px;color:var(--gray);margin-bottom:4px;display:none"></div>
     </div>
@@ -1953,6 +1956,39 @@ IMPORTANT :
 
 // === SEO JOB QUEUE ===
 let jobPollTimer = null;
+let currentJobId = null;
+
+async function cancelSeoJob() {
+  if (!currentJobId) return;
+  const token = getToken();
+  if (!token) return;
+
+  try {
+    const getRes = await fetch(`https://api.github.com/repos/${REPO}/contents/jobs.json?ref=${BRANCH}&_=${Date.now()}`, {
+      headers: { 'Authorization': `token ${token}` }, cache: 'no-store'
+    });
+    const getData = await getRes.json();
+    const jobsContent = JSON.parse(decodeURIComponent(escape(atob(getData.content.replace(/\n/g, '')))));
+
+    const job = jobsContent.jobs.find(function(j) { return j.id === currentJobId; });
+    if (job) job.status = 'cancelled';
+
+    const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(jobsContent, null, 2))));
+    await fetch(`https://api.github.com/repos/${REPO}/contents/jobs.json`, {
+      method: 'PUT',
+      headers: { 'Authorization': `token ${token}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: 'cancel job', content: encoded, sha: getData.sha, branch: BRANCH })
+    });
+  } catch(e) {}
+
+  clearInterval(jobPollTimer);
+  currentJobId = null;
+  document.getElementById('seoButtons').style.display = 'flex';
+  document.getElementById('seoCancelBtn').style.display = 'none';
+  document.getElementById('seoJobStatus').textContent = 'Annulé';
+  document.getElementById('seoJobStatus').style.color = 'var(--gray)';
+  toast('Job annulé');
+}
 
 async function submitSeoJob(jobType) {
   const token = getToken();
@@ -2025,9 +2061,11 @@ async function submitSeoJob(jobType) {
     });
 
     if (putRes.ok) {
+      currentJobId = jobId;
+      document.getElementById('seoButtons').style.display = 'none';
+      document.getElementById('seoCancelBtn').style.display = '';
       status.textContent = 'Job soumis. Claude Code traite...';
       toast('Job SEO soumis : ' + slug);
-      // Commencer à poll le status
       pollJobStatus(jobId);
     } else {
       status.textContent = 'Erreur soumission';
@@ -2068,6 +2106,9 @@ function pollJobStatus(jobId) {
         status.textContent = 'Terminé ! Chargement de la page...';
         status.style.color = 'var(--ok)';
         clearInterval(jobPollTimer);
+        currentJobId = null;
+        document.getElementById('seoButtons').style.display = 'flex';
+        document.getElementById('seoCancelBtn').style.display = 'none';
         toast('Contenu SEO généré !');
         // Charger la page générée
         setTimeout(() => {
@@ -2077,6 +2118,9 @@ function pollJobStatus(jobId) {
         status.textContent = 'Erreur de génération';
         status.style.color = 'var(--bad)';
         clearInterval(jobPollTimer);
+        currentJobId = null;
+        document.getElementById('seoButtons').style.display = 'flex';
+        document.getElementById('seoCancelBtn').style.display = 'none';
       } else {
         status.textContent = 'En attente du worker' + dotsStr;
       }
