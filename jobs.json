@@ -377,9 +377,10 @@
       "url": "4-agrafer",
       "slug": "4-agrafer",
       "type": "analyse",
-      "status": "processing",
+      "status": "error",
       "createdAt": "2026-04-08T17:18:12.689Z",
-      "startedAt": "2026-04-08T17:18:14.382Z"
+      "startedAt": "2026-04-08T17:18:14.382Z",
+      "finishedAt": "2026-04-08T17:21:17.350Z"
     }
   ]
 }
