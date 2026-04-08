@@ -365,8 +365,8 @@
       <button class="btn" style="width:100%;margin-bottom:6px" onclick="showTokenModal()">Token GitHub</button>
     </div>
 
-    <!-- Générer SEO (sticky en bas) -->
-    <div style="position:sticky;bottom:0;background:var(--card);border-top:1px solid var(--border);padding:12px 0 0;margin-top:auto">
+    <!-- Générer SEO (sticky en bas, z-index pour rester au-dessus de l'arbo) -->
+    <div style="position:sticky;bottom:0;background:var(--card);border-top:1px solid var(--border);padding:12px 0 4px;margin-top:auto;z-index:5;box-shadow:0 -4px 12px rgba(0,0,0,0.08)">
       <h2>Générer SEO</h2>
       <input type="text" id="seoUrlInput" placeholder="/142-cisailles" style="width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:6px;font-size:12px;margin-bottom:6px">
       <button class="btn btn-primary" style="width:100%;margin-bottom:4px" onclick="submitSeoJob()">Lancer Claude Code</button>
