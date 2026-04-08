@@ -526,6 +526,7 @@
         <button class="btn btn-primary" onclick="openPreview()">Preview Wynstor</button>
         <button class="btn" onclick="toggleSource()">Source</button>
         <button class="btn btn-ok" onclick="saveToGithub()">Sauvegarder</button>
+        <button class="btn" onclick="pushToMagento()" style="background:#e65100;color:#fff;border-color:#e65100" id="btnPushMagento" title="Push vers Magento">Push Magento</button>
       </div>
     </div>
 
@@ -3410,6 +3411,79 @@ document.getElementById('editor').addEventListener('drop', (e) => {
     }
   }
 });
+
+// === PUSH MAGENTO ===
+async function pushToMagento() {
+  const token = getToken();
+  if (!token) { toast('Token GitHub requis'); return; }
+  if (!currentFile || !pagesData) { toast('Aucune page chargée'); return; }
+
+  const currentPage = pagesData.pages.find(p => p.file === currentFile);
+  if (!currentPage) { toast('Page introuvable dans pages.json'); return; }
+
+  const catId = parseInt(currentPage.id);
+
+  // Collecter les meta
+  const metaTitle = document.getElementById('metaTitle');
+  const metaDesc = document.getElementById('metaDesc');
+  const metaH1 = document.getElementById('metaH1');
+
+  // Collecter le contenu HTML
+  const blocs = document.querySelectorAll('#editor .bloc-content');
+  let contentHtml = '';
+  blocs.forEach(b => { contentHtml += b.innerHTML; });
+
+  // Collecter les images sous-cat
+  const subcatsImages = [];
+  if (currentPage.design === 'homepage') {
+    const children = getChildPages(currentPage.id);
+    children.forEach(child => {
+      if (child.image) {
+        subcatsImages.push({ category_id: parseInt(child.id), image: child.image });
+      }
+    });
+  }
+
+  // Résumé avant push
+  const parts = [];
+  if (metaTitle && metaTitle.value) parts.push('Title');
+  if (metaDesc && metaDesc.value) parts.push('Meta');
+  if (metaH1 && metaH1.value) parts.push('H1');
+  if (contentHtml.trim()) parts.push('Contenu');
+  if (subcatsImages.length) parts.push(subcatsImages.length + ' images sous-cat');
+
+  if (parts.length === 0) { toast('Rien à pousser'); return; }
+
+  if (!confirm('Push vers Magento (cat #' + catId + ') :\\n\\n' + parts.join('\\n') + '\\n\\nConfirmer ?')) return;
+
+  toast('Push Magento en cours...');
+
+  const payload = { category_id: catId };
+  if (metaTitle && metaTitle.value) payload.meta_title = metaTitle.value;
+  if (metaDesc && metaDesc.value) payload.meta_description = metaDesc.value;
+  if (metaH1 && metaH1.value) payload.h1 = metaH1.value;
+  if (contentHtml.trim()) payload.content = contentHtml;
+  if (subcatsImages.length) payload.subcats_images = subcatsImages;
+
+  try {
+    const res = await fetch('https://dev3.wynstor.com/media/wysiwyg/smartwave/porto/category/push-content.php', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    if (data.ok) {
+      toast('Push OK — ' + data.updated.length + ' champs mis à jour');
+      // Mettre à jour le statut dans pages.json
+      currentPage.status = currentPage.status === 'todo' ? 'draft' : currentPage.status;
+      await savePagesJson();
+    } else {
+      toast('Erreur Magento: ' + (data.error || 'inconnue'), 4000);
+    }
+  } catch(e) {
+    toast('Erreur: ' + e.message, 4000);
+  }
+}
 
 // === SLUG NOMMAGE IMAGES ===
 function getCurrentSlug() {
