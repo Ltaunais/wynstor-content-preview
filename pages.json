@@ -1119,7 +1119,8 @@
       "file": "pages/65-couper-et-decouper.html",
       "name": "Couper et découper",
       "level": "N0",
-      "status": "draft"
+      "status": "draft",
+      "design": "homepage"
     },
     {
       "id": "142",
