@@ -1961,7 +1961,20 @@ async function submitSeoJob(jobType) {
   const urlInput = document.getElementById('seoUrlInput').value.trim();
   if (!urlInput) { toast('Entrez une URL de catégorie'); return; }
 
-  const slug = urlInput.replace(/^\//, '').replace(/\.html$/, '');
+  let slug = urlInput.replace(/^\//, '').replace(/\.html$/, '');
+  // Si le collègue tape un nom au lieu d'un slug, chercher dans pages.json
+  if (pagesData && !/^\d+-/.test(slug)) {
+    const match = pagesData.pages.find(function(p) {
+      return p.name.toLowerCase() === slug.toLowerCase() || p.file.includes(slug.toLowerCase().replace(/\s+/g, '-'));
+    });
+    if (match) {
+      slug = match.file.replace('pages/','').replace('.html','');
+    } else {
+      toast('Slug non trouvé. Utilisez le format "142-cisailles"');
+      status.style.display = 'none';
+      return;
+    }
+  }
   const status = document.getElementById('seoJobStatus');
   status.style.display = 'block';
   status.textContent = 'Soumission du job...';
