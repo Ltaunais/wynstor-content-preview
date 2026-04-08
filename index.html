@@ -494,6 +494,56 @@
   .toast.visible { display: block; animation: fadeIn 0.2s; }
   @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
+  /* === CONFIGURATEUR BLOC === */
+  .bloc-config {
+    display: none;
+    position: fixed;
+    top: 80px;
+    right: 16px;
+    width: 280px;
+    max-height: calc(100vh - 100px);
+    overflow-y: auto;
+    background: #1a1a2e;
+    color: #ccc;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    z-index: 100;
+    font-size: 11px;
+    scrollbar-width: thin;
+  }
+  .bloc-config.visible { display: block; }
+  .bloc-config-header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 10px 14px; border-bottom: 1px solid #333;
+    font-weight: 600; font-size: 12px; color: #fff;
+  }
+  .bloc-config-header button { background: none; border: none; color: #888; cursor: pointer; font-size: 16px; }
+  .bloc-config-header button:hover { color: #fff; }
+  .bloc-config-body { padding: 10px 14px; }
+  .bloc-config-section { margin-bottom: 12px; border-bottom: 1px solid #2a2a3e; padding-bottom: 10px; }
+  .bloc-config-section:last-child { border-bottom: none; }
+  .bloc-config-label { font-size: 9px; text-transform: uppercase; letter-spacing: 1px; color: #888; margin-bottom: 6px; }
+  .bloc-config-row { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
+  .bloc-config-row label { min-width: 50px; font-size: 10px; color: #aaa; }
+  .bloc-config-row input[type="text"],
+  .bloc-config-row input[type="url"],
+  .bloc-config-row input[type="number"],
+  .bloc-config-row select {
+    flex: 1; background: #2a2a3e; color: #ccc; border: 1px solid #3a3a4e;
+    border-radius: 4px; padding: 4px 6px; font-size: 11px;
+  }
+  .bloc-config-row input:focus, .bloc-config-row select:focus { border-color: var(--pr); outline: none; }
+  .bloc-config-row input[type="color"] {
+    width: 28px; height: 28px; border: 1px solid #3a3a4e; border-radius: 4px;
+    cursor: pointer; padding: 1px; background: #2a2a3e;
+  }
+  .bloc-config-presets { display: flex; gap: 4px; flex-wrap: wrap; }
+  .bloc-config-preset {
+    padding: 3px 8px; border-radius: 4px; font-size: 10px; cursor: pointer;
+    border: 1px solid #3a3a4e; background: #2a2a3e; color: #ccc; transition: all .15s;
+  }
+  .bloc-config-preset:hover, .bloc-config-preset.active { background: var(--pr); color: #fff; border-color: var(--pr); }
+
   /* === CORBEILLE DRAG === */
   .trash-zone {
     display: none;
@@ -3930,6 +3980,280 @@ async function savePagesJson() {
     toast('Erreur GitHub: ' + e.message, 3000);
   }
 }
+
+// === CONFIGURATEUR BLOC ===
+(function() {
+  // Créer le panneau
+  var panel = document.createElement('div');
+  panel.className = 'bloc-config';
+  panel.id = 'blocConfig';
+
+  var header = document.createElement('div');
+  header.className = 'bloc-config-header';
+  var headerTitle = document.createElement('span');
+  headerTitle.textContent = 'Configurer le bloc';
+  var closeBtn = document.createElement('button');
+  closeBtn.textContent = '\u00d7';
+  closeBtn.onclick = function() { panel.classList.remove('visible'); currentConfigBloc = null; };
+  header.appendChild(headerTitle);
+  header.appendChild(closeBtn);
+  panel.appendChild(header);
+
+  var body = document.createElement('div');
+  body.className = 'bloc-config-body';
+  body.id = 'blocConfigBody';
+  panel.appendChild(body);
+  document.body.appendChild(panel);
+
+  var currentConfigBloc = null;
+
+  // Ouvrir le config au clic sur un bloc
+  document.addEventListener('click', function(e) {
+    var bloc = e.target.closest('.bloc');
+    if (!bloc) { return; }
+    // Ignore si clic sur la toolbar du bloc
+    if (e.target.closest('.bloc-toolbar')) return;
+    openBlocConfig(bloc);
+  });
+
+  function openBlocConfig(bloc) {
+    currentConfigBloc = bloc;
+    var content = bloc.querySelector('.bloc-content');
+    if (!content) return;
+
+    body.textContent = '';
+
+    // === CONTENEUR (padding, gap, background, border-radius) ===
+    var wrappers = content.querySelectorAll('[class*="row"], [class*="ws-bg"], [class*="rounded"], aside, blockquote, [class*="ws-my"]');
+    var wrapper = wrappers.length ? wrappers[0] : null;
+    if (wrapper || content.children.length > 0) {
+      var target = wrapper || content.children[0];
+      addSection('Conteneur', [
+        makePaddingControl(target),
+        makeGapControl(target),
+        makeBgControl(target),
+        makeRadiusControl(target)
+      ]);
+    }
+
+    // === BOUTONS (<a class="btn">) ===
+    var buttons = content.querySelectorAll('a.btn, a[class*="btn-"]');
+    buttons.forEach(function(btn, i) {
+      addSection('Bouton ' + (i + 1), [
+        makeTextInput('Texte', btn.textContent.trim(), function(val) { btn.textContent = val; markDirty(); }),
+        makeTextInput('Lien', btn.getAttribute('href') || '#', function(val) { btn.setAttribute('href', val); markDirty(); }),
+        makeBtnVariantControl(btn)
+      ]);
+    });
+
+    // === IMAGES ===
+    var images = content.querySelectorAll('img');
+    images.forEach(function(img, i) {
+      addSection('Image ' + (i + 1), [
+        makeTextInput('Alt', img.alt || '', function(val) { img.alt = val; markDirty(); }),
+        makeTextInput('Src', img.src || '', function(val) { img.src = val; markDirty(); })
+      ]);
+    });
+
+    // === LIENS WIDGET ===
+    var widgets = content.querySelectorAll('.widget-link');
+    widgets.forEach(function(w, i) {
+      addSection('Lien interne ' + (i + 1), [
+        makeTextInput('Texte', w.textContent.trim(), function(val) { w.textContent = val; markDirty(); }),
+        makeTextInput('ID path', w.getAttribute('title') || '', function(val) { w.setAttribute('title', val); markDirty(); })
+      ]);
+    });
+
+    // === TITRES H2/H3 ===
+    var headings = content.querySelectorAll('h2, h3');
+    headings.forEach(function(h, i) {
+      addSection(h.tagName + ' ' + (i + 1), [
+        makeTextInput('Texte', h.textContent.trim(), function(val) { h.textContent = val; markDirty(); })
+      ]);
+    });
+
+    panel.classList.add('visible');
+  }
+
+  function addSection(title, controls) {
+    var section = document.createElement('div');
+    section.className = 'bloc-config-section';
+    var label = document.createElement('div');
+    label.className = 'bloc-config-label';
+    label.textContent = title;
+    section.appendChild(label);
+    controls.forEach(function(c) { if (c) section.appendChild(c); });
+    body.appendChild(section);
+  }
+
+  function makeTextInput(label, value, onChange) {
+    var row = document.createElement('div');
+    row.className = 'bloc-config-row';
+    var lbl = document.createElement('label');
+    lbl.textContent = label;
+    var input = document.createElement('input');
+    input.type = 'text';
+    input.value = value;
+    input.addEventListener('input', function() { onChange(input.value); });
+    row.appendChild(lbl);
+    row.appendChild(input);
+    return row;
+  }
+
+  function makePaddingControl(el) {
+    var row = document.createElement('div');
+    row.className = 'bloc-config-row';
+    var lbl = document.createElement('label');
+    lbl.textContent = 'Padding';
+    row.appendChild(lbl);
+
+    var presets = document.createElement('div');
+    presets.className = 'bloc-config-presets';
+    [
+      { label: 'S', value: '12px 16px' },
+      { label: 'M', value: '20px 24px' },
+      { label: 'L', value: '32px 40px' },
+      { label: 'XL', value: '48px 56px' }
+    ].forEach(function(p) {
+      var btn = document.createElement('button');
+      btn.className = 'bloc-config-preset';
+      btn.textContent = p.label;
+      btn.onclick = function() {
+        el.style.padding = p.value;
+        presets.querySelectorAll('.bloc-config-preset').forEach(function(b) { b.classList.remove('active'); });
+        btn.classList.add('active');
+        markDirty();
+      };
+      presets.appendChild(btn);
+    });
+    row.appendChild(presets);
+    return row;
+  }
+
+  function makeGapControl(el) {
+    var row = document.createElement('div');
+    row.className = 'bloc-config-row';
+    var lbl = document.createElement('label');
+    lbl.textContent = 'Gap';
+    row.appendChild(lbl);
+
+    var presets = document.createElement('div');
+    presets.className = 'bloc-config-presets';
+    [
+      { label: '0', value: '0' },
+      { label: 'S', value: '8px' },
+      { label: 'M', value: '16px' },
+      { label: 'L', value: '24px' },
+      { label: 'XL', value: '32px' }
+    ].forEach(function(p) {
+      var btn = document.createElement('button');
+      btn.className = 'bloc-config-preset';
+      btn.textContent = p.label;
+      btn.onclick = function() {
+        el.style.gap = p.value;
+        presets.querySelectorAll('.bloc-config-preset').forEach(function(b) { b.classList.remove('active'); });
+        btn.classList.add('active');
+        markDirty();
+      };
+      presets.appendChild(btn);
+    });
+    row.appendChild(presets);
+    return row;
+  }
+
+  function makeBgControl(el) {
+    var row = document.createElement('div');
+    row.className = 'bloc-config-row';
+    var lbl = document.createElement('label');
+    lbl.textContent = 'Fond';
+    row.appendChild(lbl);
+
+    var presets = document.createElement('div');
+    presets.className = 'bloc-config-presets';
+    [
+      { label: 'Aucun', value: 'transparent' },
+      { label: 'Clair', value: 'var(--bs-light)' },
+      { label: 'Sombre', value: 'var(--bs-dark)', color: '#fff' },
+      { label: 'Gradient', value: 'linear-gradient(90deg, var(--ws-purple-800), var(--ws-blue-550))', color: '#fff' }
+    ].forEach(function(p) {
+      var btn = document.createElement('button');
+      btn.className = 'bloc-config-preset';
+      btn.textContent = p.label;
+      btn.onclick = function() {
+        el.style.background = p.value;
+        if (p.color) { el.style.color = p.color; } else { el.style.color = ''; }
+        presets.querySelectorAll('.bloc-config-preset').forEach(function(b) { b.classList.remove('active'); });
+        btn.classList.add('active');
+        markDirty();
+      };
+      presets.appendChild(btn);
+    });
+    row.appendChild(presets);
+    return row;
+  }
+
+  function makeRadiusControl(el) {
+    var row = document.createElement('div');
+    row.className = 'bloc-config-row';
+    var lbl = document.createElement('label');
+    lbl.textContent = 'Radius';
+    row.appendChild(lbl);
+
+    var presets = document.createElement('div');
+    presets.className = 'bloc-config-presets';
+    [
+      { label: '0', value: '0' },
+      { label: 'S', value: '8px' },
+      { label: 'M', value: '12px' },
+      { label: 'L', value: '16px' },
+      { label: 'XL', value: '24px' }
+    ].forEach(function(p) {
+      var btn = document.createElement('button');
+      btn.className = 'bloc-config-preset';
+      btn.textContent = p.label;
+      btn.onclick = function() {
+        el.style.borderRadius = p.value;
+        presets.querySelectorAll('.bloc-config-preset').forEach(function(b) { b.classList.remove('active'); });
+        btn.classList.add('active');
+        markDirty();
+      };
+      presets.appendChild(btn);
+    });
+    row.appendChild(presets);
+    return row;
+  }
+
+  function makeBtnVariantControl(btn) {
+    var row = document.createElement('div');
+    row.className = 'bloc-config-row';
+    var lbl = document.createElement('label');
+    lbl.textContent = 'Style';
+    row.appendChild(lbl);
+
+    var presets = document.createElement('div');
+    presets.className = 'bloc-config-presets';
+    [
+      { label: 'Primary', cls: 'btn-primary' },
+      { label: 'Light', cls: 'btn-light' },
+      { label: 'Dark', cls: 'btn-dark' },
+      { label: 'Outline', cls: 'btn-outline-primary' },
+      { label: 'Success', cls: 'btn-success' }
+    ].forEach(function(p) {
+      var preset = document.createElement('button');
+      preset.className = 'bloc-config-preset';
+      preset.textContent = p.label;
+      preset.onclick = function() {
+        btn.className = btn.className.replace(/btn-\S+/g, '').trim() + ' btn ' + p.cls;
+        presets.querySelectorAll('.bloc-config-preset').forEach(function(b) { b.classList.remove('active'); });
+        preset.classList.add('active');
+        markDirty();
+      };
+      presets.appendChild(preset);
+    });
+    row.appendChild(presets);
+    return row;
+  }
+})();
 
 // === CORBEILLE DRAG ===
 (function() {
