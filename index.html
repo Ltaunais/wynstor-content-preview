@@ -799,7 +799,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // === DIRTY STATE + AUTO-SAVE ===
 let autoSaveTimer = null;
-const AUTO_SAVE_DELAY = 3000; // 3 secondes après la dernière modif
+const AUTO_SAVE_DELAY = 500; // 500ms debounce pour grouper les frappes rapides
 
 function markDirty() {
   dirty = true;
