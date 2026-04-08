@@ -216,7 +216,10 @@
   #mediaDropZone.dragover { border-color: var(--pr); background: rgba(111,66,193,0.05); }
 
   /* Mots exclus */
-  .excluded-word { background: rgba(240,61,61,0.15); text-decoration: line-through; text-decoration-color: var(--bad); cursor: help; }
+  .excluded-word { background: rgba(240,61,61,0.15); text-decoration: line-through; text-decoration-color: var(--bad); cursor: pointer; position: relative; }
+  .excluded-word:hover { background: rgba(240,61,61,0.3); }
+  .excluded-word::after { content: '🔄'; font-size: 8px; position: absolute; top: -8px; right: -6px; opacity: 0; transition: opacity 0.15s; }
+  .excluded-word:hover::after { opacity: 1; }
   .bl-tag {
     display: inline-flex; align-items: center; gap: 3px;
     background: rgba(240,61,61,0.1); color: var(--bad); border: 1px solid rgba(240,61,61,0.3);
@@ -2063,6 +2066,95 @@ document.getElementById('stRadius').addEventListener('input', (e) => {
   if (!stActiveEl) return;
   stActiveEl.style.borderRadius = e.target.value + 'px';
   markDirty();
+});
+
+// Clic sur un mot exclu → régénérer la phrase
+document.addEventListener('click', function(e) {
+  var target = e.target;
+  if (!target.classList.contains('excluded-word')) return;
+  if (!target.closest('.bloc-content')) return;
+
+  var word = target.textContent;
+  var parentP = target.closest('p');
+  if (!parentP) return;
+
+  var sentence = parentP.textContent;
+  var token = getToken();
+  if (!token) { showTokenModal(); return; }
+
+  // Marquer visuellement
+  var originalBg = parentP.style.background;
+  parentP.style.background = 'rgba(111,66,193,0.08)';
+  parentP.style.transition = 'background 0.3s';
+  target.textContent = '...';
+
+  var slug = currentFile ? currentFile.replace('pages/','').replace('.html','') : '';
+
+  // Soumettre un mini job
+  (async function() {
+    try {
+      var getRes = await fetch('https://api.github.com/repos/' + REPO + '/contents/jobs.json?ref=' + BRANCH + '&_=' + Date.now(), {
+        headers: { 'Authorization': 'token ' + token }, cache: 'no-store'
+      });
+      var getData = await getRes.json();
+      var jobsContent = JSON.parse(decodeURIComponent(escape(atob(getData.content.replace(/\n/g, '')))));
+
+      var jobId = 'reword-' + Date.now();
+      jobsContent.jobs.push({
+        id: jobId,
+        url: slug,
+        slug: slug,
+        type: 'reword',
+        status: 'pending',
+        sentence: sentence,
+        bannedWord: word,
+        createdAt: new Date().toISOString()
+      });
+
+      var encoded = btoa(unescape(encodeURIComponent(JSON.stringify(jobsContent, null, 2))));
+      await fetch('https://api.github.com/repos/' + REPO + '/contents/jobs.json', {
+        method: 'PUT',
+        headers: { 'Authorization': 'token ' + token, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: 'reword: ' + word, content: encoded, sha: getData.sha, branch: BRANCH })
+      });
+
+      toast('Reformulation en cours...');
+
+      var pollReword = setInterval(async function() {
+        try {
+          var r = await fetch('https://api.github.com/repos/' + REPO + '/contents/jobs.json?ref=' + BRANCH + '&_=' + Date.now(), {
+            headers: { 'Authorization': 'token ' + token }, cache: 'no-store'
+          });
+          var d = await r.json();
+          var jobs = JSON.parse(decodeURIComponent(escape(atob(d.content.replace(/\n/g, ''))))).jobs;
+          var j = jobs.find(function(x) { return x.id === jobId; });
+          if (j && j.status === 'done' && j.result) {
+            clearInterval(pollReword);
+            parentP.textContent = j.result;
+            parentP.style.background = originalBg;
+            highlightBlacklistedWords();
+            markDirty();
+            toast('Phrase reformulée');
+          } else if (j && j.status === 'error') {
+            clearInterval(pollReword);
+            target.textContent = word;
+            parentP.style.background = originalBg;
+            toast('Erreur reformulation');
+          }
+        } catch(err) {}
+      }, 8000);
+
+      setTimeout(function() {
+        clearInterval(pollReword);
+        if (target.textContent === '...') { target.textContent = word; parentP.style.background = originalBg; }
+      }, 120000);
+
+    } catch(err) {
+      target.textContent = word;
+      parentP.style.background = originalBg;
+      toast('Erreur: ' + err.message);
+    }
+  })();
 });
 
 // Bouton Exclure dans le toolbar
