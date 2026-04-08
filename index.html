@@ -154,6 +154,16 @@
   .bp-card-info { padding: 10px 12px; border-top: 1px solid var(--border); }
   .bp-card-name { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
   .bp-card-desc { font-size: 11px; color: var(--gray); }
+  .bp-card-fav {
+    position: absolute; top: 6px; right: 6px; background: rgba(255,255,255,0.9);
+    border: none; border-radius: 50%; width: 28px; height: 28px; cursor: pointer;
+    font-size: 14px; display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.15); transition: all 0.15s; z-index: 2;
+  }
+  .bp-card-fav:hover { transform: scale(1.15); }
+  .bp-card-fav.faved { background: var(--pr); color: #fff; }
+  .bp-card { position: relative; }
+  .bp-cat-count { font-size: 10px; opacity: 0.6; margin-left: 4px; }
 
   @media (max-width: 768px) {
     .bp-cats { display: none; }
@@ -573,8 +583,32 @@ function deleteBloc(btn) {
   markDirty();
 }
 
-// === BLOCK PICKER (modal catalogue) ===
+// === BLOCK PICKER (modal catalogue + favoris) ===
 let pendingInsertBar = null;
+
+// Favoris en localStorage
+function getFavorites() {
+  try { return JSON.parse(localStorage.getItem('ws_fav_blocks') || '[]'); } catch(e) { return []; }
+}
+function saveFavorites(favs) { localStorage.setItem('ws_fav_blocks', JSON.stringify(favs)); }
+function isFavorite(id) { return getFavorites().includes(id); }
+function toggleFavorite(id) {
+  let favs = getFavorites();
+  if (favs.includes(id)) { favs = favs.filter(f => f !== id); }
+  else { favs.push(id); }
+  saveFavorites(favs);
+  return favs.includes(id);
+}
+
+// Chercher un bloc par ID dans blocksData
+function findBlock(id) {
+  for (const cat of blocksData.categories) {
+    for (const b of cat.blocks) {
+      if (b.id === id) return b;
+    }
+  }
+  return null;
+}
 
 function showInsertMenu(btn) {
   pendingInsertBar = btn.closest('.insert-bar');
@@ -585,13 +619,28 @@ function openBlockPicker() {
   if (!blocksData) return;
   const overlay = document.getElementById('blockPickerOverlay');
   const catsDiv = document.getElementById('bpCats');
-  const gridDiv = document.getElementById('bpGrid');
 
-  // Build categories
   catsDiv.textContent = '';
-  // Bouton "Tous"
+
+  // Bouton Favoris en premier
+  const favCount = getFavorites().length;
+  const favBtn = document.createElement('button');
+  favBtn.className = 'bp-cat-btn' + (favCount > 0 ? ' active' : '');
+  favBtn.textContent = 'Favoris';
+  const favBadge = document.createElement('span');
+  favBadge.className = 'bp-cat-count';
+  favBadge.textContent = favCount > 0 ? '(' + favCount + ')' : '';
+  favBtn.appendChild(favBadge);
+  favBtn.addEventListener('click', () => {
+    catsDiv.querySelectorAll('.bp-cat-btn').forEach(b => b.classList.remove('active'));
+    favBtn.classList.add('active');
+    renderPickerGrid('__favs__');
+  });
+  catsDiv.appendChild(favBtn);
+
+  // Bouton Tous
   const allBtn = document.createElement('button');
-  allBtn.className = 'bp-cat-btn active';
+  allBtn.className = 'bp-cat-btn' + (favCount === 0 ? ' active' : '');
   allBtn.textContent = 'Tous';
   allBtn.addEventListener('click', () => {
     catsDiv.querySelectorAll('.bp-cat-btn').forEach(b => b.classList.remove('active'));
@@ -600,10 +649,15 @@ function openBlockPicker() {
   });
   catsDiv.appendChild(allBtn);
 
+  // Catégories
   blocksData.categories.forEach(cat => {
     const btn = document.createElement('button');
     btn.className = 'bp-cat-btn';
     btn.textContent = cat.name;
+    const countSpan = document.createElement('span');
+    countSpan.className = 'bp-cat-count';
+    countSpan.textContent = '(' + cat.blocks.length + ')';
+    btn.appendChild(countSpan);
     btn.addEventListener('click', () => {
       catsDiv.querySelectorAll('.bp-cat-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
@@ -612,7 +666,8 @@ function openBlockPicker() {
     catsDiv.appendChild(btn);
   });
 
-  renderPickerGrid(null);
+  // Afficher favoris si y en a, sinon tous
+  renderPickerGrid(favCount > 0 ? '__favs__' : null);
   overlay.classList.add('visible');
 }
 
@@ -620,47 +675,80 @@ function renderPickerGrid(filterCat) {
   const gridDiv = document.getElementById('bpGrid');
   gridDiv.textContent = '';
 
-  blocksData.categories.forEach(cat => {
-    if (filterCat && cat.name !== filterCat) return;
+  let blocksToShow = [];
 
-    cat.blocks.forEach(block => {
-      const card = document.createElement('div');
-      card.className = 'bp-card';
-      card.addEventListener('click', () => {
-        insertTemplate(pendingInsertBar, block.id);
-        closeBlockPicker();
-      });
-
-      // Preview miniature du HTML
-      const preview = document.createElement('div');
-      preview.className = 'bp-card-preview';
-      // Render le HTML du bloc en miniature
-      const previewContent = document.createElement('div');
-      previewContent.style.cssText = 'width:100%;pointer-events:none';
-      let previewHtml = block.html
-        .replace(/\{\{widget[^}]*anchor_text="([^"]+)"[^}]*\}\}/g, '<span style="color:#6f42c1;text-decoration:underline">$1</span>')
-        .replace(/<script[\s\S]*?<\/script>/g, '');
-      previewContent.innerHTML = previewHtml;
-      preview.appendChild(previewContent);
-      card.appendChild(preview);
-
-      // Info
-      const info = document.createElement('div');
-      info.className = 'bp-card-info';
-
-      const name = document.createElement('div');
-      name.className = 'bp-card-name';
-      name.textContent = block.name;
-      info.appendChild(name);
-
-      const desc = document.createElement('div');
-      desc.className = 'bp-card-desc';
-      desc.textContent = block.desc;
-      info.appendChild(desc);
-
-      card.appendChild(info);
-      gridDiv.appendChild(card);
+  if (filterCat === '__favs__') {
+    const favs = getFavorites();
+    favs.forEach(id => {
+      const block = findBlock(id);
+      if (block) blocksToShow.push(block);
     });
+    if (blocksToShow.length === 0) {
+      const empty = document.createElement('div');
+      empty.style.cssText = 'grid-column:1/-1;text-align:center;padding:40px;color:var(--gray);font-size:14px';
+      empty.textContent = 'Pas encore de favoris. Cliquez sur l\'etoile d\'un bloc pour l\'ajouter ici.';
+      gridDiv.appendChild(empty);
+      return;
+    }
+  } else {
+    blocksData.categories.forEach(cat => {
+      if (filterCat && cat.name !== filterCat) return;
+      cat.blocks.forEach(block => blocksToShow.push(block));
+    });
+  }
+
+  blocksToShow.forEach(block => {
+    const card = document.createElement('div');
+    card.className = 'bp-card';
+
+    // Bouton favori (étoile)
+    const favStar = document.createElement('button');
+    favStar.className = 'bp-card-fav' + (isFavorite(block.id) ? ' faved' : '');
+    favStar.textContent = isFavorite(block.id) ? '\u2605' : '\u2606';
+    favStar.title = 'Ajouter aux favoris';
+    favStar.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const nowFav = toggleFavorite(block.id);
+      favStar.className = 'bp-card-fav' + (nowFav ? ' faved' : '');
+      favStar.textContent = nowFav ? '\u2605' : '\u2606';
+      // Mettre à jour le compteur dans la sidebar
+      const favCountSpan = document.querySelector('.bp-cats .bp-cat-btn .bp-cat-count');
+      if (favCountSpan) favCountSpan.textContent = '(' + getFavorites().length + ')';
+    });
+    card.appendChild(favStar);
+
+    // Clic sur la carte = insérer
+    card.addEventListener('click', () => {
+      insertTemplate(pendingInsertBar, block.id);
+      closeBlockPicker();
+    });
+
+    // Preview miniature
+    const preview = document.createElement('div');
+    preview.className = 'bp-card-preview';
+    const previewContent = document.createElement('div');
+    previewContent.style.cssText = 'width:100%;pointer-events:none';
+    let previewHtml = block.html
+      .replace(/\{\{widget[^}]*anchor_text="([^"]+)"[^}]*\}\}/g, '<span style="color:#6f42c1;text-decoration:underline">$1</span>')
+      .replace(/<script[\s\S]*?<\/script>/g, '');
+    previewContent.innerHTML = previewHtml;
+    preview.appendChild(previewContent);
+    card.appendChild(preview);
+
+    // Info
+    const info = document.createElement('div');
+    info.className = 'bp-card-info';
+    const name = document.createElement('div');
+    name.className = 'bp-card-name';
+    name.textContent = block.name;
+    info.appendChild(name);
+    const desc = document.createElement('div');
+    desc.className = 'bp-card-desc';
+    desc.textContent = block.desc;
+    info.appendChild(desc);
+    card.appendChild(info);
+
+    gridDiv.appendChild(card);
   });
 }
 
