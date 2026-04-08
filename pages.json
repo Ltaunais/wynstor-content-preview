@@ -1826,6 +1826,13 @@
       "name": "Ouvre-lettres",
       "level": "N1",
       "status": "todo"
+    },
+    {
+      "id": "152",
+      "file": "pages/152-agrafes.html",
+      "name": "Agrafes",
+      "level": "N1",
+      "status": "draft"
     }
   ]
 }
