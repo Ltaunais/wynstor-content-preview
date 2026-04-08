@@ -481,10 +481,11 @@
       "url": "4-agrafer",
       "slug": "4-agrafer",
       "type": "reword",
-      "status": "pending",
+      "status": "processing",
       "sentence": "Vous complétez votre commande avec des accessoires — dégrafeuses, recharges spécifiques — pour que chaque poste reste opérationnel sans attendre la prochaine livraison. Regrouper vos achats sur un même fournisseur, c'est un bon de commande unique, une seule réception et moins de temps perdu en suivi administratif.H3+IA",
       "bannedWord": "—",
-      "createdAt": "2026-04-08T17:57:53.871Z"
+      "createdAt": "2026-04-08T17:57:53.871Z",
+      "startedAt": "2026-04-08T17:57:55.482Z"
     }
   ]
 }
