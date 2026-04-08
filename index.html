@@ -432,6 +432,38 @@
   .toast.visible { display: block; animation: fadeIn 0.2s; }
   @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
+  /* === GRILLE SOUS-CATÉGORIES (homepage N0) === */
+  .subcats-section { margin-bottom: 16px; }
+  .subcats-section h2 { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--gray); margin-bottom: 10px; }
+  .subcats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .subcat-card {
+    background: var(--card); border: 1px solid var(--border); border-radius: 8px;
+    overflow: hidden; transition: box-shadow 0.2s, transform 0.2s;
+  }
+  .subcat-card:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.08); transform: translateY(-1px); }
+  .subcat-card .sc-img-zone {
+    height: 100px; background: #f8f9fa; display: flex; align-items: center; justify-content: center;
+    border-bottom: 1px solid var(--border); position: relative; cursor: pointer;
+    transition: background 0.2s;
+  }
+  .subcat-card .sc-img-zone.dragover { background: var(--pr-light); border-color: var(--pr); }
+  .subcat-card .sc-img-zone img { max-height: 80px; max-width: 90%; object-fit: contain; }
+  .subcat-card .sc-img-zone .sc-placeholder {
+    font-size: 10px; color: var(--gray); text-align: center; line-height: 1.4;
+  }
+  .subcat-card .sc-img-zone .sc-remove {
+    position: absolute; top: 4px; right: 4px; background: rgba(0,0,0,0.5); color: #fff;
+    border: none; border-radius: 3px; width: 18px; height: 18px; font-size: 10px;
+    cursor: pointer; display: none; align-items: center; justify-content: center;
+  }
+  .subcat-card .sc-img-zone:hover .sc-remove { display: flex; }
+  .subcat-card .sc-info { padding: 8px 10px; }
+  .subcat-card .sc-name { font-size: 12px; font-weight: 600; color: #333; margin-bottom: 2px; }
+  .subcat-card .sc-level { font-size: 9px; color: var(--gray); }
+  .subcat-card .sc-status { font-size: 9px; padding: 1px 5px; border-radius: 3px; background: #f0f0f0; color: var(--gray); }
+  .subcat-card .sc-status.draft { background: var(--pr-light); color: var(--pr); }
+  .subcat-card .sc-status.done { background: #d1f2e0; color: var(--ok); }
+
   @media (max-width: 1024px) {
     .layout { grid-template-columns: 1fr; }
     .sidebar, .templates { position: static; height: auto; border: none; border-bottom: 1px solid var(--border); }
@@ -490,6 +522,10 @@
     </div>
 
     <div class="meta-bar" id="metaBar"></div>
+    <div class="subcats-section" id="subcatsSection" style="display:none">
+      <h2>Sous-catégories</h2>
+      <div class="subcats-grid" id="subcatsGrid"></div>
+    </div>
     <div class="editor" id="editor">Chargement...</div>
     <div class="stats-bar" id="statsBar"></div>
     <div class="source-area" id="sourceArea">
@@ -712,6 +748,7 @@ async function loadFile(filename) {
   }
 
   renderMeta();
+  renderSubcatsGrid();
   renderEditor();
   setupImageDropTargets();
   setupFaqButtons();
@@ -3359,6 +3396,190 @@ document.getElementById('editor').addEventListener('drop', (e) => {
     }
   }
 });
+
+// === SOUS-CATÉGORIES GRID (homepage) ===
+function getChildPages(pageId) {
+  if (!pagesData) return [];
+  const pages = pagesData.pages;
+  const idx = pages.findIndex(p => p.id === pageId);
+  if (idx === -1) return [];
+
+  const parentLevel = pages[idx].level;
+  const childLevelNum = parseInt(parentLevel.replace('N','')) + 1;
+  const childLevel = 'N' + childLevelNum;
+
+  const children = [];
+  for (let i = idx + 1; i < pages.length; i++) {
+    const p = pages[i];
+    const pLevelNum = parseInt(p.level.replace('N',''));
+    if (pLevelNum <= parseInt(parentLevel.replace('N',''))) break;
+    if (p.level === childLevel) children.push(p);
+  }
+  return children;
+}
+
+function renderSubcatsGrid() {
+  const section = document.getElementById('subcatsSection');
+  const grid = document.getElementById('subcatsGrid');
+  section.style.display = 'none';
+  grid.textContent = '';
+
+  if (!currentFile || !pagesData) return;
+  const currentPage = pagesData.pages.find(p => p.file === currentFile);
+  if (!currentPage || currentPage.design !== 'homepage') return;
+
+  const children = getChildPages(currentPage.id);
+  if (children.length === 0) return;
+
+  section.style.display = 'block';
+  const statusLabels = { done: 'Publié', review: 'Review', draft: 'Brouillon', todo: 'À faire' };
+
+  children.forEach(child => {
+    const card = document.createElement('div');
+    card.className = 'subcat-card';
+    card.dataset.catId = child.id;
+
+    const imgZone = document.createElement('div');
+    imgZone.className = 'sc-img-zone';
+
+    if (child.image) {
+      const img = document.createElement('img');
+      img.src = child.image;
+      img.alt = child.name;
+      imgZone.appendChild(img);
+
+      const removeBtn = document.createElement('button');
+      removeBtn.className = 'sc-remove';
+      removeBtn.textContent = '×';
+      removeBtn.onclick = (e) => { e.stopPropagation(); removeSubcatImage(child.id); };
+      imgZone.appendChild(removeBtn);
+    } else {
+      const ph = document.createElement('div');
+      ph.className = 'sc-placeholder';
+      const icon = document.createElement('div');
+      icon.textContent = '📷';
+      const label = document.createElement('div');
+      label.textContent = 'Drop image';
+      ph.appendChild(icon);
+      ph.appendChild(label);
+      imgZone.appendChild(ph);
+    }
+
+    // Drop zone events
+    imgZone.addEventListener('dragover', (e) => { e.preventDefault(); imgZone.classList.add('dragover'); });
+    imgZone.addEventListener('dragleave', () => imgZone.classList.remove('dragover'));
+    imgZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      imgZone.classList.remove('dragover');
+      if (e.dataTransfer.files.length) {
+        uploadSubcatImage(child.id, e.dataTransfer.files[0]);
+        return;
+      }
+      const mediaUrl = e.dataTransfer.getData('application/x-media-url') || e.dataTransfer.getData('text/plain');
+      if (mediaUrl && mediaUrl.startsWith('http')) {
+        setSubcatImage(child.id, mediaUrl);
+      }
+    });
+
+    imgZone.addEventListener('click', () => {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'image/*';
+      input.onchange = () => { if (input.files[0]) uploadSubcatImage(child.id, input.files[0]); };
+      input.click();
+    });
+
+    const info = document.createElement('div');
+    info.className = 'sc-info';
+
+    const nameDiv = document.createElement('div');
+    nameDiv.className = 'sc-name';
+    nameDiv.textContent = child.name;
+
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;justify-content:space-between;align-items:center;margin-top:4px';
+
+    const levelSpan = document.createElement('span');
+    levelSpan.className = 'sc-level';
+    levelSpan.textContent = child.level + ' · #' + child.id;
+
+    const statusSpan = document.createElement('span');
+    statusSpan.className = 'sc-status' + (child.status === 'draft' ? ' draft' : child.status === 'done' ? ' done' : '');
+    statusSpan.textContent = statusLabels[child.status] || child.status;
+
+    row.appendChild(levelSpan);
+    row.appendChild(statusSpan);
+    info.appendChild(nameDiv);
+    info.appendChild(row);
+
+    card.appendChild(imgZone);
+    card.appendChild(info);
+    grid.appendChild(card);
+  });
+}
+
+async function uploadSubcatImage(catId, file) {
+  const token = getToken();
+  if (!token) { toast('Token GitHub requis'); return; }
+
+  toast('Upload en cours...');
+  const formData = new FormData();
+  formData.append('image', file);
+
+  try {
+    const res = await fetch(getMediaApiUrl(), {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + token },
+      body: formData
+    });
+    if (res.ok) {
+      const data = await res.json();
+      await setSubcatImage(catId, data.url);
+      toast('Image uploadée');
+    } else {
+      toast('Erreur upload', 3000);
+    }
+  } catch(e) {
+    toast('Erreur: ' + e.message, 3000);
+  }
+}
+
+async function setSubcatImage(catId, url) {
+  const page = pagesData.pages.find(p => p.id === catId);
+  if (page) page.image = url;
+  await savePagesJson();
+  renderSubcatsGrid();
+}
+
+async function removeSubcatImage(catId) {
+  const page = pagesData.pages.find(p => p.id === catId);
+  if (page) delete page.image;
+  await savePagesJson();
+  renderSubcatsGrid();
+}
+
+async function savePagesJson() {
+  const token = getToken();
+  if (!token) return;
+
+  try {
+    const getRes = await fetch('https://api.github.com/repos/' + REPO + '/contents/pages.json?ref=' + BRANCH + '&_=' + Date.now(), {
+      headers: { 'Authorization': 'token ' + token }, cache: 'no-store'
+    });
+    const getData = await getRes.json();
+    const sha = getData.sha;
+
+    const content = btoa(unescape(encodeURIComponent(JSON.stringify(pagesData, null, 2))));
+    const putRes = await fetch('https://api.github.com/repos/' + REPO + '/contents/pages.json', {
+      method: 'PUT',
+      headers: { 'Authorization': 'token ' + token, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: 'subcats: update images', content: content, sha: sha, branch: BRANCH })
+    });
+    if (!putRes.ok) toast('Erreur sauvegarde pages.json', 3000);
+  } catch(e) {
+    toast('Erreur GitHub: ' + e.message, 3000);
+  }
+}
 
 // Warn before leaving with unsaved changes
 window.addEventListener('beforeunload', e => { if (dirty) { e.preventDefault(); e.returnValue = ''; } });

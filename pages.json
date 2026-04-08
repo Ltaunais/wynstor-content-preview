@@ -5,7 +5,8 @@
       "file": "pages/4-agrafer.html",
       "name": "Agrafer",
       "level": "N0",
-      "status": "draft"
+      "status": "draft",
+      "design": "homepage"
     },
     {
       "id": "152",
@@ -96,7 +97,8 @@
       "file": "pages/106-matelasseurs-de-cartons.html",
       "name": "Matelasseurs de cartons",
       "level": "N1",
-      "status": "todo"
+      "status": "todo",
+      "design": "faceting"
     },
     {
       "id": "13",
@@ -1125,14 +1127,16 @@
       "file": "pages/142-cisailles.html",
       "name": "Cisailles",
       "level": "N1",
-      "status": "todo"
+      "status": "todo",
+      "design": "homepage"
     },
     {
       "id": "150",
       "file": "pages/150-cisailles-d-atelier.html",
       "name": "Cisailles d'atelier",
       "level": "N2",
-      "status": "todo"
+      "status": "todo",
+      "design": "faceting"
     },
     {
       "id": "222",
@@ -1153,14 +1157,16 @@
       "file": "pages/218-cisailles-papier.html",
       "name": "Cisailles papier",
       "level": "N2",
-      "status": "todo"
+      "status": "todo",
+      "design": "faceting"
     },
     {
       "id": "145",
       "file": "pages/145-cisailles-a1.html",
       "name": "Cisailles papier A1",
       "level": "N3",
-      "status": "todo"
+      "status": "todo",
+      "design": "faceting"
     },
     {
       "id": "305",
@@ -1174,7 +1180,8 @@
       "file": "pages/146-cisailles-a2.html",
       "name": "Cisailles papier A2",
       "level": "N3",
-      "status": "todo"
+      "status": "todo",
+      "design": "faceting"
     },
     {
       "id": "300",
@@ -1195,7 +1202,8 @@
       "file": "pages/147-cisailles-a3.html",
       "name": "Cisailles papier A3",
       "level": "N3",
-      "status": "todo"
+      "status": "todo",
+      "design": "faceting"
     },
     {
       "id": "299",
@@ -1216,7 +1224,8 @@
       "file": "pages/148-cisailles-a4.html",
       "name": "Cisailles papier A4",
       "level": "N3",
-      "status": "todo"
+      "status": "todo",
+      "design": "faceting"
     },
     {
       "id": "298",
@@ -1237,7 +1246,8 @@
       "file": "pages/219-cisailles-materiaux-specifiques.html",
       "name": "Cisailles matériaux spécifiques",
       "level": "N2",
-      "status": "todo"
+      "status": "todo",
+      "design": "faceting"
     },
     {
       "id": "220",
@@ -1314,7 +1324,8 @@
       "file": "pages/149-coupeuses.html",
       "name": "Coupeuses",
       "level": "N1",
-      "status": "todo"
+      "status": "todo",
+      "design": "consommables"
     },
     {
       "id": "154",
