@@ -273,10 +273,12 @@
       "url": "65-couper-et-decouper",
       "slug": "65-couper-et-decouper",
       "type": "regen-bloc",
-      "status": "processing",
+      "status": "done",
       "h2": "Pourquoi investir dans une cisaille ?",
       "createdAt": "2026-04-08T15:27:39.875Z",
-      "startedAt": "2026-04-08T15:27:41.064Z"
+      "startedAt": "2026-04-08T15:27:41.064Z",
+      "result": "<p>Vous découpez chaque jour des bons de commande, des documents de transport ou des supports de présentation, et les ciseaux vous ralentissent dès que le format dépasse une feuille A4. Avec une {{widget type=\"Magento\\Catalog\\Block\\Category\\Widget\\Link\" anchor_text=\"cisaille\" id_path=\"category/142\"}}, vous positionnez le document contre le guide, abaissez le levier et obtenez une coupe droite en un seul geste. Le gain de temps se mesure dès la première journée, surtout quand les demandes de découpe s'enchaînent entre deux réunions ou au retour du courrier.</p>\n\n<p>La lame pivotante d'une cisaille attaque le papier par un point et progresse vers le bord opposé, ce qui réduit l'effort physique par rapport à un massicot à lame droite. Vous contrôlez la trajectoire de coupe du début à la fin, un avantage concret quand vous devez retailler un badge, ajuster une fiche produit ou recadrer un visuel avant de le {{widget type=\"Magento\\Catalog\\Block\\Category\\Widget\\Link\" anchor_text=\"plastifier\" id_path=\"category/13\"}}. Le format compact de la plupart des modèles libère de la place sur le bureau, là où un {{widget type=\"Magento\\Catalog\\Block\\Category\\Widget\\Link\" anchor_text=\"massicot\" id_path=\"category/143\"}} réclamerait un poste dédié.</p>\n\n<p>Côté durabilité, une cisaille bien entretenue conserve sa précision de coupe pendant des années. Pensez à remplacer la lame et le bâton de coupe dès que le tranchant faiblit : vous trouverez les pièces compatibles dans la rubrique {{widget type=\"Magento\\Catalog\\Block\\Category\\Widget\\Link\" anchor_text=\"accessoires de coupe\" id_path=\"category/154\"}}. Un jeu de rechange en stock dans votre salle courrier ou votre atelier reprographie vous évitera toute interruption le jour où la lame fatigue.</p>",
+      "finishedAt": "2026-04-08T15:29:11.958Z"
     },
     {
       "id": "reword-1775662088498",
