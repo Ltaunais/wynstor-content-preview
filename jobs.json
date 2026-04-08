@@ -391,6 +391,36 @@
       "createdAt": "2026-04-08T17:24:06.650Z",
       "startedAt": "2026-04-08T17:24:07.935Z",
       "finishedAt": "2026-04-08T17:30:51.662Z"
+    },
+    {
+      "id": "job-1775670401471",
+      "url": "4-agrafer",
+      "slug": "4-agrafer",
+      "type": "redaction",
+      "status": "pending",
+      "createdAt": "2026-04-08T17:46:41.471Z",
+      "structure": {
+        "h2s": [
+          "Vous agrafez des documents courants au poste de travail",
+          "Vous assemblez des dossiers épais de plus de 50 feuilles",
+          "Vous préparez des livrets ou brochures en format A3",
+          "Vous équipez plusieurs bureaux en matériel d'agrafage",
+          "Courrier, factures et petits dossiers au quotidien",
+          "En déplacement, en réunion, entre deux bureaux",
+          "Agrafage répétitif — accueil, service courrier, secrétariat",
+          "Rapports épais, mémoires techniques, dossiers d'appel d'offres",
+          "Brochures, cahiers et plaquettes en piqûre à cheval",
+          "Administrations, collectivités et établissements scolaires",
+          "Questions fréquentes"
+        ],
+        "faqs": [
+          "Quelle agrafeuse choisir pour un usage quotidien au bureau ?",
+          "Quelles agrafes sont compatibles avec mon agrafeuse ?",
+          "Comment agrafer des documents épais de plus de 50 feuilles ?",
+          "Comment choisir entre agrafeuse manuelle et agrafeuse électrique ?",
+          "Nouvelle question ?Quelle agrafeuse pour un usage intensif au bureau ?"
+        ]
+      }
     }
   ]
 }
