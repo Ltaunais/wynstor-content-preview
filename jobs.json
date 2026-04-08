@@ -337,11 +337,12 @@
       "url": "65-couper-et-decouper",
       "slug": "65-couper-et-decouper",
       "type": "reword",
-      "status": "pending",
+      "status": "processing",
       "sentence": "Pensez aussi aux finitions : arrondir un angle de badge, perforer une encoche pour un ruban, retailler un carton mousse avant collage. Les accessoires de découpe complètent votre poste de travail pour ces gestes ponctuels qui, cumulés, déterminent la qualité perçue de vos réalisations. Si vous avez également besoin de protéger ces supports contre l'usure, consultez la rubrique Plastifier pour les solutions de pelliculage adaptées.",
       "bannedWord": "__h3_generate__",
       "h2Context": "Vous préparez des supports visuels ou de la PLV en interne",
-      "createdAt": "2026-04-08T15:41:55.062Z"
+      "createdAt": "2026-04-08T15:41:55.062Z",
+      "startedAt": "2026-04-08T15:41:56.306Z"
     }
   ]
 }
