@@ -125,6 +125,14 @@
       "createdAt": "2026-04-08T14:22:30.252Z",
       "startedAt": "2026-04-08T14:22:46.318Z",
       "finishedAt": "2026-04-08T14:24:04.344Z"
+    },
+    {
+      "id": "job-1775658278806",
+      "url": "65-couper-et-decouper",
+      "slug": "65-couper-et-decouper",
+      "type": "analyse",
+      "status": "pending",
+      "createdAt": "2026-04-08T14:24:38.806Z"
     }
   ]
 }
