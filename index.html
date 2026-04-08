@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wynstor SEO — Visionneuse contenu</title>
+<style>
+  :root {
+    --bs-primary: #6f42c1;
+    --bs-secondary-bg: #f8f9fa;
+    --ws-gray-200: #e9ecef;
+    --ws-gray-600: #6c757d;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #212529; background: #f5f5f5; }
+  
+  /* Layout */
+  .layout { display: grid; grid-template-columns: 280px 1fr; min-height: 100vh; }
+  
+  /* Sidebar */
+  .sidebar { background: #fff; border-right: 1px solid var(--ws-gray-200); padding: 20px; position: sticky; top: 0; height: 100vh; overflow-y: auto; }
+  .sidebar h2 { font-size: 14px; text-transform: uppercase; letter-spacing: 1px; color: var(--ws-gray-600); margin-bottom: 16px; }
+  .sidebar .file-list { list-style: none; }
+  .sidebar .file-list li { margin-bottom: 4px; }
+  .sidebar .file-list a { display: block; padding: 8px 12px; border-radius: 6px; text-decoration: none; color: #212529; font-size: 14px; transition: background 0.15s; }
+  .sidebar .file-list a:hover { background: var(--bs-secondary-bg); }
+  .sidebar .file-list a.active { background: var(--bs-primary); color: #fff; }
+  .sidebar .file-list .cat-id { font-size: 11px; color: var(--ws-gray-600); margin-right: 4px; }
+  .sidebar .file-list a.active .cat-id { color: rgba(255,255,255,0.7); }
+  
+  /* Main */
+  .main { padding: 40px; max-width: 900px; }
+  
+  /* Meta bar */
+  .meta-bar { background: #fff; border: 1px solid var(--ws-gray-200); border-radius: 8px; padding: 16px 20px; margin-bottom: 24px; font-size: 13px; }
+  .meta-bar .meta-row { display: flex; gap: 8px; margin-bottom: 4px; }
+  .meta-bar .meta-label { font-weight: 600; min-width: 50px; color: var(--ws-gray-600); }
+  .meta-bar .meta-value { color: #212529; }
+  .meta-bar .char-count { color: var(--ws-gray-600); font-size: 11px; }
+  
+  /* Content preview */
+  .content-preview { background: #fff; border: 1px solid var(--ws-gray-200); border-radius: 8px; padding: 32px 40px; }
+  .content-preview .ws-h2 { font-size: 20px; font-weight: 600; color: #212529; margin: 32px 0 12px 0; padding-bottom: 8px; border-bottom: 2px solid var(--bs-primary); }
+  .content-preview .ws-h2:first-child { margin-top: 0; }
+  .content-preview p { font-size: 15px; line-height: 1.75; margin-bottom: 12px; color: #333; }
+  .content-preview .ws-faq { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--ws-gray-200); }
+  .content-preview .faq-item { margin-bottom: 16px; padding: 16px; background: var(--bs-secondary-bg); border-radius: 6px; }
+  .content-preview .ws-h3 { font-size: 15px; font-weight: 600; margin-bottom: 8px; }
+  .content-preview .faq-item p { margin-bottom: 0; font-size: 14px; }
+  
+  /* Widget markers */
+  .widget-link { background: #e8d5f5; color: var(--bs-primary); padding: 2px 6px; border-radius: 3px; font-size: 13px; text-decoration: none; cursor: help; border: 1px dashed var(--bs-primary); }
+  .widget-link:hover { background: var(--bs-primary); color: #fff; }
+  
+  /* Stats bar */
+  .stats-bar { display: flex; gap: 16px; margin-top: 16px; padding: 12px 20px; background: #fff; border: 1px solid var(--ws-gray-200); border-radius: 8px; font-size: 12px; color: var(--ws-gray-600); flex-wrap: wrap; }
+  .stats-bar .stat { display: flex; align-items: center; gap: 4px; }
+  .stats-bar .stat-value { font-weight: 600; color: #212529; }
+  .stats-bar .stat-ok { color: #198754; }
+  .stats-bar .stat-warn { color: #ffc107; }
+  .stats-bar .stat-bad { color: #dc3545; }
+  
+  /* Bloc outlines */
+  .bloc-wrapper { position: relative; margin: 24px 0; padding: 16px; border: 1px dashed transparent; border-radius: 8px; transition: border-color 0.2s; }
+  .bloc-wrapper:hover { border-color: var(--bs-primary); }
+  .bloc-wrapper .bloc-label { display: none; position: absolute; top: -10px; right: 12px; background: var(--bs-primary); color: #fff; font-size: 10px; padding: 2px 8px; border-radius: 3px; }
+  .bloc-wrapper:hover .bloc-label { display: block; }
+  
+  /* Source toggle */
+  .source-toggle { margin-top: 16px; }
+  .source-toggle button { background: #fff; border: 1px solid var(--ws-gray-200); padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 13px; }
+  .source-toggle button:hover { background: var(--bs-secondary-bg); }
+  .source-code { display: none; margin-top: 12px; background: #1e1e1e; color: #d4d4d4; padding: 20px; border-radius: 8px; font-family: 'Fira Code', monospace; font-size: 12px; line-height: 1.6; overflow-x: auto; white-space: pre-wrap; word-break: break-all; }
+  .source-code.visible { display: block; }
+  
+  @media (max-width: 768px) {
+    .layout { grid-template-columns: 1fr; }
+    .sidebar { position: static; height: auto; border-right: none; border-bottom: 1px solid var(--ws-gray-200); }
+  }
+</style>
+</head>
+<body>
+
+<div class="layout">
+  <div class="sidebar">
+    <h2>Pages</h2>
+    <ul class="file-list" id="fileList">
+      <li><a href="#" class="active" data-file="65-couper-et-decouper.html"><span class="cat-id">65</span> Couper et découper</a></li>
+      <!-- Futures pages -->
+      <!--
+      <li><a href="#" data-file="142-cisailles.html"><span class="cat-id">142</span> Cisailles</a></li>
+      <li><a href="#" data-file="218-cisailles-papier.html"><span class="cat-id">218</span> Cisailles papier</a></li>
+      <li><a href="#" data-file="148-cisailles-a4.html"><span class="cat-id">148</span> Cisailles A4</a></li>
+      -->
+    </ul>
+  </div>
+  
+  <div class="main">
+    <div class="meta-bar" id="metaBar">Chargement...</div>
+    <div class="content-preview" id="contentPreview">Chargement...</div>
+    <div class="stats-bar" id="statsBar"></div>
+    <div class="source-toggle">
+      <button onclick="toggleSource()">Voir le HTML source</button>
+    </div>
+    <pre class="source-code" id="sourceCode"></pre>
+  </div>
+</div>
+
+<script>
+const BLACKLIST_VERBS = /\b(offre|permet|propose|assure|dispose de|bénéficie de|se distingue|séduit|accompagne|facilite|optimise)\b/gi;
+const BLACKLIST_ADJ = /\b(idéal|parfait|optimal|performant|polyvalent|ergonomique|robuste|fiable|innovant|premium|incontournable|exceptionnel|remarquable|essentiel|indispensable)\b/gi;
+const BLACKLIST_EXPR = /(découvrez|n'hésitez pas|conçu pour|que vous soyez|grâce à|large gamme|vaste choix|en effet|de plus,|par ailleurs,|néanmoins|toutefois|cependant)/gi;
+const EM_DASH = /—/g;
+
+async function loadFile(filename) {
+  try {
+    const res = await fetch(filename);
+    const html = await res.text();
+    renderContent(html, filename);
+    
+    document.querySelectorAll('.file-list a').forEach(a => a.classList.remove('active'));
+    document.querySelector(`[data-file="${filename}"]`)?.classList.add('active');
+  } catch(e) {
+    document.getElementById('contentPreview').innerHTML = '<p>Fichier non trouvé.</p>';
+  }
+}
+
+function renderContent(html, filename) {
+  // Extract meta from comments
+  const metaMatch = html.match(/Title: (.+)\n\s+Meta: (.+)\n\s+H1: (.+)/);
+  const metaBar = document.getElementById('metaBar');
+  if (metaMatch) {
+    const titleLen = metaMatch[1].match(/\((\d+ chars)\)/)?.[1] || metaMatch[1].length + ' chars';
+    const metaLen = metaMatch[2].match(/\((\d+ chars)\)/)?.[1] || metaMatch[2].length + ' chars';
+    metaBar.innerHTML = `
+      <div class="meta-row"><span class="meta-label">Title</span><span class="meta-value">${metaMatch[1]}</span></div>
+      <div class="meta-row"><span class="meta-label">Meta</span><span class="meta-value">${metaMatch[2]}</span></div>
+      <div class="meta-row"><span class="meta-label">H1</span><span class="meta-value">${metaMatch[3]}</span></div>
+    `;
+  } else {
+    metaBar.innerHTML = '<em>Pas de meta trouvé dans les commentaires</em>';
+  }
+  
+  // Clean HTML for display (remove comments, script tags for display)
+  let displayHtml = html
+    .replace(/<!--[\s\S]*?-->/g, '')
+    .replace(/<script[\s\S]*?<\/script>/g, '')
+    .trim();
+  
+  // Replace widget tags with visual markers
+  displayHtml = displayHtml.replace(
+    /\{\{widget[^}]*anchor_text="([^"]+)"[^}]*id_path="([^"]+)"[^}]*\}\}/g,
+    '<span class="widget-link" title="$2">$1</span>'
+  );
+  
+  // Wrap each h2+content in bloc-wrapper
+  let blocIndex = 0;
+  displayHtml = displayHtml.replace(/<h2/g, () => {
+    blocIndex++;
+    return `</div><div class="bloc-wrapper"><span class="bloc-label">Bloc ${blocIndex}</span><h2`;
+  });
+  displayHtml = displayHtml + '</div>';
+  displayHtml = displayHtml.replace(/^<\/div>/, '');
+  
+  document.getElementById('contentPreview').innerHTML = displayHtml;
+  
+  // Source code
+  document.getElementById('sourceCode').textContent = html;
+  document.getElementById('sourceCode').classList.remove('visible');
+  
+  // Stats
+  const textOnly = html.replace(/<[^>]+>/g, '').replace(/\{\{[^}]+\}\}/g, '').replace(/<!--[\s\S]*?-->/g, '');
+  const wordCount = textOnly.trim().split(/\s+/).filter(w => w.length > 0).length;
+  const widgetCount = (html.match(/\{\{widget/g) || []).length;
+  const h2Count = (html.match(/<h2/g) || []).length;
+  const faqCount = (html.match(/faq-item/g) || []).length;
+  
+  // Blacklist check
+  const verbHits = (textOnly.match(BLACKLIST_VERBS) || []);
+  const adjHits = (textOnly.match(BLACKLIST_ADJ) || []);
+  const exprHits = (textOnly.match(BLACKLIST_EXPR) || []);
+  const emDashHits = (html.match(EM_DASH) || []);
+  const totalHits = verbHits.length + adjHits.length + exprHits.length + emDashHits.length;
+  
+  const ratio = wordCount > 0 ? Math.round(wordCount / widgetCount) : 0;
+  const ratioClass = ratio >= 100 ? 'stat-ok' : ratio >= 50 ? 'stat-warn' : 'stat-bad';
+  const blClass = totalHits === 0 ? 'stat-ok' : 'stat-bad';
+  const blDetail = totalHits > 0 ? ` (${[...verbHits, ...adjHits, ...exprHits, ...emDashHits].join(', ')})` : '';
+  
+  document.getElementById('statsBar').innerHTML = `
+    <div class="stat">Mots : <span class="stat-value">${wordCount}</span></div>
+    <div class="stat">H2 : <span class="stat-value">${h2Count}</span></div>
+    <div class="stat">Widgets liens : <span class="stat-value">${widgetCount}</span></div>
+    <div class="stat">FAQ : <span class="stat-value">${faqCount}</span></div>
+    <div class="stat">Ratio mots/lien : <span class="stat-value ${ratioClass}">${ratio}</span></div>
+    <div class="stat">Blacklist : <span class="stat-value ${blClass}">${totalHits}${blDetail}</span></div>
+  `;
+}
+
+function toggleSource() {
+  document.getElementById('sourceCode').classList.toggle('visible');
+}
+
+// Init
+document.addEventListener('DOMContentLoaded', () => {
+  loadFile('65-couper-et-decouper.html');
+  
+  document.querySelectorAll('.file-list a').forEach(a => {
+    a.addEventListener('click', (e) => {
+      e.preventDefault();
+      loadFile(a.dataset.file);
+    });
+  });
+});
+</script>
+
+</body>
+</html>
