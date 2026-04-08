@@ -2654,7 +2654,10 @@ function regenBloc(btn) {
             const j = jobs.find(function(x) { return x.id === jobId; });
             if (j && j.status === 'done' && j.result) {
               clearInterval(pollRegen);
-              content.innerHTML = '<h2 class="ws-h2">' + h2Text + '</h2>\n' + j.result;
+              var regenHtml = ('<h2 class="ws-h2">' + h2Text + '</h2>\n' + j.result)
+                .replace(/\{\{widget[^}]*anchor_text="([^"]+)"[^}]*id_path="([^"]+)"[^}]*\}\}/g,
+                  '<span class="widget-link" title="$2" contenteditable="false">$1</span>');
+              content.innerHTML = regenHtml;
               setupImageDropTargets();
               setupFaqButtons();
               highlightBlacklistedWords();
@@ -2784,7 +2787,10 @@ function launchGuidedRegen(bloc, instruction) {
             var j = jobs.find(function(x) { return x.id === jobId; });
             if (j && j.status === 'done' && j.result) {
               clearInterval(pollRegen);
-              content.innerHTML = '<h2 class="ws-h2">' + h2Text + '</h2>\n' + j.result;
+              var regenHtml = ('<h2 class="ws-h2">' + h2Text + '</h2>\n' + j.result)
+                .replace(/\{\{widget[^}]*anchor_text="([^"]+)"[^}]*id_path="([^"]+)"[^}]*\}\}/g,
+                  '<span class="widget-link" title="$2" contenteditable="false">$1</span>');
+              content.innerHTML = regenHtml;
               setupImageDropTargets();
               setupFaqButtons();
               highlightBlacklistedWords();
