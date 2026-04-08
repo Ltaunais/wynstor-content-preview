@@ -1224,6 +1224,72 @@ function openBlockPicker() {
   // Afficher favoris si y en a, sinon tous
   renderPickerGrid(favCount > 0 ? '__favs__' : null);
   overlay.classList.add('visible');
+
+  // Ajouter le bouton "Nouveau H2 + IA" en haut de la grille
+  addAiBlockButton();
+}
+
+function addAiBlockButton() {
+  const gridDiv = document.getElementById('bpGrid');
+  const existing = gridDiv.querySelector('.ai-new-block');
+  if (existing) return;
+
+  const card = document.createElement('div');
+  card.className = 'bp-card ai-new-block';
+  card.style.cssText = 'border:2px dashed var(--pr);background:rgba(111,66,193,0.03);order:-1';
+  card.addEventListener('click', function() {
+    closeBlockPicker();
+    showNewH2Prompt();
+  });
+
+  const preview = document.createElement('div');
+  preview.style.cssText = 'height:100px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:var(--pr)';
+  preview.innerHTML = '<div style="font-size:28px">&#10024;</div><div style="font-size:12px;font-weight:600">Nouveau H2 + IA</div>';
+  card.appendChild(preview);
+
+  const info = document.createElement('div');
+  info.className = 'bp-card-info';
+  const name = document.createElement('div');
+  name.className = 'bp-card-name';
+  name.textContent = 'Rédaction IA';
+  info.appendChild(name);
+  const desc = document.createElement('div');
+  desc.className = 'bp-card-desc';
+  desc.textContent = 'Tapez un titre H2, Claude rédige le contenu';
+  info.appendChild(desc);
+  card.appendChild(info);
+
+  gridDiv.prepend(card);
+}
+
+function showNewH2Prompt() {
+  var h2Title = prompt('Titre du H2 :');
+  if (!h2Title || !h2Title.trim()) return;
+  h2Title = h2Title.trim();
+
+  // Insérer un bloc avec placeholder
+  var insertBar = pendingInsertBar;
+  if (!insertBar) {
+    var editor = document.getElementById('editor');
+    insertBar = editor.querySelector('.insert-bar:last-child');
+  }
+  if (!insertBar) return;
+
+  var newBloc = document.createElement('div');
+  newBloc.className = 'bloc';
+  newBloc.innerHTML = '<div class="bloc-toolbar"><button onclick="moveBloc(this,-1)" title="Monter">&#8593;</button><button onclick="moveBloc(this,1)" title="Descendre">&#8595;</button><button onclick="regenBloc(this)" title="Régénérer">&#128260;</button><button onclick="regenBlocGuided(this)" title="Régénérer guidé">&#128161;</button><button onclick="dupeBloc(this)" title="Dupliquer">&#128203;</button><button onclick="saveBlocAsPreset(this)" title="Preset">&#128190;</button><button onclick="deleteBloc(this)" title="Supprimer">&#10005;</button></div><div class="bloc-content" contenteditable="true" oninput="markDirty()"><h2 class="ws-h2">' + h2Title + '</h2><p style="color:var(--pr);font-style:italic">Rédaction IA en cours...</p></div>';
+
+  var newBar = document.createElement('div');
+  newBar.className = 'insert-bar';
+  newBar.innerHTML = '<button onclick="showInsertMenu(this)" title="Insérer un bloc">+</button>';
+
+  insertBar.after(newBloc);
+  newBloc.after(newBar);
+  markDirty();
+
+  // Lancer la regen sur ce bloc
+  var regenBtn = newBloc.querySelector('[title="Régénérer"]');
+  if (regenBtn) regenBloc(regenBtn);
 }
 
 function renderPickerGrid(filterCat) {
