@@ -175,10 +175,11 @@
       "url": "65-couper-et-decouper",
       "slug": "65-couper-et-decouper",
       "type": "regen-bloc",
-      "status": "pending",
+      "status": "processing",
       "h2": "Massicots vs cisailles vs rogneuses",
       "instruction": "Parler de la longueur de coupe, et l'épasseur de chaque matériels",
-      "createdAt": "2026-04-08T15:03:28.935Z"
+      "createdAt": "2026-04-08T15:03:28.935Z",
+      "startedAt": "2026-04-08T15:03:54.687Z"
     }
   ]
 }
