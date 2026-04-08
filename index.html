@@ -490,6 +490,19 @@
   </div>
 </div>
 
+<!-- CLAUDE API KEY MODAL -->
+<div class="modal-overlay" id="claudeKeyModal">
+  <div class="modal">
+    <h3>Clé API Claude</h3>
+    <p>Clé API Anthropic pour la génération de contenu SEO. Stockée en localStorage uniquement.</p>
+    <input type="password" id="claudeKeyInput" placeholder="sk-ant-api03-...">
+    <div class="modal-actions">
+      <button class="btn" onclick="hideClaudeKeyModal()">Annuler</button>
+      <button class="btn btn-primary" onclick="saveClaudeKey()">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
 
@@ -1553,6 +1566,194 @@ markDirty = function() {
   clearTimeout(previewTimer);
   previewTimer = setTimeout(updatePreviewIfOpen, 500);
 };
+
+// === CLAUDE API KEY ===
+function getClaudeKey() { return localStorage.getItem('ws_claude_key') || ''; }
+function showClaudeKeyModal() { document.getElementById('claudeKeyModal').classList.add('visible'); document.getElementById('claudeKeyInput').value = getClaudeKey(); }
+function hideClaudeKeyModal() { document.getElementById('claudeKeyModal').classList.remove('visible'); }
+function saveClaudeKey() { localStorage.setItem('ws_claude_key', document.getElementById('claudeKeyInput').value.trim()); hideClaudeKeyModal(); toast('Clé Claude enregistrée'); }
+
+// === GENERATE SEO ===
+let seoDataCache = null;
+let skillPromptCache = null;
+
+async function loadSeoData() {
+  if (seoDataCache) return seoDataCache;
+  try {
+    const res = await fetch('seo-data.json?_=' + Date.now(), { cache: 'no-store' });
+    seoDataCache = await res.json();
+  } catch(e) { seoDataCache = { categories: [], gsc: {} }; }
+  return seoDataCache;
+}
+
+async function loadSkillPrompt() {
+  if (skillPromptCache) return skillPromptCache;
+  try {
+    const res = await fetch('skill-prompt.md?_=' + Date.now(), { cache: 'no-store' });
+    skillPromptCache = await res.text();
+  } catch(e) { skillPromptCache = ''; }
+  return skillPromptCache;
+}
+
+function findCategory(tree, slug) {
+  // slug = "142-cisailles" → cherche id 142
+  const idMatch = slug.replace(/^\//, '').match(/^(\d+)-/);
+  if (!idMatch) return null;
+  const id = parseInt(idMatch[1]);
+
+  function search(nodes) {
+    for (const node of nodes) {
+      if (node.id === id) return node;
+      if (node.children && node.children.length) {
+        const found = search(node.children);
+        if (found) return found;
+      }
+    }
+    return null;
+  }
+  return search(tree);
+}
+
+function findParent(tree, targetId, parent) {
+  for (const node of tree) {
+    if (node.id === targetId) return parent;
+    if (node.children && node.children.length) {
+      const found = findParent(node.children, targetId, node);
+      if (found) return found;
+    }
+  }
+  return null;
+}
+
+async function generateSeo() {
+  const claudeKey = getClaudeKey();
+  if (!claudeKey) { showClaudeKeyModal(); return; }
+
+  const urlInput = document.getElementById('seoUrlInput').value.trim();
+  if (!urlInput) { toast('Entrez une URL de catégorie'); return; }
+
+  const status = document.getElementById('seoStatus');
+  status.style.display = 'block';
+  status.textContent = 'Chargement des données...';
+
+  const seoData = await loadSeoData();
+  const skillPrompt = await loadSkillPrompt();
+
+  // Trouver la catégorie dans l'arbo
+  const slug = urlInput.replace(/^\//, '');
+  const category = findCategory(seoData.categories, slug);
+  const parent = category ? findParent(seoData.categories, category.id, null) : null;
+
+  // Récupérer les données GSC pour cette page
+  const gscData = seoData.gsc[slug] || { queries: [], totalImpressions: 0, totalClicks: 0 };
+
+  // Chercher la cannibalisation : quelles autres pages captent les mêmes requêtes
+  const mainQueries = gscData.queries.slice(0, 5).map(q => q.query);
+  const cannibalization = {};
+  mainQueries.forEach(query => {
+    Object.entries(seoData.gsc).forEach(([page, data]) => {
+      if (page === slug) return;
+      const match = data.queries.find(q => q.query === query);
+      if (match) {
+        if (!cannibalization[query]) cannibalization[query] = [];
+        cannibalization[query].push({ page, position: match.position, impressions: match.impressions });
+      }
+    });
+  });
+
+  // Construire le contexte
+  const context = `
+## Catégorie à rédiger
+- URL: /${slug}
+- Nom: ${category ? category.name : slug}
+- Produits: ${category ? category.products : '?'}
+- Parent: ${parent ? parent.name + ' (ID ' + parent.id + ')' : 'racine'}
+- Enfants: ${category && category.children.length ? category.children.map(c => c.name + ' (ID ' + c.id + ', ' + c.products + ' produits)').join(', ') : 'aucun'}
+
+## Données GSC (90 jours)
+- Impressions totales: ${gscData.totalImpressions}
+- Clics totaux: ${gscData.totalClicks}
+- Top requêtes:
+${gscData.queries.slice(0, 15).map(q => '  - "' + q.query + '" → pos ' + q.position + ', ' + q.impressions + ' imp, ' + q.clicks + ' clics').join('\n')}
+
+## Cannibalisation détectée
+${Object.keys(cannibalization).length === 0 ? 'Aucune détectée' :
+  Object.entries(cannibalization).map(([query, pages]) =>
+    '- "' + query + '" : aussi sur ' + pages.map(p => p.page + ' (pos ' + p.position + ')').join(', ')
+  ).join('\n')}
+
+## Arbo enfants complète
+${category && category.children.length ? JSON.stringify(category.children, null, 2) : 'Pas d\'enfants'}
+`;
+
+  status.textContent = 'Génération en cours (Claude API)...';
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': claudeKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 4096,
+        messages: [{
+          role: 'user',
+          content: `Tu es un rédacteur SEO expert pour wynstor.com (grossiste B2B fournitures de bureau).
+
+${skillPrompt}
+
+${context}
+
+Génère le contenu HTML pour cette page catégorie.
+Respecte TOUTES les règles du skill (anti-cannibalisation, humanisation, blacklist, maillage).
+
+IMPORTANT :
+- Output = HTML brut uniquement (pas de markdown, pas de commentaires explicatifs)
+- Commence par un commentaire HTML avec Title, Meta, H1
+- Utilise les widgets Magento pour les liens internes
+- Pas de <article>, pas de <h1>, pas de <table>
+- FAQ en format ws-faq + JSON-LD
+- JAMAIS inventer de données`
+        }]
+      })
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      const html = data.content[0].text;
+
+      // Injecter dans l'éditeur
+      currentRawHtml = html;
+      currentFile = 'pages/' + slug + '.html';
+      currentSha = null;
+      renderMeta();
+      renderEditor();
+      setupImageDropTargets();
+      updateStats();
+      markDirty();
+
+      status.textContent = 'Contenu généré. Vérifiez et sauvegardez.';
+      status.style.color = 'var(--ok)';
+      toast('Contenu SEO généré');
+
+      // Mettre à jour le titre de page
+      document.getElementById('pageTitle').textContent = slug;
+    } else {
+      const err = await response.json();
+      status.textContent = 'Erreur API';
+      status.style.color = 'var(--bad)';
+      toast('Erreur Claude: ' + (err.error?.message || response.status), 5000);
+    }
+  } catch(e) {
+    status.textContent = 'Erreur réseau';
+    status.style.color = 'var(--bad)';
+    toast('Erreur: ' + e.message, 5000);
+  }
+}
 
 // === RESIZE SIDEBAR MÉDIA ===
 (function() {
