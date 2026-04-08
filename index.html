@@ -307,7 +307,7 @@ async function loadFile(filename) {
     });
     const data = await res.json();
     currentSha = data.sha;
-    currentRawHtml = atob(data.content.replace(/\n/g, ''));
+    currentRawHtml = decodeURIComponent(escape(atob(data.content.replace(/\n/g, ''))));
   } catch(e) {
     // Fallback: fetch raw
     const res = await fetch(filename);
