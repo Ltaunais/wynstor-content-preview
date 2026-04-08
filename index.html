@@ -560,19 +560,32 @@ function renderEditor() {
 
 // === BLOC ACTIONS ===
 function moveBloc(btn, dir) {
+  // Structure DOM : [bar] [bloc] [bar] [bloc] [bar] ...
   const bloc = btn.closest('.bloc');
-  const insertBar = bloc.previousElementSibling;
-  if (dir === -1 && insertBar?.previousElementSibling?.classList.contains('bloc')) {
-    const target = insertBar.previousElementSibling;
-    const targetBar = target.previousElementSibling;
-    bloc.parentNode.insertBefore(insertBar, targetBar);
-    bloc.parentNode.insertBefore(bloc, targetBar);
-  } else if (dir === 1 && bloc.nextElementSibling?.nextElementSibling?.classList.contains('bloc')) {
-    const nextBar = bloc.nextElementSibling;
-    const nextBloc = nextBar.nextElementSibling;
-    const nextNextBar = nextBloc.nextElementSibling;
-    bloc.parentNode.insertBefore(bloc, nextNextBar);
-    bloc.parentNode.insertBefore(insertBar, bloc);
+  const parent = bloc.parentNode;
+  const allBlocs = Array.from(parent.querySelectorAll('.bloc'));
+  const idx = allBlocs.indexOf(bloc);
+
+  if (dir === -1 && idx > 0) {
+    // Monter = placer avant le bloc précédent
+    const prevBloc = allBlocs[idx - 1];
+    const myBar = bloc.previousElementSibling; // insert-bar avant moi
+    // Déplacer mon insert-bar + moi avant le bloc précédent
+    parent.insertBefore(myBar, prevBloc);
+    parent.insertBefore(bloc, prevBloc);
+  } else if (dir === 1 && idx < allBlocs.length - 1) {
+    // Descendre = placer après le bloc suivant
+    const nextBloc = allBlocs[idx + 1];
+    const nextBar = nextBloc.nextElementSibling; // insert-bar après le suivant
+    const myBar = bloc.previousElementSibling;
+    // Déplacer après le bar du bloc suivant
+    if (nextBar) {
+      parent.insertBefore(myBar, nextBar.nextSibling);
+      parent.insertBefore(bloc, nextBar.nextSibling);
+    } else {
+      parent.appendChild(myBar);
+      parent.appendChild(bloc);
+    }
   }
   markDirty();
 }
@@ -772,9 +785,11 @@ document.addEventListener('keydown', (e) => {
 
 function insertTemplate(insertBar, tplKey) {
   const html = TEMPLATES[tplKey];
-  const bloc = document.createElement('div');
-  bloc.className = 'bloc';
-  bloc.innerHTML = `
+
+  // Créer : [insert-bar] [bloc] et les insérer APRÈS l'insert-bar cliqué
+  const newBloc = document.createElement('div');
+  newBloc.className = 'bloc';
+  newBloc.innerHTML = `
     <div class="bloc-toolbar">
       <button onclick="moveBloc(this,-1)">&#8593;</button>
       <button onclick="moveBloc(this,1)">&#8595;</button>
@@ -782,12 +797,13 @@ function insertTemplate(insertBar, tplKey) {
     </div>
     <div class="bloc-content" contenteditable="true" oninput="markDirty()">${html}</div>
   `;
-  const newBar = document.createElement('div');
-  newBar.className = 'insert-bar';
-  newBar.innerHTML = '<button onclick="showInsertMenu(this)" title="Insérer un bloc">+</button>';
+  const newInsertBar = document.createElement('div');
+  newInsertBar.className = 'insert-bar';
+  newInsertBar.innerHTML = '<button onclick="showInsertMenu(this)" title="Insérer un bloc">+</button>';
 
-  insertBar.after(newBar);
-  newBar.after(bloc);
+  // Insérer après l'insert-bar cliqué : [insertBar] → [newBloc] → [newInsertBar]
+  insertBar.after(newBloc);
+  newBloc.after(newInsertBar);
   markDirty();
 }
 
