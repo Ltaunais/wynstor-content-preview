@@ -512,7 +512,15 @@
   <!-- MAIN -->
   <div class="main">
     <div class="top-bar">
-      <h1 id="pageTitle">Chargement...</h1>
+      <div style="display:flex;align-items:center;gap:10px">
+        <h1 id="pageTitle">Chargement...</h1>
+        <select id="designKeySelect" style="display:none;padding:4px 8px;border:1px solid var(--border);border-radius:5px;font-size:11px;background:var(--card);cursor:pointer" onchange="onDesignKeyChange(this.value)">
+          <option value="">— Aucun layout —</option>
+          <option value="homepage">homepage</option>
+          <option value="faceting">faceting</option>
+          <option value="consommables">consommables</option>
+        </select>
+      </div>
       <div class="actions">
         <span class="save-status" id="saveStatus"></span>
         <button class="btn btn-primary" onclick="openPreview()">Preview Wynstor</button>
@@ -748,6 +756,7 @@ async function loadFile(filename) {
   }
 
   renderMeta();
+  updateDesignKeyDropdown();
   renderSubcatsGrid();
   renderEditor();
   setupImageDropTargets();
@@ -3396,6 +3405,60 @@ document.getElementById('editor').addEventListener('drop', (e) => {
     }
   }
 });
+
+// === DESIGN KEY DROPDOWN ===
+function updateDesignKeyDropdown() {
+  const select = document.getElementById('designKeySelect');
+  if (!currentFile || !pagesData) { select.style.display = 'none'; return; }
+  const page = pagesData.pages.find(p => p.file === currentFile);
+  if (!page) { select.style.display = 'none'; return; }
+  select.style.display = 'inline-block';
+  select.value = page.design || '';
+}
+
+async function onDesignKeyChange(value) {
+  if (!currentFile || !pagesData) return;
+  const page = pagesData.pages.find(p => p.file === currentFile);
+  if (!page) return;
+
+  const oldValue = page.design || '';
+  if (value === oldValue) return;
+
+  // Update local
+  if (value) { page.design = value; } else { delete page.design; }
+
+  // Sync Magento
+  const token = getToken();
+  if (!token) { toast('Token requis'); return; }
+
+  toast('Sync Magento...');
+  try {
+    const res = await fetch('https://dev3.wynstor.com/media/wysiwyg/smartwave/porto/category/design-key.php', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ category_id: parseInt(page.id), design_key: value })
+    });
+    const data = await res.json();
+    if (data.ok) {
+      toast('Layout ' + (value || 'supprimé') + ' → Magento OK');
+    } else {
+      toast('Erreur Magento: ' + (data.error || 'inconnue'), 3000);
+      // Rollback
+      if (oldValue) { page.design = oldValue; } else { delete page.design; }
+      document.getElementById('designKeySelect').value = oldValue;
+      return;
+    }
+  } catch(e) {
+    toast('Erreur: ' + e.message, 3000);
+    if (oldValue) { page.design = oldValue; } else { delete page.design; }
+    document.getElementById('designKeySelect').value = oldValue;
+    return;
+  }
+
+  // Sync pages.json sur GitHub
+  await savePagesJson();
+  renderSubcatsGrid();
+}
 
 // === SOUS-CATÉGORIES GRID (homepage) ===
 function getChildPages(pageId) {
