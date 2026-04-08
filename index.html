@@ -1950,7 +1950,9 @@ function highlightBlacklistedWords() {
   if (blacklistCache.length === 0) return;
 
   var escaped = blacklistCache.map(function(w) { return w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); });
-  var pattern = new RegExp('\\b(' + escaped.join('|') + ')\\b', 'gi');
+  // Trier par longueur décroissante pour matcher les expressions longues d'abord
+  escaped.sort(function(a,b) { return b.length - a.length; });
+  var pattern = new RegExp('(' + escaped.join('|') + ')', 'gi');
 
   document.querySelectorAll('.bloc-content p, .bloc-content h2, .bloc-content h3').forEach(function(el) {
     var walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
@@ -2235,7 +2237,7 @@ document.getElementById('stExclude').addEventListener('mousedown', async (e) => 
   const sel = window.getSelection();
   if (!sel || sel.isCollapsed) { toast('Sélectionnez un mot d\'abord'); return; }
   const word = sel.toString().trim();
-  if (!word || word.includes(' ')) { toast('Sélectionnez un seul mot'); return; }
+  if (!word) { toast('Sélectionnez du texte d\'abord'); return; }
 
   await addToBlacklist(word);
   updateStats();
