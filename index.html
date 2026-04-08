@@ -215,6 +215,19 @@
   }
   #mediaDropZone.dragover { border-color: var(--pr); background: rgba(111,66,193,0.05); }
 
+  /* Image drop targets dans les blocs */
+  .img-drop-target {
+    position: relative; display: inline-block; cursor: pointer;
+  }
+  .img-drop-target::after {
+    content: 'Drop image ici'; position: absolute; inset: 0;
+    display: none; align-items: center; justify-content: center;
+    background: rgba(111,66,193,0.85); color: #fff; font-size: 12px;
+    font-weight: 600; border-radius: 8px; pointer-events: none;
+  }
+  .img-drop-target.dragover::after { display: flex; }
+  .img-drop-target img { display: block; max-width: 100%; }
+
   /* === BLOCK PICKER MODAL === */
   .block-picker-overlay {
     display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6);
@@ -555,6 +568,7 @@ async function loadFile(filename) {
 
   renderMeta();
   renderEditor();
+  setupImageDropTargets();
   updateStats();
   dirty = false;
   document.getElementById('saveStatus').textContent = '';
@@ -638,6 +652,70 @@ function renderEditor() {
   finalBar.className = 'insert-bar';
   finalBar.innerHTML = '<button onclick="showInsertMenu(this)" title="Insérer un bloc">+</button>';
   editor.appendChild(finalBar);
+}
+
+// === IMAGE DROP TARGETS ===
+function setupImageDropTargets() {
+  // Trouver tous les <img> dans les blocs éditables
+  document.querySelectorAll('.bloc-content img').forEach(img => {
+    // Ne pas wrapper si déjà wrappé
+    if (img.parentElement.classList.contains('img-drop-target')) return;
+
+    const wrapper = document.createElement('div');
+    wrapper.className = 'img-drop-target';
+    wrapper.contentEditable = 'false';
+    img.parentNode.insertBefore(wrapper, img);
+    wrapper.appendChild(img);
+
+    wrapper.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      wrapper.classList.add('dragover');
+    });
+    wrapper.addEventListener('dragleave', () => wrapper.classList.remove('dragover'));
+    wrapper.addEventListener('drop', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      wrapper.classList.remove('dragover');
+      const mediaUrl = e.dataTransfer.getData('application/x-media-url') || e.dataTransfer.getData('text/plain');
+      if (mediaUrl && mediaUrl.startsWith('http')) {
+        img.src = mediaUrl;
+        markDirty();
+      }
+    });
+
+    // Clic = ouvrir file picker pour remplacer
+    wrapper.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'image/*';
+      input.addEventListener('change', async () => {
+        if (!input.files.length) return;
+        const file = input.files[0];
+        // Upload sur Magento et remplacer l'URL
+        const token = getToken();
+        if (token) {
+          const formData = new FormData();
+          formData.append('image', file);
+          try {
+            const res = await fetch(MEDIA_API, {
+              method: 'POST',
+              headers: { 'Authorization': 'Bearer ' + token },
+              body: formData
+            });
+            if (res.ok) {
+              const data = await res.json();
+              img.src = data.url;
+              addMediaThumb(data);
+              markDirty();
+            }
+          } catch(err) { toast('Erreur upload', 3000); }
+        }
+      });
+      input.click();
+    });
+  });
 }
 
 // === BLOC ACTIONS ===
@@ -1058,6 +1136,7 @@ function insertTemplate(insertBar, tplKey) {
   // Insérer après l'insert-bar cliqué : [insertBar] → [newBloc] → [newInsertBar]
   insertBar.after(newBloc);
   newBloc.after(newInsertBar);
+  setupImageDropTargets();
   markDirty();
 }
 
@@ -1098,10 +1177,13 @@ function collectHtml() {
   document.querySelectorAll('.bloc .bloc-content').forEach(bc => {
     let blocHtml = bc.innerHTML;
     // Restore widget markers to real widgets
+    // Restore widget markers to real widgets
     blocHtml = blocHtml.replace(
       /<span class="widget-link"[^>]*title="([^"]+)"[^>]*>([^<]+)<\/span>/g,
       (_, path, text) => `{{widget type="Magento\\Catalog\\Block\\Category\\Widget\\Link" anchor_text="${text}" id_path="${path}"}}`
     );
+    // Unwrap img-drop-target wrappers (garder juste le <img>)
+    blocHtml = blocHtml.replace(/<div class="img-drop-target"[^>]*>([\s\S]*?)<\/div>/g, '$1');
     html += blocHtml.trim() + '\n\n';
   });
 
