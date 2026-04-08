@@ -215,6 +215,9 @@
   }
   #mediaDropZone.dragover { border-color: var(--pr); background: rgba(111,66,193,0.05); }
 
+  /* Mots exclus */
+  .excluded-word { background: rgba(240,61,61,0.15); text-decoration: line-through; text-decoration-color: var(--bad); cursor: help; }
+
   /* FAQ add/remove buttons */
   .faq-add-btn {
     display: flex; align-items: center; justify-content: center;
@@ -517,6 +520,12 @@
     <span class="tb-label">WS</span>
     <div class="color-presets" id="colorPresets"></div>
   </div>
+  <div class="tb-sep"></div>
+
+  <!-- Exclure mot -->
+  <div class="tb-group">
+    <button id="stExclude" title="Exclure ce mot des futures générations" style="font-size:10px;background:var(--bad);border-color:var(--bad);color:#fff">&#10007; Exclure</button>
+  </div>
 </div>
 
 <!-- TOKEN MODAL -->
@@ -625,6 +634,7 @@ async function loadFile(filename) {
   renderEditor();
   setupImageDropTargets();
   setupFaqButtons();
+  highlightBlacklistedWords();
   updateStats();
   dirty = false;
   document.getElementById('saveStatus').textContent = '';
@@ -1239,6 +1249,7 @@ function insertTemplate(insertBar, tplKey) {
   newBloc.after(newInsertBar);
   setupImageDropTargets();
   setupFaqButtons();
+  highlightBlacklistedWords();
   markDirty();
 }
 
@@ -1546,6 +1557,7 @@ async function initApp() {
   await loadBlocks();
   await loadCustomBlocks();
   await loadFavorites();
+  await loadBlacklist();
   loadMediaGallery();
   try {
     const res = await fetch('pages.json');
@@ -1565,6 +1577,63 @@ async function initApp() {
 }
 
 document.addEventListener('DOMContentLoaded', initApp);
+
+// === BLACKLIST (mots exclus persistants sur GitHub) ===
+let blacklistCache = [];
+let blacklistSha = null;
+
+async function loadBlacklist() {
+  const token = getToken();
+  try {
+    const res = await fetch(`https://api.github.com/repos/${REPO}/contents/blacklist.json?ref=${BRANCH}&_=${Date.now()}`, {
+      headers: token ? { 'Authorization': `token ${token}` } : {}, cache: 'no-store'
+    });
+    if (res.ok) {
+      const data = await res.json();
+      blacklistSha = data.sha;
+      const content = JSON.parse(decodeURIComponent(escape(atob(data.content.replace(/\n/g, '')))));
+      blacklistCache = content.words || [];
+    }
+  } catch(e) { blacklistCache = []; }
+}
+
+async function addToBlacklist(word) {
+  word = word.toLowerCase().trim();
+  if (!word || blacklistCache.includes(word)) return;
+  blacklistCache.push(word);
+
+  const token = getToken();
+  if (token) {
+    try {
+      const content = JSON.stringify({ words: blacklistCache }, null, 2);
+      const encoded = btoa(unescape(encodeURIComponent(content)));
+      const body = { message: 'blacklist: + ' + word, content: encoded, branch: BRANCH };
+      if (blacklistSha) body.sha = blacklistSha;
+      const res = await fetch(`https://api.github.com/repos/${REPO}/contents/blacklist.json`, {
+        method: 'PUT',
+        headers: { 'Authorization': `token ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      if (res.ok) {
+        const data = await res.json();
+        blacklistSha = data.content.sha;
+      }
+    } catch(e) {}
+  }
+}
+
+// Barrer visuellement les mots exclus dans l'éditeur
+function highlightBlacklistedWords() {
+  if (blacklistCache.length === 0) return;
+  document.querySelectorAll('.bloc-content p').forEach(function(p) {
+    blacklistCache.forEach(function(word) {
+      const regex = new RegExp('\\b(' + word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')\\b', 'gi');
+      if (regex.test(p.textContent)) {
+        p.innerHTML = p.innerHTML.replace(regex, '<span class="excluded-word" title="Mot exclu des futures générations">$1</span>');
+      }
+    });
+  });
+}
 
 // === STYLE TOOLBAR ===
 const stToolbar = document.getElementById('styleToolbar');
@@ -1723,6 +1792,22 @@ document.getElementById('stPadding').addEventListener('input', (e) => {
 document.getElementById('stRadius').addEventListener('input', (e) => {
   if (!stActiveEl) return;
   stActiveEl.style.borderRadius = e.target.value + 'px';
+  markDirty();
+});
+
+// Bouton Exclure dans le toolbar
+document.getElementById('stExclude').addEventListener('mousedown', async (e) => {
+  e.preventDefault();
+  const sel = window.getSelection();
+  if (!sel || sel.isCollapsed) { toast('Sélectionnez un mot d\'abord'); return; }
+  const word = sel.toString().trim();
+  if (!word || word.includes(' ')) { toast('Sélectionnez un seul mot'); return; }
+
+  await addToBlacklist(word);
+  toast('Mot exclu : "' + word + '"');
+
+  // Barrer visuellement
+  highlightBlacklistedWords();
   markDirty();
 });
 
@@ -1932,6 +2017,7 @@ IMPORTANT :
       renderEditor();
       setupImageDropTargets();
   setupFaqButtons();
+  highlightBlacklistedWords();
       updateStats();
       markDirty();
 
