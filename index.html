@@ -377,10 +377,11 @@
   .widget-link { background: var(--pr-light); color: var(--pr); padding: 1px 5px; border-radius: 3px; font-size: 12px; border: 1px dashed var(--pr); cursor: help; }
 
   /* Insert bar between blocs */
-  .insert-bar { height: 24px; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s; }
+  .insert-bar { height: 24px; display: flex; align-items: center; justify-content: center; gap: 6px; opacity: 0; transition: opacity 0.2s; }
   .insert-bar:hover { opacity: 1; }
-  .insert-bar button { background: var(--card); border: 1px solid var(--border); border-radius: 50%; width: 24px; height: 24px; font-size: 16px; cursor: pointer; color: var(--pr); line-height: 1; }
-  .insert-bar button:hover { background: var(--pr); color: #fff; }
+  .insert-bar button { background: var(--card); border: 1px solid var(--border); border-radius: 12px; height: 24px; font-size: 11px; cursor: pointer; color: var(--pr); line-height: 1; padding: 0 8px; }
+  .insert-bar button:hover { background: var(--pr); color: #fff; border-color: var(--pr); }
+  .insert-bar .ib-ai { color: var(--pr); font-size: 10px; }
 
   /* Stats */
   .stats-bar { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 12px; padding: 10px 16px; background: var(--card); border: 1px solid var(--border); border-radius: 8px; font-size: 11px; color: var(--gray); }
@@ -780,7 +781,7 @@ function renderEditor() {
     // Insert bar before each bloc
     const insertBar = document.createElement('div');
     insertBar.className = 'insert-bar';
-    insertBar.innerHTML = '<button onclick="showInsertMenu(this)" title="Insérer un bloc">+</button>';
+    insertBar.innerHTML = '<button onclick="showInsertMenu(this)" title="Insérer un bloc">+ Bloc</button><button class="ib-ai" onclick="quickNewH2(this)" title="Nouveau H2 rédigé par IA">&#10024; H2+IA</button>';
     editor.appendChild(insertBar);
     editor.appendChild(div);
   });
@@ -788,7 +789,7 @@ function renderEditor() {
   // Final insert bar
   const finalBar = document.createElement('div');
   finalBar.className = 'insert-bar';
-  finalBar.innerHTML = '<button onclick="showInsertMenu(this)" title="Insérer un bloc">+</button>';
+  finalBar.innerHTML = '<button onclick="showInsertMenu(this)" title="Insérer un bloc">+ Bloc</button><button class="ib-ai" onclick="quickNewH2(this)" title="Nouveau H2 rédigé par IA">&#10024; H2+IA</button>';
   editor.appendChild(finalBar);
 }
 
@@ -953,7 +954,7 @@ function dupeBloc(btn) {
   `;
   const newBar = document.createElement('div');
   newBar.className = 'insert-bar';
-  newBar.innerHTML = '<button onclick="showInsertMenu(this)" title="Insérer un bloc">+</button>';
+  newBar.innerHTML = '<button onclick="showInsertMenu(this)" title="Insérer un bloc">+ Bloc</button><button class="ib-ai" onclick="quickNewH2(this)" title="Nouveau H2 rédigé par IA">&#10024; H2+IA</button>';
 
   // Insérer après le bloc actuel
   const nextBar = bloc.nextElementSibling;
@@ -1262,6 +1263,11 @@ function addAiBlockButton() {
   gridDiv.prepend(card);
 }
 
+function quickNewH2(btn) {
+  pendingInsertBar = btn.closest('.insert-bar');
+  showNewH2Prompt();
+}
+
 function showNewH2Prompt() {
   var h2Title = prompt('Titre du H2 :');
   if (!h2Title || !h2Title.trim()) return;
@@ -1281,7 +1287,7 @@ function showNewH2Prompt() {
 
   var newBar = document.createElement('div');
   newBar.className = 'insert-bar';
-  newBar.innerHTML = '<button onclick="showInsertMenu(this)" title="Insérer un bloc">+</button>';
+  newBar.innerHTML = '<button onclick="showInsertMenu(this)" title="Insérer un bloc">+ Bloc</button><button class="ib-ai" onclick="quickNewH2(this)" title="Nouveau H2 rédigé par IA">&#10024; H2+IA</button>';
 
   insertBar.after(newBloc);
   newBloc.after(newBar);
@@ -1419,7 +1425,7 @@ function insertTemplate(insertBar, tplKey) {
   `;
   const newInsertBar = document.createElement('div');
   newInsertBar.className = 'insert-bar';
-  newInsertBar.innerHTML = '<button onclick="showInsertMenu(this)" title="Insérer un bloc">+</button>';
+  newInsertBar.innerHTML = '<button onclick="showInsertMenu(this)" title="Insérer un bloc">+ Bloc</button><button class="ib-ai" onclick="quickNewH2(this)" title="Nouveau H2 rédigé par IA">&#10024; H2+IA</button>';
 
   // Insérer après l'insert-bar cliqué : [insertBar] → [newBloc] → [newInsertBar]
   insertBar.after(newBloc);
