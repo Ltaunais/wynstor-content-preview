@@ -356,6 +356,12 @@
       <!-- Chargé dynamiquement depuis pages.json -->
     </ul>
     <div style="margin-top:24px">
+      <h2>Générer SEO</h2>
+      <input type="text" id="seoUrlInput" placeholder="/142-cisailles" style="width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:6px;font-size:12px;margin-bottom:6px">
+      <button class="btn btn-primary" style="width:100%;margin-bottom:4px" onclick="submitSeoJob()">Lancer Claude Code</button>
+      <div id="seoJobStatus" style="font-size:11px;color:var(--gray);margin-bottom:12px;display:none"></div>
+    </div>
+    <div style="margin-top:12px">
       <h2>Config</h2>
       <button class="btn" style="width:100%;margin-bottom:6px" onclick="showTokenModal()">Token GitHub</button>
     </div>
@@ -1753,6 +1759,114 @@ IMPORTANT :
     status.style.color = 'var(--bad)';
     toast('Erreur: ' + e.message, 5000);
   }
+}
+
+// === SEO JOB QUEUE ===
+let jobPollTimer = null;
+
+async function submitSeoJob() {
+  const token = getToken();
+  if (!token) { showTokenModal(); return; }
+
+  const urlInput = document.getElementById('seoUrlInput').value.trim();
+  if (!urlInput) { toast('Entrez une URL de catégorie'); return; }
+
+  const slug = urlInput.replace(/^\//, '').replace(/\.html$/, '');
+  const status = document.getElementById('seoJobStatus');
+  status.style.display = 'block';
+  status.textContent = 'Soumission du job...';
+  status.style.color = 'var(--pr)';
+
+  try {
+    // Lire jobs.json actuel
+    const getRes = await fetch(`https://api.github.com/repos/${REPO}/contents/jobs.json?ref=${BRANCH}&_=${Date.now()}`, {
+      headers: { 'Authorization': `token ${token}` }, cache: 'no-store'
+    });
+    const getData = await getRes.json();
+    const jobsSha = getData.sha;
+    const jobsContent = JSON.parse(decodeURIComponent(escape(atob(getData.content.replace(/\n/g, '')))));
+
+    // Ajouter le job
+    const jobId = 'job-' + Date.now();
+    jobsContent.jobs.push({
+      id: jobId,
+      url: slug,
+      slug: slug,
+      status: 'pending',
+      createdAt: new Date().toISOString()
+    });
+
+    // Écrire jobs.json
+    const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(jobsContent, null, 2))));
+    const putRes = await fetch(`https://api.github.com/repos/${REPO}/contents/jobs.json`, {
+      method: 'PUT',
+      headers: { 'Authorization': `token ${token}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        message: 'job: ' + slug,
+        content: encoded,
+        sha: jobsSha,
+        branch: BRANCH
+      })
+    });
+
+    if (putRes.ok) {
+      status.textContent = 'Job soumis. Claude Code traite...';
+      toast('Job SEO soumis : ' + slug);
+      // Commencer à poll le status
+      pollJobStatus(jobId);
+    } else {
+      status.textContent = 'Erreur soumission';
+      status.style.color = 'var(--bad)';
+    }
+  } catch(e) {
+    status.textContent = 'Erreur: ' + e.message;
+    status.style.color = 'var(--bad)';
+  }
+}
+
+function pollJobStatus(jobId) {
+  clearInterval(jobPollTimer);
+  const status = document.getElementById('seoJobStatus');
+  let dots = 0;
+
+  jobPollTimer = setInterval(async () => {
+    dots = (dots + 1) % 4;
+    const dotsStr = '.'.repeat(dots + 1);
+
+    try {
+      const token = getToken();
+      const res = await fetch(`https://api.github.com/repos/${REPO}/contents/jobs.json?ref=${BRANCH}&_=${Date.now()}`, {
+        headers: token ? { 'Authorization': `token ${token}` } : {},
+        cache: 'no-store'
+      });
+      if (!res.ok) return;
+      const data = await res.json();
+      const content = JSON.parse(decodeURIComponent(escape(atob(data.content.replace(/\n/g, '')))));
+      const job = content.jobs.find(j => j.id === jobId);
+
+      if (!job) return;
+
+      if (job.status === 'processing') {
+        status.textContent = 'Claude Code en cours' + dotsStr;
+        status.style.color = 'var(--pr)';
+      } else if (job.status === 'done') {
+        status.textContent = 'Terminé ! Chargement de la page...';
+        status.style.color = 'var(--ok)';
+        clearInterval(jobPollTimer);
+        toast('Contenu SEO généré !');
+        // Charger la page générée
+        setTimeout(() => {
+          loadFile('pages/' + job.slug + '.html');
+        }, 2000);
+      } else if (job.status === 'error') {
+        status.textContent = 'Erreur de génération';
+        status.style.color = 'var(--bad)';
+        clearInterval(jobPollTimer);
+      } else {
+        status.textContent = 'En attente du worker' + dotsStr;
+      }
+    } catch(e) {}
+  }, 10000); // Poll toutes les 10 secondes
 }
 
 // === RESIZE SIDEBAR MÉDIA ===
