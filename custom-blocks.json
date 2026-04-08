@@ -1,3 +1,10 @@
 {
-  "blocks": []
+  "blocks": [
+    {
+      "id": "custom-1775641033837",
+      "name": "test 1",
+      "desc": "Bloc personnalisé",
+      "html": "<h2 class=\"ws-h2\" style=\"border:none;font-size:2rem\"><img src=\"https://placehold.co/800x500/e9ecef/6c757d?text=Image+produit\" alt=\"Description\" class=\"w-100\" loading=\"lazy\" data-first-enter-image=\"true\" style=\"font-size: 2rem; object-fit: cover; height: 500px; min-height: 300px;\">Votre titre a<span style=\"font-size: 2rem;\">ccrocheur ici</span></h2>\n    <p class=\"mb-4\" style=\"font-size:1.1rem;line-height:1.7;color:var(--ws-gray-700)\">Votre texte de mise en situation. Adressez-vous directement au lecteur, projetez-le dans son quotidien professionnel.</p>\n    <a href=\"#\" class=\"btn btn-primary btn-lg\" style=\"background:var(--bs-primary);border:none;border-radius:8px;padding:12px 28px\">Demander un devis</a>"
+    }
+  ]
 }
