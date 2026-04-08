@@ -4,8 +4,9 @@
       "id": "job-test-001",
       "url": "4-agrafer",
       "slug": "4-agrafer",
-      "status": "pending",
-      "createdAt": "2026-04-08T11:00:00.000Z"
+      "status": "processing",
+      "createdAt": "2026-04-08T11:00:00.000Z",
+      "startedAt": "2026-04-08T10:46:19.606Z"
     }
   ]
 }
