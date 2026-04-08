@@ -4,6 +4,84 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Wynstor SEO — Éditeur de contenu</title>
+<script type="module">
+  // Détourage IA — RMBG-1.4 via HuggingFace Transformers (CDN)
+  import { AutoModel, AutoProcessor, RawImage } from 'https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.5.1';
+
+  const MODEL_ID = 'briaai/RMBG-1.4';
+  let rmbgModel = null, rmbgProcessor = null, rmbgLoading = null;
+
+  async function ensureRmbgLoaded() {
+    if (rmbgModel && rmbgProcessor) return;
+    if (rmbgLoading) { await rmbgLoading; return; }
+    rmbgLoading = (async () => {
+      [rmbgModel, rmbgProcessor] = await Promise.all([
+        AutoModel.from_pretrained(MODEL_ID, { dtype: 'q8' }),
+        AutoProcessor.from_pretrained(MODEL_ID)
+      ]);
+    })();
+    await rmbgLoading;
+  }
+
+  window.removeBackground = async function(imgUrl) {
+    try {
+      await ensureRmbgLoaded();
+      const image = await RawImage.fromURL(imgUrl);
+      const { pixel_values } = await rmbgProcessor(image);
+      const { output } = await rmbgModel({ input: pixel_values });
+
+      const maskTensor = output[0];
+      const squeezed = maskTensor.squeeze();
+      const [h, w] = squeezed.dims;
+      const maskBytes = new Uint8Array(h * w);
+      for (let i = 0; i < squeezed.data.length; i++) {
+        maskBytes[i] = Math.round(Math.min(1, Math.max(0, squeezed.data[i])) * 255);
+      }
+
+      // Mask canvas
+      const maskCanvas = document.createElement('canvas');
+      maskCanvas.width = w; maskCanvas.height = h;
+      const maskCtx = maskCanvas.getContext('2d');
+      const maskImageData = maskCtx.createImageData(w, h);
+      for (let i = 0; i < maskBytes.length; i++) {
+        maskImageData.data[i*4] = maskBytes[i];
+        maskImageData.data[i*4+1] = maskBytes[i];
+        maskImageData.data[i*4+2] = maskBytes[i];
+        maskImageData.data[i*4+3] = 255;
+      }
+      maskCtx.putImageData(maskImageData, 0, 0);
+
+      // Scale mask
+      const scaledCanvas = document.createElement('canvas');
+      scaledCanvas.width = image.width; scaledCanvas.height = image.height;
+      const scaledCtx = scaledCanvas.getContext('2d');
+      scaledCtx.drawImage(maskCanvas, 0, 0, image.width, image.height);
+      const scaledMask = scaledCtx.getImageData(0, 0, image.width, image.height);
+
+      // Apply mask
+      const canvas = document.createElement('canvas');
+      canvas.width = image.width; canvas.height = image.height;
+      const ctx = canvas.getContext('2d');
+      const imgEl = new Image();
+      imgEl.crossOrigin = 'anonymous';
+      await new Promise((resolve, reject) => {
+        imgEl.onload = resolve; imgEl.onerror = reject; imgEl.src = imgUrl;
+      });
+      ctx.drawImage(imgEl, 0, 0);
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      for (let i = 0; i < image.width * image.height; i++) {
+        imageData.data[i*4+3] = scaledMask.data[i*4];
+      }
+      ctx.putImageData(imageData, 0, 0);
+
+      const blob = await new Promise(resolve => canvas.toBlob(b => resolve(b), 'image/png'));
+      return URL.createObjectURL(blob);
+    } catch(e) {
+      console.error('[rmbg] error:', e);
+      return imgUrl;
+    }
+  };
+</script>
 <style>
   :root { --pr: #6f42c1; --pr-light: #e8d5f5; --bg: #f5f5f5; --card: #fff; --border: #e9ecef; --gray: #6c757d; --ok: #198754; --warn: #ffc107; --bad: #dc3545; }
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -1529,6 +1607,45 @@ function addMediaThumb(img) {
     sizeEl.textContent = img.width + 'x' + img.height;
     thumb.appendChild(sizeEl);
   }
+
+  // Bouton détourer
+  const rmbgBtn = document.createElement('button');
+  rmbgBtn.style.cssText = 'position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.7);color:#fff;border:none;border-radius:4px;padding:2px 6px;font-size:9px;cursor:pointer;z-index:2;display:none';
+  rmbgBtn.textContent = 'Détourer';
+  rmbgBtn.addEventListener('click', async (e) => {
+    e.stopPropagation();
+    rmbgBtn.textContent = 'Chargement modèle...';
+    rmbgBtn.style.background = 'var(--pr)';
+    try {
+      const resultUrl = await window.removeBackground(img.url);
+      // Convertir le blob URL en fichier et uploader sur Magento
+      const response = await fetch(resultUrl);
+      const blob = await response.blob();
+      const file = new File([blob], img.filename.replace(/\.[^.]+$/, '-nobg.png'), { type: 'image/png' });
+      const token = getToken();
+      if (token) {
+        const formData = new FormData();
+        formData.append('image', file);
+        const upRes = await fetch(MEDIA_API, {
+          method: 'POST',
+          headers: { 'Authorization': 'Bearer ' + token },
+          body: formData
+        });
+        if (upRes.ok) {
+          const data = await upRes.json();
+          addMediaThumb(data);
+          toast('Image détourée et uploadée');
+        }
+      }
+    } catch(err) {
+      toast('Erreur détourage: ' + err.message, 4000);
+    }
+    rmbgBtn.textContent = 'Détourer';
+    rmbgBtn.style.background = 'rgba(0,0,0,0.7)';
+  });
+  thumb.appendChild(rmbgBtn);
+  thumb.addEventListener('mouseenter', () => { rmbgBtn.style.display = 'block'; });
+  thumb.addEventListener('mouseleave', () => { rmbgBtn.style.display = 'none'; });
 
   // Drag vers l'éditeur
   thumb.addEventListener('dragstart', (e) => {
