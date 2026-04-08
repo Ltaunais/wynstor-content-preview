@@ -324,11 +324,13 @@
       "url": "65-couper-et-decouper",
       "slug": "65-couper-et-decouper",
       "type": "regen-bloc",
-      "status": "processing",
+      "status": "done",
       "h2": "En anticipant le remplacement avant que la lame ne soit trop",
       "instruction": "Rédige un sous-paragraphe de 2-3 phrases pour le H3 \"En anticipant le remplacement avant que la lame ne soit trop\". Contexte du paragraphe original : \"En anticipant le remplacement avant que la lame ne soit trop usée, vous protégez aussi vos documents : un bord de coupe émoussé froisse le papier au l\". Développe ce point spécifique.",
       "createdAt": "2026-04-08T15:37:09.380Z",
-      "startedAt": "2026-04-08T15:37:10.584Z"
+      "startedAt": "2026-04-08T15:37:10.584Z",
+      "result": "<p>En changeant vos lames de cutter ou de massicot dès les premiers signes d'usure, vous évitez les coupes irrégulières qui abîment vos documents. Une lame émoussée ne tranche plus le papier : elle le déchire, le froisse et laisse des fibres visibles sur le bord. Vos présentations clients, vos devis reliés, vos supports de communication méritent une finition nette à chaque découpe.</p>\n\n<p>Surveillez la résistance que vous ressentez en coupant. Quand le geste demande plus de pression qu'au premier jour, la lame a perdu son tranchant. Forcer sur une lame usée fatigue le poignet, ralentit votre cadence de travail et augmente le risque de déraper hors de la ligne de coupe. Remplacer la lame à ce stade précis, c'est garder un geste fluide et un résultat impeccable sans effort supplémentaire.</p>\n\n<p>Gardez toujours un jeu de lames de rechange à portée de main dans votre espace de travail. Retrouvez un large choix de fournitures dans la rubrique {{widget type=\"Magento\\Catalog\\Block\\Category\\Widget\\Link\" anchor_text=\"couper et découper\" id_path=\"category/65\"}} pour anticiper vos besoins et ne jamais vous retrouver bloqué en pleine tâche avec un équipement qui ne coupe plus correctement.</p>",
+      "finishedAt": "2026-04-08T15:37:31.092Z"
     }
   ]
 }
