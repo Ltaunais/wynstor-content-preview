@@ -363,11 +363,12 @@
       "url": "65-couper-et-decouper",
       "slug": "65-couper-et-decouper",
       "type": "reword",
-      "status": "pending",
+      "status": "processing",
       "sentence": "Identifiez d'abord la marque et le modèle de votre appareil, qu'il s'agisse d'une cisaille, d'un massicot ou d'une rogneuse. Chaque constructeur conçoit ses lames selon des dimensions et des systèmes de fixation spécifiques. Monter un accessoire adapté, c'est retrouver une coupe franche dès la première utilisation et éviter d'endommager le mécanisme de guidage.",
       "bannedWord": "__h3_generate__",
       "h2Context": "Vous remplacez une lame ou un accessoire sur votre machine",
-      "createdAt": "2026-04-08T15:43:06.973Z"
+      "createdAt": "2026-04-08T15:43:06.973Z",
+      "startedAt": "2026-04-08T15:43:08.567Z"
     }
   ]
 }
