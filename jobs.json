@@ -455,11 +455,13 @@
       "url": "4-agrafer",
       "slug": "4-agrafer",
       "type": "reword",
-      "status": "processing",
+      "status": "done",
       "sentence": "L'agrafage en piqûre à cheval reste la méthode la plus rapide pour assembler des livrets, catalogues et brochures pliés en deux. Vous glissez vos feuilles A3, l'agrafe vient se poser en plein pli, et votre document est prêt à être distribué. Pour ce type de travail, tournez-vous vers une agrafeuse de livrets conçue pour atteindre le centre de la feuille grâce à un bras allongé.H3+IA",
       "bannedWord": "conçue",
       "createdAt": "2026-04-08T17:56:34.178Z",
-      "startedAt": "2026-04-08T17:56:37.413Z"
+      "startedAt": "2026-04-08T17:56:37.413Z",
+      "result": "L'agrafage en piqûre à cheval reste la méthode la plus rapide pour assembler des livrets, catalogues et brochures pliés en deux. Vous glissez vos feuilles A3, l'agrafe vient se poser en plein pli, et votre document est prêt à être distribué. Pour ce type de travail, tournez-vous vers une agrafeuse de livrets pensée pour atteindre le centre de la feuille grâce à un bras allongé.",
+      "finishedAt": "2026-04-08T17:56:46.682Z"
     }
   ]
 }
