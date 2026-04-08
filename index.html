@@ -1425,11 +1425,14 @@ function renderPagesList() {
       currentContent.className = 'file-list';
       currentContent.style.cssText = 'display:none;padding-left:0;margin:0';
 
-      header.addEventListener('click', () => {
-        const open = currentContent.style.display !== 'none';
-        currentContent.style.display = open ? 'none' : '';
-        chevron.style.transform = open ? '' : 'rotate(90deg)';
-      });
+      // Closure : capturer la référence locale
+      (function(content, chev) {
+        header.addEventListener('click', () => {
+          const open = content.style.display !== 'none';
+          content.style.display = open ? 'none' : '';
+          chev.style.transform = open ? '' : 'rotate(90deg)';
+        });
+      })(currentContent, chevron);
 
       currentGroup.appendChild(header);
       currentGroup.appendChild(currentContent);
