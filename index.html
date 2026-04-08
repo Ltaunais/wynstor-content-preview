@@ -286,30 +286,19 @@
     </div>
   </div>
 
-  <!-- SIDEBAR DROITE : BLOCS + MÉDIA -->
+  <!-- SIDEBAR DROITE : MÉDIA -->
   <div class="templates" id="templatesPanel">
-    <!-- Tabs -->
-    <div style="display:flex;gap:0;margin-bottom:12px;border-bottom:1px solid var(--border)">
-      <button class="tab-btn active" onclick="switchTab('blocs')" id="tabBlocs" style="flex:1;padding:8px;border:none;background:none;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1px;cursor:pointer;border-bottom:2px solid var(--pr);color:var(--pr)">Blocs</button>
-      <button class="tab-btn" onclick="switchTab('media')" id="tabMedia" style="flex:1;padding:8px;border:none;background:none;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1px;cursor:pointer;border-bottom:2px solid transparent;color:var(--gray)">Média</button>
+    <h2>Média</h2>
+    <!-- Drop zone -->
+    <div id="mediaDropZone" style="border:2px dashed var(--border);border-radius:8px;padding:20px 12px;text-align:center;cursor:pointer;margin-bottom:12px;transition:all 0.2s">
+      <div style="font-size:24px;margin-bottom:4px">&#128247;</div>
+      <div style="font-size:11px;color:var(--gray)">Drag & drop ou cliquer</div>
+      <input type="file" id="mediaFileInput" accept="image/*" multiple style="display:none">
     </div>
-    <!-- Tab Blocs -->
-    <div id="panelBlocs">
-      <div id="blocksContainer">Chargement...</div>
-    </div>
-    <!-- Tab Média -->
-    <div id="panelMedia" style="display:none">
-      <!-- Drop zone -->
-      <div id="mediaDropZone" style="border:2px dashed var(--border);border-radius:8px;padding:20px 12px;text-align:center;cursor:pointer;margin-bottom:12px;transition:all 0.2s">
-        <div style="font-size:24px;margin-bottom:4px">&#128247;</div>
-        <div style="font-size:11px;color:var(--gray)">Drag & drop ou cliquer</div>
-        <input type="file" id="mediaFileInput" accept="image/*" multiple style="display:none">
-      </div>
-      <!-- Upload status -->
-      <div id="mediaUploadStatus" style="font-size:11px;color:var(--gray);margin-bottom:8px;display:none"></div>
-      <!-- Galerie -->
-      <div id="mediaGallery" style="display:grid;grid-template-columns:1fr 1fr;gap:6px;max-height:calc(100vh - 250px);overflow-y:auto">
-      </div>
+    <!-- Upload status -->
+    <div id="mediaUploadStatus" style="font-size:11px;color:var(--gray);margin-bottom:8px;display:none"></div>
+    <!-- Galerie -->
+    <div id="mediaGallery" style="display:grid;grid-template-columns:1fr 1fr;gap:6px;max-height:calc(100vh - 220px);overflow-y:auto">
     </div>
   </div>
 </div>
@@ -1188,6 +1177,7 @@ async function initApp() {
   await loadBlocks();
   await loadCustomBlocks();
   await loadFavorites();
+  loadMediaGallery();
   try {
     const res = await fetch('pages.json');
     const data = await res.json();
@@ -1428,17 +1418,6 @@ markDirty = function() {
   clearTimeout(previewTimer);
   previewTimer = setTimeout(updatePreviewIfOpen, 500);
 };
-
-// === TABS BLOCS / MÉDIA ===
-function switchTab(tab) {
-  document.getElementById('panelBlocs').style.display = tab === 'blocs' ? '' : 'none';
-  document.getElementById('panelMedia').style.display = tab === 'media' ? '' : 'none';
-  document.getElementById('tabBlocs').style.borderBottomColor = tab === 'blocs' ? 'var(--pr)' : 'transparent';
-  document.getElementById('tabBlocs').style.color = tab === 'blocs' ? 'var(--pr)' : 'var(--gray)';
-  document.getElementById('tabMedia').style.borderBottomColor = tab === 'media' ? 'var(--pr)' : 'transparent';
-  document.getElementById('tabMedia').style.color = tab === 'media' ? 'var(--pr)' : 'var(--gray)';
-  if (tab === 'media' && !mediaLoaded) loadMediaGallery();
-}
 
 // === PANNEAU MÉDIA ===
 const MEDIA_API = 'https://dev3.wynstor.com/media/wysiwyg/smartwave/porto/category/upload.php';
