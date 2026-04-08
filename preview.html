@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wynstor — Preview</title>
+<!-- CSS Wynstor depuis dev3 -->
+<link rel="stylesheet" href="https://dev3.wynstor.com/static/version1775570575/frontend/Smartwave/porto_child/fr_FR/css/styles-m.css">
+<link rel="stylesheet" href="https://dev3.wynstor.com/static/version1775570575/frontend/Smartwave/porto_child/fr_FR/css/styles-l.css">
+<link rel="stylesheet" href="https://dev3.wynstor.com/media/porto/web/css/wynstor-root.css">
+<link rel="stylesheet" href="https://dev3.wynstor.com/media/porto/web/css/wynstor.css">
+<link rel="stylesheet" href="https://dev3.wynstor.com/media/porto/configed_css/settings_default.css">
+<link rel="stylesheet" href="https://dev3.wynstor.com/media/porto/web/css/custom.css">
+<style>
+  body { background: #fff; }
+  .preview-bar { position: sticky; top: 0; z-index: 100; background: #212529; color: #fff; padding: 8px 20px; display: flex; align-items: center; justify-content: space-between; font-size: 13px; }
+  .preview-bar .page-name { font-weight: 600; }
+  .preview-bar .meta-info { font-size: 11px; opacity: 0.7; }
+  .preview-bar button { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); color: #fff; padding: 5px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; }
+  .preview-bar button:hover { background: rgba(255,255,255,0.25); }
+  .preview-wrapper { max-width: 1440px; margin: 0 auto; padding: 30px 15px; }
+  .preview-h1 { font-size: 28px; font-weight: 700; text-transform: uppercase; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #6f42c1; }
+  .preview-h1 em { font-style: normal; color: #6f42c1; }
+  .preview-intro { font-size: 1.1rem; line-height: 1.7; margin-bottom: 24px; color: #333; }
+  .preview-content { line-height: 1.75; }
+  /* Widget markers en preview */
+  .widget-preview { color: #6f42c1; text-decoration: underline; text-decoration-style: dotted; cursor: help; }
+  /* Responsive indicators */
+  .viewport-btns { display: flex; gap: 4px; }
+  .viewport-btns button.active { background: rgba(255,255,255,0.4); }
+</style>
+</head>
+<body>
+
+<div class="preview-bar">
+  <div>
+    <span class="page-name" id="previewTitle">Chargement...</span>
+    <span class="meta-info" id="previewMeta"></span>
+  </div>
+  <div style="display:flex;align-items:center;gap:12px">
+    <div class="viewport-btns">
+      <button onclick="setViewport('100%')" class="active" title="Desktop">Desktop</button>
+      <button onclick="setViewport('768px')" title="Tablet">Tablet</button>
+      <button onclick="setViewport('375px')" title="Mobile">Mobile</button>
+    </div>
+    <button onclick="window.close()">Fermer</button>
+  </div>
+</div>
+
+<div id="viewportWrapper" style="margin:0 auto;transition:max-width 0.3s">
+  <div class="preview-wrapper">
+    <h1 class="preview-h1" id="previewH1"></h1>
+    <div class="preview-content" id="previewContent">Chargement...</div>
+  </div>
+</div>
+
+<script>
+function setViewport(width) {
+  document.getElementById('viewportWrapper').style.maxWidth = width;
+  document.querySelectorAll('.viewport-btns button').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+}
+
+window.addEventListener('message', (e) => {
+  if (e.data && e.data.type === 'wynstor-preview') {
+    const { html, title, meta, h1 } = e.data;
+    
+    document.getElementById('previewTitle').textContent = title || 'Preview';
+    document.getElementById('previewMeta').textContent = meta ? ' — ' + meta : '';
+    document.getElementById('previewH1').textContent = h1 || '';
+    
+    // Process content
+    let content = html
+      .replace(/<!--[\s\S]*?-->/g, '')
+      .replace(/<script[\s\S]*?<\/script>/g, '');
+    
+    // Replace widgets with styled links
+    content = content.replace(
+      /\{\{widget[^}]*anchor_text="([^"]+)"[^}]*id_path="([^"]+)"[^}]*\}\}/g,
+      '<span class="widget-preview" title="$2">$1</span>'
+    );
+    
+    document.getElementById('previewContent').innerHTML = content;
+  }
+});
+
+// Request content from opener
+if (window.opener) {
+  window.opener.postMessage({ type: 'wynstor-preview-ready' }, '*');
+}
+</script>
+
+</body>
+</html>

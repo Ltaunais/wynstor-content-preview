@@ -144,6 +144,7 @@
       <h1 id="pageTitle">Chargement...</h1>
       <div class="actions">
         <span class="save-status" id="saveStatus"></span>
+        <button class="btn btn-primary" onclick="openPreview()">Preview Wynstor</button>
         <button class="btn" onclick="toggleSource()">Source</button>
         <button class="btn btn-ok" onclick="saveToGithub()">Sauvegarder</button>
       </div>
@@ -667,6 +668,45 @@ async function initApp() {
 }
 
 document.addEventListener('DOMContentLoaded', initApp);
+
+// === PREVIEW WYNSTOR ===
+let previewWindow = null;
+function openPreview() {
+  const html = collectHtml();
+  const title = document.getElementById('metaTitle')?.value || '';
+  const meta = document.getElementById('metaDesc')?.value || '';
+  const h1 = document.getElementById('metaH1')?.value || '';
+
+  previewWindow = window.open('preview.html', 'wynstor-preview', 'width=1460,height=900');
+
+  // Listen for preview ready
+  window.addEventListener('message', function handler(e) {
+    if (e.data && e.data.type === 'wynstor-preview-ready') {
+      previewWindow.postMessage({ type: 'wynstor-preview', html, title, meta, h1 }, '*');
+      window.removeEventListener('message', handler);
+    }
+  });
+}
+
+// Auto-update preview on changes
+function updatePreviewIfOpen() {
+  if (previewWindow && !previewWindow.closed) {
+    const html = collectHtml();
+    const title = document.getElementById('metaTitle')?.value || '';
+    const meta = document.getElementById('metaDesc')?.value || '';
+    const h1 = document.getElementById('metaH1')?.value || '';
+    previewWindow.postMessage({ type: 'wynstor-preview', html, title, meta, h1 }, '*');
+  }
+}
+
+// Debounced preview update
+let previewTimer = null;
+const origMarkDirty = markDirty;
+markDirty = function() {
+  origMarkDirty();
+  clearTimeout(previewTimer);
+  previewTimer = setTimeout(updatePreviewIfOpen, 500);
+};
 
 // Warn before leaving with unsaved changes
 window.addEventListener('beforeunload', e => { if (dirty) { e.preventDefault(); e.returnValue = ''; } });
