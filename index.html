@@ -870,28 +870,27 @@ function setupH3Buttons() {
 
 function expandToH3(pElement) {
   var paragraphText = pElement.textContent.replace('H3+IA', '').trim();
-  var h3Title = prompt('Titre du H3 (sous-section) :', paragraphText.substring(0, 60));
-  if (!h3Title || !h3Title.trim()) return;
+
+  // Placeholder H3 au-dessus du paragraphe
+  var h3El = document.createElement('h3');
+  h3El.className = 'ws-h3';
+  h3El.style.cssText = 'color:var(--pr);font-style:italic';
+  h3El.textContent = 'Génération du H3...';
+  pElement.before(h3El);
+  markDirty();
 
   var token = getToken();
   if (!token) { showTokenModal(); return; }
   var slug = currentFile ? currentFile.replace('pages/','').replace('.html','') : '';
 
-  // Remplacer le paragraphe par un placeholder
-  var originalHtml = pElement.outerHTML;
-  var parentBloc = pElement.closest('.bloc-content');
-  var h3El = document.createElement('h3');
-  h3El.className = 'ws-h3';
-  h3El.textContent = h3Title.trim();
-  var placeholderP = document.createElement('p');
-  placeholderP.style.cssText = 'color:var(--pr);font-style:italic';
-  placeholderP.textContent = 'Rédaction H3 en cours...';
+  // Trouver le H2 parent
+  var parentH2 = '';
+  var prev = h3El.previousElementSibling;
+  while (prev) {
+    if (prev.classList && prev.classList.contains('ws-h2')) { parentH2 = prev.textContent; break; }
+    prev = prev.previousElementSibling;
+  }
 
-  pElement.replaceWith(h3El);
-  h3El.after(placeholderP);
-  markDirty();
-
-  // Soumettre un job regen
   (async function() {
     try {
       var getRes = await fetch('https://api.github.com/repos/' + REPO + '/contents/jobs.json?ref=' + BRANCH + '&_=' + Date.now(), {
@@ -905,10 +904,11 @@ function expandToH3(pElement) {
         id: jobId,
         url: slug,
         slug: slug,
-        type: 'regen-bloc',
+        type: 'reword',
         status: 'pending',
-        h2: h3Title.trim(),
-        instruction: 'Rédige un sous-paragraphe de 2-3 phrases pour le H3 "' + h3Title.trim() + '". Contexte du paragraphe original : "' + paragraphText.substring(0, 150) + '". Développe ce point spécifique.',
+        sentence: paragraphText,
+        bannedWord: '__h3_generate__',
+        h2Context: parentH2,
         createdAt: new Date().toISOString()
       });
 
@@ -916,10 +916,10 @@ function expandToH3(pElement) {
       await fetch('https://api.github.com/repos/' + REPO + '/contents/jobs.json', {
         method: 'PUT',
         headers: { 'Authorization': 'token ' + token, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: 'h3: ' + h3Title.trim(), content: encoded, sha: getData.sha, branch: BRANCH })
+        body: JSON.stringify({ message: 'h3 gen', content: encoded, sha: getData.sha, branch: BRANCH })
       });
 
-      toast('Rédaction H3 lancée');
+      toast('Génération du H3...');
 
       var pollH3 = setInterval(async function() {
         try {
@@ -931,25 +931,22 @@ function expandToH3(pElement) {
           var j = jobs.find(function(x) { return x.id === jobId; });
           if (j && j.status === 'done' && j.result) {
             clearInterval(pollH3);
-            var resultHtml = j.result.replace(/\{\{widget[^}]*anchor_text="([^"]+)"[^}]*id_path="([^"]+)"[^}]*\}\}/g,
-              '<span class="widget-link" title="$2" contenteditable="false">$1</span>');
-            placeholderP.outerHTML = resultHtml;
+            h3El.textContent = j.result.replace(/^["']|["']$/g, '').replace(/<[^>]+>/g, '');
+            h3El.style.cssText = '';
             setupH3Buttons();
-            setupImageDropTargets();
-            highlightBlacklistedWords();
             markDirty();
-            toast('H3 rédigé');
+            toast('H3 généré');
           } else if (j && j.status === 'error') {
             clearInterval(pollH3);
-            placeholderP.textContent = paragraphText;
-            toast('Erreur rédaction H3');
+            h3El.remove();
+            toast('Erreur');
           }
         } catch(err) {}
-      }, 8000);
+      }, 5000);
 
-      setTimeout(function() { clearInterval(pollH3); }, 180000);
+      setTimeout(function() { clearInterval(pollH3); }, 120000);
     } catch(err) {
-      placeholderP.textContent = paragraphText;
+      h3El.remove();
       toast('Erreur: ' + err.message);
     }
   })();
