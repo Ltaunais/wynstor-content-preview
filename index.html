@@ -602,18 +602,62 @@ function deleteBloc(btn) {
 // === BLOCK PICKER (modal catalogue + favoris) ===
 let pendingInsertBar = null;
 
-// Favoris en localStorage
-function getFavorites() {
-  try { return JSON.parse(localStorage.getItem('ws_fav_blocks') || '[]'); } catch(e) { return []; }
+// Favoris stockés dans favorites.json sur GitHub
+let favoritesCache = [];
+let favoritesSha = null;
+
+async function loadFavorites() {
+  const token = getToken();
+  try {
+    const res = await fetch(`https://api.github.com/repos/${REPO}/contents/favorites.json?ref=${BRANCH}&_=${Date.now()}`, {
+      headers: token ? { 'Authorization': `token ${token}` } : {},
+      cache: 'no-store'
+    });
+    if (res.ok) {
+      const data = await res.json();
+      favoritesSha = data.sha;
+      const content = JSON.parse(decodeURIComponent(escape(atob(data.content.replace(/\n/g, '')))));
+      favoritesCache = content.favorites || [];
+    }
+  } catch(e) {
+    // Fallback fetch raw
+    try {
+      const res = await fetch('favorites.json?_=' + Date.now(), { cache: 'no-store' });
+      const data = await res.json();
+      favoritesCache = data.favorites || [];
+    } catch(e2) { favoritesCache = []; }
+  }
 }
-function saveFavorites(favs) { localStorage.setItem('ws_fav_blocks', JSON.stringify(favs)); }
-function isFavorite(id) { return getFavorites().includes(id); }
-function toggleFavorite(id) {
-  let favs = getFavorites();
-  if (favs.includes(id)) { favs = favs.filter(f => f !== id); }
-  else { favs.push(id); }
-  saveFavorites(favs);
-  return favs.includes(id);
+
+function getFavorites() { return favoritesCache; }
+function isFavorite(id) { return favoritesCache.includes(id); }
+
+async function toggleFavorite(id) {
+  if (favoritesCache.includes(id)) {
+    favoritesCache = favoritesCache.filter(f => f !== id);
+  } else {
+    favoritesCache.push(id);
+  }
+  // Sauvegarder sur GitHub
+  const token = getToken();
+  if (token) {
+    try {
+      const content = JSON.stringify({ favorites: favoritesCache }, null, 2);
+      const encoded = btoa(unescape(encodeURIComponent(content)));
+      const body = { message: 'update favorites', content: encoded, branch: BRANCH };
+      if (favoritesSha) body.sha = favoritesSha;
+      const res = await fetch(`https://api.github.com/repos/${REPO}/contents/favorites.json`, {
+        method: 'PUT',
+        headers: { 'Authorization': `token ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      if (res.ok) {
+        const data = await res.json();
+        favoritesSha = data.content.sha;
+      }
+    } catch(e) { console.error('[fav] save error:', e); }
+  }
+  return favoritesCache.includes(id);
 }
 
 // Chercher un bloc par ID dans blocksData
@@ -722,12 +766,11 @@ function renderPickerGrid(filterCat) {
     favStar.className = 'bp-card-fav' + (isFavorite(block.id) ? ' faved' : '');
     favStar.textContent = isFavorite(block.id) ? '\u2605' : '\u2606';
     favStar.title = 'Ajouter aux favoris';
-    favStar.addEventListener('click', (e) => {
+    favStar.addEventListener('click', async (e) => {
       e.stopPropagation();
-      const nowFav = toggleFavorite(block.id);
+      const nowFav = await toggleFavorite(block.id);
       favStar.className = 'bp-card-fav' + (nowFav ? ' faved' : '');
       favStar.textContent = nowFav ? '\u2605' : '\u2606';
-      // Mettre à jour le compteur dans la sidebar
       const favCountSpan = document.querySelector('.bp-cats .bp-cat-btn .bp-cat-count');
       if (favCountSpan) favCountSpan.textContent = '(' + getFavorites().length + ')';
     });
@@ -974,6 +1017,7 @@ function updateStats() {
 // === INIT ===
 async function initApp() {
   await loadBlocks();
+  await loadFavorites();
   try {
     const res = await fetch('pages.json');
     const data = await res.json();
