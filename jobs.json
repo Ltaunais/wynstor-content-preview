@@ -4,9 +4,10 @@
       "id": "job-test-001",
       "url": "4-agrafer",
       "slug": "4-agrafer",
-      "status": "processing",
+      "status": "done",
       "createdAt": "2026-04-08T11:00:00.000Z",
-      "startedAt": "2026-04-08T10:46:19.606Z"
+      "startedAt": "2026-04-08T10:46:19.606Z",
+      "finishedAt": "2026-04-08T10:47:47.686Z"
     }
   ]
 }
