@@ -607,7 +607,7 @@ async function loadFile(filename) {
 
 // === RENDER META ===
 function renderMeta() {
-  const m = currentRawHtml.match(/Title: (.+)\n\s+Meta: (.+)\n\s+H1: (.+)/);
+  const m = currentRawHtml.match(/Title:\s*(.+)\n\s*Meta[^:]*:\s*(.+)\n\s*H1:\s*(.+)/);
   const bar = document.getElementById('metaBar');
   if (m) {
     bar.innerHTML = `
