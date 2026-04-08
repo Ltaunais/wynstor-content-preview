@@ -1696,6 +1696,10 @@ function cleanBlocHtml(blocHtml) {
   blocHtml = blocHtml.replace(/ style="transition: background[^"]*"/g, '');
   // Nettoyer contenteditable
   blocHtml = blocHtml.replace(/ contenteditable="[^"]*"/g, '');
+  // Retirer les <div class="ws-faq"></div> vides
+  blocHtml = blocHtml.replace(/<div class="ws-faq"><\/div>/g, '');
+  // Retirer les <section class="faq-wrap"> vides (sans contenu)
+  blocHtml = blocHtml.replace(/<section class="faq-wrap"[^>]*><\/section>/g, '');
 
   // FAQ : transformer structure simple → accordion CSS pur avec <section>
   if (blocHtml.indexOf('faq-item') !== -1) {
