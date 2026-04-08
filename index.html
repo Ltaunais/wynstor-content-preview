@@ -3168,6 +3168,27 @@ async function uploadFiles(files) {
     let file = files[i];
     if (!file.type.startsWith('image/')) continue;
 
+    // Convertir AVIF/WebP en PNG avant upload (Magento stocke du PNG, le CDN reconvertit)
+    if (file.type === 'image/avif' || file.type === 'image/webp') {
+      status.textContent = 'Conversion ' + file.type.split('/')[1].toUpperCase() + ' → PNG : ' + file.name + '...';
+      try {
+        var fileUrl = URL.createObjectURL(file);
+        var img = new Image();
+        await new Promise(function(resolve, reject) { img.onload = resolve; img.onerror = reject; img.src = fileUrl; });
+        var canvas = document.createElement('canvas');
+        canvas.width = img.naturalWidth;
+        canvas.height = img.naturalHeight;
+        canvas.getContext('2d').drawImage(img, 0, 0);
+        URL.revokeObjectURL(fileUrl);
+        var blob = await new Promise(function(resolve) { canvas.toBlob(resolve, 'image/png'); });
+        var newName = file.name.replace(/\.(avif|webp)$/i, '.png');
+        file = new File([blob], newName, { type: 'image/png' });
+      } catch(convErr) {
+        console.error('[convert] error:', convErr);
+        toast('Erreur conversion, upload tel quel');
+      }
+    }
+
     if (doRmbg) {
       status.textContent = 'Détourage ' + (i+1) + '/' + files.length + ' : ' + file.name + ' (rembg Python)...';
       try {
