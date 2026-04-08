@@ -11,6 +11,12 @@
       "name": "test 2",
       "desc": "Bloc personnalisé",
       "html": "<h2 class=\"ws-h2\" style=\"border: none; font-size: 2rem; background-color: rgb(0, 97, 226);\"><img src=\"https://placehold.co/800x500/e9ecef/6c757d?text=Image+produit\" alt=\"Description\" class=\"w-100\" loading=\"lazy\" data-first-enter-image=\"true\" style=\"object-fit: cover; height: 100%; min-height: 300px;\">Votre titre accrocheur ici</h2>\n    <p class=\"mb-4\" style=\"font-size:1.1rem;line-height:1.7;color:var(--ws-gray-700)\">Votre texte de mise en situation. Adressez-vous directement au lecteur, projetez-le dans son quotidien professionnel.</p>\n    <a href=\"#\" class=\"btn btn-primary btn-lg\" style=\"background:var(--bs-primary);border:none;border-radius:8px;padding:12px 28px\">Demander un devis</a>\n  "
+    },
+    {
+      "id": "custom-1775668361944",
+      "name": "test toto",
+      "desc": "Bloc personnalisé",
+      "html": "<h2 class=\"ws-h2\">Vous traitez des volumes importants en entreprise</h2>\n\n<p>En PME, vous agrafez entre 200 et 500 documents par semaine. Les rapports trimestriels, les dossiers clients, les bordereaux de livraison. Une <span class=\"widget-link\" title=\"category/162\" contenteditable=\"false\">agrafeuse électrique</span> divise par trois le temps de traitement : 0,8 seconde par agrafage contre 2,5 secondes en manuel. Sur un mois, vous économisez 4 heures de travail administratif.<button class=\"p-h3-btn\" contenteditable=\"false\">H3+IA</button></p>\n\n<p>Les services courrier des collectivités territoriales utilisent nos <span class=\"excluded-word\" title=\"Mot exclu\">modèle</span>s électriques pour les mailings mensuels. Capacité 50 feuilles 80g, rechargement automatique des <span class=\"widget-link\" title=\"category/152\" contenteditable=\"false\">agrafes</span> par barres de 5000. Le moteur silencieux (niveau sonore 45 dB) respecte l'environnement de travail en open space.<button class=\"p-h3-btn\" contenteditable=\"false\">H3+IA</button></p>"
     }
   ]
 }
