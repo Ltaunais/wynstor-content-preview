@@ -2415,6 +2415,14 @@ function pollJobStatus(jobId) {
   clearInterval(jobPollTimer);
   const status = document.getElementById('seoJobStatus');
   let dots = 0;
+  const startTime = Date.now();
+
+  function formatElapsed() {
+    const sec = Math.floor((Date.now() - startTime) / 1000);
+    const min = Math.floor(sec / 60);
+    const s = sec % 60;
+    return (min > 0 ? min + 'min ' : '') + s + 's';
+  }
 
   jobPollTimer = setInterval(async () => {
     dots = (dots + 1) % 4;
@@ -2434,10 +2442,14 @@ function pollJobStatus(jobId) {
       if (!job) return;
 
       if (job.status === 'processing') {
-        status.textContent = 'Claude Code en cours' + dotsStr;
+        status.textContent = 'Claude Code en cours ' + formatElapsed() + dotsStr;
         status.style.color = 'var(--pr)';
+      } else if (job.status === 'pending') {
+        status.textContent = 'En attente du worker ' + formatElapsed() + dotsStr;
+        status.style.color = 'var(--gray)';
       } else if (job.status === 'done') {
-        status.textContent = 'Terminé ! Chargement de la page...';
+        const elapsed = formatElapsed();
+        status.textContent = 'Terminé en ' + elapsed + ' ! Chargement...';
         status.style.color = 'var(--ok)';
         clearInterval(jobPollTimer);
         currentJobId = null;
