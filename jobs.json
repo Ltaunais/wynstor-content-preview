@@ -283,11 +283,13 @@
       "url": "65-couper-et-decouper",
       "slug": "65-couper-et-decouper",
       "type": "reword",
-      "status": "processing",
+      "status": "done",
       "sentence": "Avant de choisir, évaluez le format maximal que vous traitez au quotidien. Un modèle A4 couvre la majorité des besoins bureautiques, tandis qu'un format A3 s'impose si vous manipulez des affiches ou des plans. Vérifiez aussi la capacité de coupe en nombre de feuilles par passe : sous-dimensionner cet aspect vous obligerait à multiplier les passages et ralentirait votre production. La présence d'une règle graduée et d'un guide de coupe angulaire vous fera gagner en précision, surtout si vous réalisez des découpes répétitives.",
       "bannedWord": "modèle",
       "createdAt": "2026-04-08T15:28:08.498Z",
-      "startedAt": "2026-04-08T15:28:10.007Z"
+      "startedAt": "2026-04-08T15:28:10.007Z",
+      "result": "Avant de choisir, évaluez le format maximal que vous traitez au quotidien. Un massicot A4 couvre la majorité des besoins bureautiques, tandis qu'un format A3 s'impose si vous manipulez des affiches ou des plans. Vérifiez aussi la capacité de coupe en nombre de feuilles par passe : sous-dimensionner cet aspect vous obligerait à multiplier les passages et ralentirait votre production. La présence d'une règle graduée et d'un guide de coupe angulaire vous fera gagner en précision, surtout si vous réalisez des découpes répétitives.",
+      "finishedAt": "2026-04-08T15:28:21.052Z"
     }
   ]
 }
