@@ -1503,6 +1503,10 @@ function updateStats() {
   const blWords = total > 0 ? ` (${[...vHits,...aHits,...eHits].join(', ')})` : '';
 
   const statsBar = document.getElementById('statsBar');
+  // Conserver l'état ouvert du panel blacklist
+  var panelWasOpen = false;
+  var oldPanel = document.getElementById('blPanel');
+  if (oldPanel) panelWasOpen = oldPanel.classList.contains('open');
   statsBar.textContent = '';
 
   const statsHtml = [
@@ -1550,6 +1554,11 @@ function updateStats() {
     statsBar.appendChild(panel);
   }
   renderBlacklistPanel();
+  // Restaurer l'état ouvert
+  if (panelWasOpen) {
+    var p = document.getElementById('blPanel');
+    if (p) p.classList.add('open');
+  }
 }
 
 function renderBlacklistPanel() {
@@ -1744,7 +1753,7 @@ async function initApp() {
   await loadCustomBlocks();
   await loadFavorites();
   await loadBlacklist();
-  renderBlacklistTags();
+  updateStats();
   loadMediaGallery();
   renderHistory();
   try {
@@ -1810,39 +1819,6 @@ async function addToBlacklist(word) {
   }
 }
 
-function renderBlacklistTags() {
-  const container = document.getElementById('blacklistTags');
-  if (!container) return;
-  container.textContent = '';
-
-  if (blacklistCache.length === 0) {
-    const empty = document.createElement('span');
-    empty.style.cssText = 'font-size:10px;color:var(--gray);font-style:italic';
-    empty.textContent = 'Aucun mot exclu';
-    container.appendChild(empty);
-    return;
-  }
-
-  blacklistCache.forEach(function(word) {
-    const tag = document.createElement('span');
-    tag.className = 'bl-tag';
-
-    const label = document.createTextNode(word);
-    tag.appendChild(label);
-
-    const remove = document.createElement('span');
-    remove.className = 'bl-tag-remove';
-    remove.textContent = '\u00d7';
-    remove.title = 'Retirer de la blacklist';
-    remove.addEventListener('click', function() {
-      removeFromBlacklist(word);
-    });
-    tag.appendChild(remove);
-
-    container.appendChild(tag);
-  });
-}
-
 async function removeFromBlacklist(word) {
   blacklistCache = blacklistCache.filter(function(w) { return w !== word; });
 
@@ -1865,19 +1841,47 @@ async function removeFromBlacklist(word) {
     } catch(e) {}
   }
 
-  renderBlacklistTags();
+  updateStats();
   toast('Mot retiré : "' + word + '"');
 }
 
 // Barrer visuellement les mots exclus dans l'éditeur
 function highlightBlacklistedWords() {
+  // Retirer les anciens highlights
+  document.querySelectorAll('.excluded-word').forEach(function(span) {
+    var text = document.createTextNode(span.textContent);
+    span.parentNode.replaceChild(text, span);
+  });
+
   if (blacklistCache.length === 0) return;
-  document.querySelectorAll('.bloc-content p').forEach(function(p) {
-    blacklistCache.forEach(function(word) {
-      const regex = new RegExp('\\b(' + word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')\\b', 'gi');
-      if (regex.test(p.textContent)) {
-        p.innerHTML = p.innerHTML.replace(regex, '<span class="excluded-word" title="Mot exclu des futures générations">$1</span>');
+
+  var escaped = blacklistCache.map(function(w) { return w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); });
+  var pattern = new RegExp('\\b(' + escaped.join('|') + ')\\b', 'gi');
+
+  document.querySelectorAll('.bloc-content p, .bloc-content h2, .bloc-content h3').forEach(function(el) {
+    var walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+    var nodes = [];
+    while (walker.nextNode()) nodes.push(walker.currentNode);
+
+    nodes.forEach(function(node) {
+      pattern.lastIndex = 0;
+      if (!pattern.test(node.textContent)) return;
+      pattern.lastIndex = 0;
+
+      var frag = document.createDocumentFragment();
+      var last = 0;
+      var m;
+      while ((m = pattern.exec(node.textContent)) !== null) {
+        if (m.index > last) frag.appendChild(document.createTextNode(node.textContent.slice(last, m.index)));
+        var span = document.createElement('span');
+        span.className = 'excluded-word';
+        span.title = 'Mot exclu';
+        span.textContent = m[0];
+        frag.appendChild(span);
+        last = pattern.lastIndex;
       }
+      if (last < node.textContent.length) frag.appendChild(document.createTextNode(node.textContent.slice(last)));
+      node.parentNode.replaceChild(frag, node);
     });
   });
 }
@@ -2051,7 +2055,7 @@ document.getElementById('stExclude').addEventListener('mousedown', async (e) => 
   if (!word || word.includes(' ')) { toast('Sélectionnez un seul mot'); return; }
 
   await addToBlacklist(word);
-  renderBlacklistTags();
+  updateStats();
   toast('Mot exclu : "' + word + '"');
 
   // Barrer visuellement
