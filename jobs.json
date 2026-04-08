@@ -144,6 +144,29 @@
       "createdAt": "2026-04-08T14:35:05.635Z",
       "startedAt": "2026-04-08T14:35:21.045Z",
       "finishedAt": "2026-04-08T14:37:07.928Z"
+    },
+    {
+      "id": "job-1775659378248",
+      "url": "65-couper-et-decouper",
+      "slug": "65-couper-et-decouper",
+      "type": "redaction",
+      "status": "pending",
+      "createdAt": "2026-04-08T14:42:58.248Z",
+      "structure": {
+        "h2s": [
+          "Vous devez couper des ramettes entières au format exact",
+          "Vous découpez des documents un par un au poste de travail",
+          "Vous préparez des supports visuels ou de la PLV en interne",
+          "Vous remplacez une lame ou un accessoire sur votre machine",
+          "Massicots vs cisailles vs rogneuses",
+          "Questions fréquentes"
+        ],
+        "faqs": [
+          "Quelle différence entre un massicot, une rogneuse et une cisaille pour choisir le bon matériel de coupe au bureau ?",
+          "Comment équiper un service reprographie qui découpe des documents toute la journée sans multiplier les appareils ?",
+          "Quels accessoires prévoir pour entretenir son matériel de coupe et garantir des découpes nettes dans la durée ?"
+        ]
+      }
     }
   ]
 }
