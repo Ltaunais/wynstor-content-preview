@@ -462,6 +462,16 @@
       "startedAt": "2026-04-08T17:56:37.413Z",
       "result": "L'agrafage en piqûre à cheval reste la méthode la plus rapide pour assembler des livrets, catalogues et brochures pliés en deux. Vous glissez vos feuilles A3, l'agrafe vient se poser en plein pli, et votre document est prêt à être distribué. Pour ce type de travail, tournez-vous vers une agrafeuse de livrets pensée pour atteindre le centre de la feuille grâce à un bras allongé.",
       "finishedAt": "2026-04-08T17:56:50.597Z"
+    },
+    {
+      "id": "reword-1775671037849",
+      "url": "4-agrafer",
+      "slug": "4-agrafer",
+      "type": "reword",
+      "status": "pending",
+      "sentence": "Le choix des agrafes compte autant que celui de la machine. Une agrafe trop courte ne traversera pas le bloc de feuilles ; une agrafe inadaptée se tordra dans le mécanisme. Vérifiez la compatibilité entre le calibre d'agrafes et votre agrafeuse avant toute commande. Vous trouverez aussi dans la rubrique accessoires les pièces de rechange et consommables pour maintenir votre équipement en état de fonctionnement quotidien.H3+IA",
+      "bannedWord": "la machine",
+      "createdAt": "2026-04-08T17:57:17.849Z"
     }
   ]
 }
