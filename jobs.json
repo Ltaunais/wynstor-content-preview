@@ -67,9 +67,10 @@
       "id": "job-1775654878103",
       "url": "152-agrafes",
       "slug": "152-agrafes",
-      "status": "processing",
+      "status": "done",
       "createdAt": "2026-04-08T13:27:58.103Z",
-      "startedAt": "2026-04-08T13:28:05.477Z"
+      "startedAt": "2026-04-08T13:28:05.477Z",
+      "finishedAt": "2026-04-08T13:31:23.334Z"
     }
   ]
 }
