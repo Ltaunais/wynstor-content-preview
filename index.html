@@ -227,6 +227,24 @@
   }
   .bl-tag-remove:hover { opacity: 1; }
 
+  /* Blacklist panel dans stats bar */
+  .bl-panel {
+    display: none; grid-column: 1 / -1; padding: 8px 0 0;
+    border-top: 1px solid var(--border); margin-top: 8px;
+  }
+  .bl-panel.open { display: block; }
+  .bl-panel-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 6px; }
+  .bl-panel-add { display: flex; gap: 4px; }
+  .bl-panel-add input {
+    flex: 1; padding: 3px 8px; border: 1px solid var(--border); border-radius: 4px;
+    font-size: 11px;
+  }
+  .bl-panel-add button {
+    background: var(--bad); color: #fff; border: none; border-radius: 4px;
+    padding: 3px 8px; font-size: 10px; cursor: pointer;
+  }
+  .stat-clickable { cursor: pointer; text-decoration: underline dotted; }
+
   /* Historique */
   .history-item { border: 1px solid var(--border); border-radius: 8px; margin-bottom: 8px; overflow: hidden; }
   .history-header { padding: 8px 10px; background: #f8f9fa; font-size: 11px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
@@ -464,11 +482,6 @@
       <div style="font-size:24px;margin-bottom:4px">&#128247;</div>
       <div style="font-size:11px;color:var(--gray)">Drag & drop ou cliquer</div>
       <input type="file" id="mediaFileInput" accept="image/*" multiple style="display:none">
-    </div>
-    <!-- Blacklist visuelle -->
-    <div id="blacklistSection" style="margin-bottom:12px">
-      <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--gray);margin-bottom:6px">Mots exclus</div>
-      <div id="blacklistTags" style="display:flex;flex-wrap:wrap;gap:4px"></div>
     </div>
     <!-- Upload status -->
     <div id="mediaUploadStatus" style="font-size:11px;color:var(--gray);margin-bottom:8px;display:none"></div>
@@ -1489,14 +1502,111 @@ function updateStats() {
   const blClass = total === 0 ? 'stat-ok' : 'stat-bad';
   const blWords = total > 0 ? ` (${[...vHits,...aHits,...eHits].join(', ')})` : '';
 
-  document.getElementById('statsBar').innerHTML = `
-    <div class="stat">Mots: <span class="stat-value">${words}</span></div>
-    <div class="stat">H2: <span class="stat-value">${h2s}</span></div>
-    <div class="stat">Liens: <span class="stat-value">${widgets}</span></div>
-    <div class="stat">FAQ: <span class="stat-value">${faqs}</span></div>
-    <div class="stat">Ratio: <span class="stat-value ${ratioClass}">${ratio} mots/lien</span></div>
-    <div class="stat">Blacklist: <span class="stat-value ${blClass}">${total}${blWords}</span></div>
-  `;
+  const statsBar = document.getElementById('statsBar');
+  statsBar.textContent = '';
+
+  const statsHtml = [
+    { label: 'Mots', value: words },
+    { label: 'H2', value: h2s },
+    { label: 'Liens', value: widgets },
+    { label: 'FAQ', value: faqs },
+    { label: 'Ratio', value: ratio + ' mots/lien', cls: ratioClass },
+  ];
+
+  statsHtml.forEach(function(s) {
+    const div = document.createElement('div');
+    div.className = 'stat';
+    div.textContent = s.label + ': ';
+    const span = document.createElement('span');
+    span.className = 'stat-value' + (s.cls ? ' ' + s.cls : '');
+    span.textContent = s.value;
+    div.appendChild(span);
+    statsBar.appendChild(div);
+  });
+
+  // Blacklist stat (cliquable)
+  const blDiv = document.createElement('div');
+  blDiv.className = 'stat';
+  blDiv.textContent = 'Blacklist: ';
+  const blSpan = document.createElement('span');
+  blSpan.className = 'stat-value stat-clickable ' + blClass;
+  blSpan.textContent = total + (blWords ? blWords : '') + ' | ' + blacklistCache.length + ' exclus';
+  blSpan.title = 'Cliquer pour gérer les mots exclus';
+  blSpan.addEventListener('click', function() {
+    const panel = document.getElementById('blPanel');
+    if (panel) panel.classList.toggle('open');
+  });
+  blDiv.appendChild(blSpan);
+  statsBar.appendChild(blDiv);
+
+  // Panel blacklist
+  let panel = document.getElementById('blPanel');
+  if (!panel) {
+    panel = document.createElement('div');
+    panel.className = 'bl-panel';
+    panel.id = 'blPanel';
+    statsBar.appendChild(panel);
+  } else {
+    statsBar.appendChild(panel);
+  }
+  renderBlacklistPanel();
+}
+
+function renderBlacklistPanel() {
+  const panel = document.getElementById('blPanel');
+  if (!panel) return;
+  panel.textContent = '';
+
+  // Tags
+  const tagsDiv = document.createElement('div');
+  tagsDiv.className = 'bl-panel-tags';
+
+  if (blacklistCache.length === 0) {
+    const empty = document.createElement('span');
+    empty.style.cssText = 'font-size:10px;color:var(--gray);font-style:italic';
+    empty.textContent = 'Aucun mot exclu. Sélectionnez un mot et cliquez ✗ Exclure.';
+    tagsDiv.appendChild(empty);
+  } else {
+    blacklistCache.forEach(function(word) {
+      const tag = document.createElement('span');
+      tag.className = 'bl-tag';
+      tag.appendChild(document.createTextNode(word));
+      const remove = document.createElement('span');
+      remove.className = 'bl-tag-remove';
+      remove.textContent = '\u00d7';
+      remove.title = 'Retirer';
+      remove.addEventListener('click', async function() {
+        await removeFromBlacklist(word);
+        updateStats();
+      });
+      tag.appendChild(remove);
+      tagsDiv.appendChild(tag);
+    });
+  }
+  panel.appendChild(tagsDiv);
+
+  // Input pour ajouter manuellement
+  const addDiv = document.createElement('div');
+  addDiv.className = 'bl-panel-add';
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.placeholder = 'Ajouter un mot...';
+  const addBtn = document.createElement('button');
+  addBtn.textContent = '+ Exclure';
+  addBtn.addEventListener('click', async function() {
+    const word = input.value.trim().toLowerCase();
+    if (!word) return;
+    await addToBlacklist(word);
+    input.value = '';
+    updateStats();
+    highlightBlacklistedWords();
+  });
+  input.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') addBtn.click();
+  });
+  addDiv.appendChild(input);
+  addDiv.appendChild(addBtn);
+  panel.appendChild(addDiv);
 }
 
 // === INIT ===
