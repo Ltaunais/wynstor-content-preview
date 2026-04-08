@@ -140,8 +140,9 @@
       "url": "65-couper-et-decouper",
       "slug": "65-couper-et-decouper",
       "type": "analyse",
-      "status": "pending",
-      "createdAt": "2026-04-08T14:35:05.635Z"
+      "status": "processing",
+      "createdAt": "2026-04-08T14:35:05.635Z",
+      "startedAt": "2026-04-08T14:35:21.045Z"
     }
   ]
 }
