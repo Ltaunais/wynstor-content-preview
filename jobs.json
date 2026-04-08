@@ -387,8 +387,9 @@
       "url": "4-agrafer",
       "slug": "4-agrafer",
       "type": "analyse",
-      "status": "pending",
-      "createdAt": "2026-04-08T17:24:06.650Z"
+      "status": "processing",
+      "createdAt": "2026-04-08T17:24:06.650Z",
+      "startedAt": "2026-04-08T17:24:07.935Z"
     }
   ]
 }
