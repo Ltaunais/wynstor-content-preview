@@ -3483,6 +3483,8 @@ async function pushToMagento() {
     });
   }
 
+  const metaAccroche = document.getElementById('metaAccroche');
+
   // Résumé avant push
   const parts = [];
   if (metaTitle && metaTitle.value) parts.push('Title');
@@ -3497,8 +3499,6 @@ async function pushToMagento() {
   if (!confirm('Push vers Magento (cat #' + catId + ') :\\n\\n' + parts.join('\\n') + '\\n\\nConfirmer ?')) return;
 
   toast('Push Magento en cours...');
-
-  const metaAccroche = document.getElementById('metaAccroche');
 
   const payload = { category_id: catId };
   if (metaTitle && metaTitle.value) payload.meta_title = metaTitle.value;
