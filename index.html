@@ -3,215 +3,637 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Wynstor SEO — Visionneuse contenu</title>
+<title>Wynstor SEO — Éditeur de contenu</title>
 <style>
-  :root {
-    --bs-primary: #6f42c1;
-    --bs-secondary-bg: #f8f9fa;
-    --ws-gray-200: #e9ecef;
-    --ws-gray-600: #6c757d;
-  }
+  :root { --pr: #6f42c1; --pr-light: #e8d5f5; --bg: #f5f5f5; --card: #fff; --border: #e9ecef; --gray: #6c757d; --ok: #198754; --warn: #ffc107; --bad: #dc3545; }
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #212529; background: #f5f5f5; }
-  
-  /* Layout */
-  .layout { display: grid; grid-template-columns: 280px 1fr; min-height: 100vh; }
-  
-  /* Sidebar */
-  .sidebar { background: #fff; border-right: 1px solid var(--ws-gray-200); padding: 20px; position: sticky; top: 0; height: 100vh; overflow-y: auto; }
-  .sidebar h2 { font-size: 14px; text-transform: uppercase; letter-spacing: 1px; color: var(--ws-gray-600); margin-bottom: 16px; }
-  .sidebar .file-list { list-style: none; }
-  .sidebar .file-list li { margin-bottom: 4px; }
-  .sidebar .file-list a { display: block; padding: 8px 12px; border-radius: 6px; text-decoration: none; color: #212529; font-size: 14px; transition: background 0.15s; }
-  .sidebar .file-list a:hover { background: var(--bs-secondary-bg); }
-  .sidebar .file-list a.active { background: var(--bs-primary); color: #fff; }
-  .sidebar .file-list .cat-id { font-size: 11px; color: var(--ws-gray-600); margin-right: 4px; }
-  .sidebar .file-list a.active .cat-id { color: rgba(255,255,255,0.7); }
-  
-  /* Main */
-  .main { padding: 40px; max-width: 900px; }
-  
-  /* Meta bar */
-  .meta-bar { background: #fff; border: 1px solid var(--ws-gray-200); border-radius: 8px; padding: 16px 20px; margin-bottom: 24px; font-size: 13px; }
-  .meta-bar .meta-row { display: flex; gap: 8px; margin-bottom: 4px; }
-  .meta-bar .meta-label { font-weight: 600; min-width: 50px; color: var(--ws-gray-600); }
-  .meta-bar .meta-value { color: #212529; }
-  .meta-bar .char-count { color: var(--ws-gray-600); font-size: 11px; }
-  
-  /* Content preview */
-  .content-preview { background: #fff; border: 1px solid var(--ws-gray-200); border-radius: 8px; padding: 32px 40px; }
-  .content-preview .ws-h2 { font-size: 20px; font-weight: 600; color: #212529; margin: 32px 0 12px 0; padding-bottom: 8px; border-bottom: 2px solid var(--bs-primary); }
-  .content-preview .ws-h2:first-child { margin-top: 0; }
-  .content-preview p { font-size: 15px; line-height: 1.75; margin-bottom: 12px; color: #333; }
-  .content-preview .ws-faq { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--ws-gray-200); }
-  .content-preview .faq-item { margin-bottom: 16px; padding: 16px; background: var(--bs-secondary-bg); border-radius: 6px; }
-  .content-preview .ws-h3 { font-size: 15px; font-weight: 600; margin-bottom: 8px; }
-  .content-preview .faq-item p { margin-bottom: 0; font-size: 14px; }
-  
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #212529; background: var(--bg); }
+
+  /* === LAYOUT 3 COLONNES === */
+  .layout { display: grid; grid-template-columns: 240px 1fr 260px; min-height: 100vh; }
+
+  /* === SIDEBAR GAUCHE : PAGES === */
+  .sidebar { background: var(--card); border-right: 1px solid var(--border); padding: 16px; position: sticky; top: 0; height: 100vh; overflow-y: auto; }
+  .sidebar h2 { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--gray); margin-bottom: 12px; }
+  .file-list { list-style: none; }
+  .file-list li { margin-bottom: 2px; }
+  .file-list a { display: block; padding: 7px 10px; border-radius: 5px; text-decoration: none; color: #212529; font-size: 13px; }
+  .file-list a:hover { background: #f8f9fa; }
+  .file-list a.active { background: var(--pr); color: #fff; }
+  .file-list .cat-id { font-size: 10px; opacity: 0.6; margin-right: 3px; }
+
+  /* === MAIN : ÉDITEUR === */
+  .main { padding: 24px 32px; max-width: 960px; }
+
+  /* Top bar */
+  .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+  .top-bar h1 { font-size: 18px; font-weight: 600; }
+  .top-bar .actions { display: flex; gap: 8px; }
+  .btn { padding: 7px 14px; border-radius: 6px; font-size: 13px; cursor: pointer; border: 1px solid var(--border); background: var(--card); }
+  .btn:hover { background: #f8f9fa; }
+  .btn-primary { background: var(--pr); color: #fff; border-color: var(--pr); }
+  .btn-primary:hover { background: #5a32a3; }
+  .btn-ok { background: var(--ok); color: #fff; border-color: var(--ok); }
+  .btn-ok:hover { background: #157347; }
+  .save-status { font-size: 12px; color: var(--gray); margin-right: 8px; line-height: 32px; }
+
+  /* Meta editable */
+  .meta-bar { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 12px 16px; margin-bottom: 16px; }
+  .meta-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+  .meta-row:last-child { margin-bottom: 0; }
+  .meta-label { font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--gray); min-width: 40px; }
+  .meta-input { flex: 1; border: 1px solid transparent; padding: 4px 8px; border-radius: 4px; font-size: 13px; font-family: inherit; }
+  .meta-input:hover { border-color: var(--border); }
+  .meta-input:focus { outline: none; border-color: var(--pr); background: #faf8fd; }
+  .meta-chars { font-size: 10px; color: var(--gray); min-width: 50px; text-align: right; }
+
+  /* Content editor */
+  .editor { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 24px 32px; min-height: 400px; }
+
+  /* Editable blocs */
+  .bloc { position: relative; margin: 20px 0; padding: 12px; border: 1px dashed transparent; border-radius: 6px; transition: all 0.2s; }
+  .bloc:hover { border-color: var(--pr); background: #fdfbff; }
+  .bloc.editing { border-color: var(--pr); background: #faf8fd; box-shadow: 0 0 0 3px rgba(111,66,193,0.1); }
+  .bloc-toolbar { display: none; position: absolute; top: -14px; right: 8px; background: var(--pr); border-radius: 4px; overflow: hidden; z-index: 10; }
+  .bloc:hover .bloc-toolbar, .bloc.editing .bloc-toolbar { display: flex; }
+  .bloc-toolbar button { background: none; border: none; color: #fff; padding: 3px 8px; font-size: 11px; cursor: pointer; }
+  .bloc-toolbar button:hover { background: rgba(255,255,255,0.2); }
+
+  /* Editable elements */
+  .bloc [contenteditable] { outline: none; }
+  .bloc [contenteditable]:focus { background: rgba(111,66,193,0.03); }
+
+  .editor .ws-h2 { font-size: 18px; font-weight: 600; color: #212529; margin: 0 0 8px; padding-bottom: 6px; border-bottom: 2px solid var(--pr); }
+  .editor p { font-size: 14px; line-height: 1.75; margin-bottom: 8px; color: #333; }
+  .editor .ws-faq { margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border); }
+  .editor .faq-item { margin-bottom: 12px; padding: 12px; background: #f8f9fa; border-radius: 6px; }
+  .editor .ws-h3 { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+  .editor .faq-item p { margin-bottom: 0; font-size: 13px; }
+
   /* Widget markers */
-  .widget-link { background: #e8d5f5; color: var(--bs-primary); padding: 2px 6px; border-radius: 3px; font-size: 13px; text-decoration: none; cursor: help; border: 1px dashed var(--bs-primary); }
-  .widget-link:hover { background: var(--bs-primary); color: #fff; }
-  
-  /* Stats bar */
-  .stats-bar { display: flex; gap: 16px; margin-top: 16px; padding: 12px 20px; background: #fff; border: 1px solid var(--ws-gray-200); border-radius: 8px; font-size: 12px; color: var(--ws-gray-600); flex-wrap: wrap; }
-  .stats-bar .stat { display: flex; align-items: center; gap: 4px; }
-  .stats-bar .stat-value { font-weight: 600; color: #212529; }
-  .stats-bar .stat-ok { color: #198754; }
-  .stats-bar .stat-warn { color: #ffc107; }
-  .stats-bar .stat-bad { color: #dc3545; }
-  
-  /* Bloc outlines */
-  .bloc-wrapper { position: relative; margin: 24px 0; padding: 16px; border: 1px dashed transparent; border-radius: 8px; transition: border-color 0.2s; }
-  .bloc-wrapper:hover { border-color: var(--bs-primary); }
-  .bloc-wrapper .bloc-label { display: none; position: absolute; top: -10px; right: 12px; background: var(--bs-primary); color: #fff; font-size: 10px; padding: 2px 8px; border-radius: 3px; }
-  .bloc-wrapper:hover .bloc-label { display: block; }
-  
-  /* Source toggle */
-  .source-toggle { margin-top: 16px; }
-  .source-toggle button { background: #fff; border: 1px solid var(--ws-gray-200); padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 13px; }
-  .source-toggle button:hover { background: var(--bs-secondary-bg); }
-  .source-code { display: none; margin-top: 12px; background: #1e1e1e; color: #d4d4d4; padding: 20px; border-radius: 8px; font-family: 'Fira Code', monospace; font-size: 12px; line-height: 1.6; overflow-x: auto; white-space: pre-wrap; word-break: break-all; }
-  .source-code.visible { display: block; }
-  
-  @media (max-width: 768px) {
+  .widget-link { background: var(--pr-light); color: var(--pr); padding: 1px 5px; border-radius: 3px; font-size: 12px; border: 1px dashed var(--pr); cursor: help; }
+
+  /* Insert bar between blocs */
+  .insert-bar { height: 24px; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s; }
+  .insert-bar:hover { opacity: 1; }
+  .insert-bar button { background: var(--card); border: 1px solid var(--border); border-radius: 50%; width: 24px; height: 24px; font-size: 16px; cursor: pointer; color: var(--pr); line-height: 1; }
+  .insert-bar button:hover { background: var(--pr); color: #fff; }
+
+  /* Stats */
+  .stats-bar { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 12px; padding: 10px 16px; background: var(--card); border: 1px solid var(--border); border-radius: 8px; font-size: 11px; color: var(--gray); }
+  .stat { display: flex; align-items: center; gap: 3px; }
+  .stat-value { font-weight: 600; color: #212529; }
+  .stat-ok { color: var(--ok) !important; }
+  .stat-bad { color: var(--bad) !important; }
+
+  /* Source */
+  .source-area { display: none; margin-top: 12px; }
+  .source-area.visible { display: block; }
+  .source-area textarea { width: 100%; min-height: 300px; background: #1e1e1e; color: #d4d4d4; border: none; border-radius: 8px; padding: 16px; font-family: 'Fira Code', 'Consolas', monospace; font-size: 12px; line-height: 1.5; resize: vertical; }
+
+  /* === SIDEBAR DROITE : TEMPLATES === */
+  .templates { background: var(--card); border-left: 1px solid var(--border); padding: 16px; position: sticky; top: 0; height: 100vh; overflow-y: auto; }
+  .templates h2 { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--gray); margin-bottom: 12px; }
+  .tpl-card { padding: 10px; margin-bottom: 8px; border: 1px solid var(--border); border-radius: 6px; cursor: grab; transition: all 0.15s; }
+  .tpl-card:hover { border-color: var(--pr); background: #fdfbff; }
+  .tpl-card:active { cursor: grabbing; }
+  .tpl-card .tpl-name { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
+  .tpl-card .tpl-desc { font-size: 11px; color: var(--gray); }
+  .tpl-card .tpl-preview { margin-top: 6px; padding: 6px; background: #f8f9fa; border-radius: 4px; font-size: 10px; color: var(--gray); line-height: 1.4; max-height: 60px; overflow: hidden; }
+  .tpl-section { margin-bottom: 16px; }
+  .tpl-section h3 { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--pr); margin-bottom: 8px; }
+
+  /* Token modal */
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 100; align-items: center; justify-content: center; }
+  .modal-overlay.visible { display: flex; }
+  .modal { background: var(--card); border-radius: 12px; padding: 24px; width: 420px; max-width: 90vw; }
+  .modal h3 { margin-bottom: 12px; font-size: 16px; }
+  .modal p { font-size: 13px; color: var(--gray); margin-bottom: 12px; }
+  .modal input { width: 100%; padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; font-size: 13px; margin-bottom: 12px; }
+  .modal .modal-actions { display: flex; gap: 8px; justify-content: flex-end; }
+
+  /* Toast */
+  .toast { position: fixed; bottom: 20px; right: 20px; background: #212529; color: #fff; padding: 10px 20px; border-radius: 8px; font-size: 13px; z-index: 200; display: none; }
+  .toast.visible { display: block; animation: fadeIn 0.2s; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+  @media (max-width: 1024px) {
     .layout { grid-template-columns: 1fr; }
-    .sidebar { position: static; height: auto; border-right: none; border-bottom: 1px solid var(--ws-gray-200); }
+    .sidebar, .templates { position: static; height: auto; border: none; border-bottom: 1px solid var(--border); }
   }
 </style>
 </head>
 <body>
 
 <div class="layout">
+  <!-- SIDEBAR GAUCHE -->
   <div class="sidebar">
     <h2>Pages</h2>
     <ul class="file-list" id="fileList">
       <li><a href="#" class="active" data-file="65-couper-et-decouper.html"><span class="cat-id">65</span> Couper et découper</a></li>
-      <!-- Futures pages -->
-      <!--
-      <li><a href="#" data-file="142-cisailles.html"><span class="cat-id">142</span> Cisailles</a></li>
-      <li><a href="#" data-file="218-cisailles-papier.html"><span class="cat-id">218</span> Cisailles papier</a></li>
-      <li><a href="#" data-file="148-cisailles-a4.html"><span class="cat-id">148</span> Cisailles A4</a></li>
-      -->
     </ul>
-  </div>
-  
-  <div class="main">
-    <div class="meta-bar" id="metaBar">Chargement...</div>
-    <div class="content-preview" id="contentPreview">Chargement...</div>
-    <div class="stats-bar" id="statsBar"></div>
-    <div class="source-toggle">
-      <button onclick="toggleSource()">Voir le HTML source</button>
+    <div style="margin-top:24px">
+      <h2>Config</h2>
+      <button class="btn" style="width:100%;margin-bottom:6px" onclick="showTokenModal()">Token GitHub</button>
     </div>
-    <pre class="source-code" id="sourceCode"></pre>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="top-bar">
+      <h1 id="pageTitle">Chargement...</h1>
+      <div class="actions">
+        <span class="save-status" id="saveStatus"></span>
+        <button class="btn" onclick="toggleSource()">Source</button>
+        <button class="btn btn-ok" onclick="saveToGithub()">Sauvegarder</button>
+      </div>
+    </div>
+
+    <div class="meta-bar" id="metaBar"></div>
+    <div class="editor" id="editor">Chargement...</div>
+    <div class="stats-bar" id="statsBar"></div>
+    <div class="source-area" id="sourceArea">
+      <textarea id="sourceCode" spellcheck="false"></textarea>
+      <div style="margin-top:8px;display:flex;gap:8px">
+        <button class="btn" onclick="applySource()">Appliquer les modifications source</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SIDEBAR DROITE : TEMPLATES -->
+  <div class="templates">
+    <h2>Templates</h2>
+
+    <div class="tpl-section">
+      <h3>Contenu</h3>
+      <div class="tpl-card" draggable="true" data-tpl="h2-section">
+        <div class="tpl-name">Section H2</div>
+        <div class="tpl-desc">Titre + paragraphe</div>
+        <div class="tpl-preview">&lt;h2&gt; + &lt;p&gt;</div>
+      </div>
+      <div class="tpl-card" draggable="true" data-tpl="h2-2p">
+        <div class="tpl-name">Section H2 + 2 paragraphes</div>
+        <div class="tpl-desc">Titre + deux blocs texte</div>
+        <div class="tpl-preview">&lt;h2&gt; + &lt;p&gt; + &lt;p&gt;</div>
+      </div>
+      <div class="tpl-card" draggable="true" data-tpl="paragraph">
+        <div class="tpl-name">Paragraphe</div>
+        <div class="tpl-desc">Bloc texte simple</div>
+        <div class="tpl-preview">&lt;p&gt;</div>
+      </div>
+    </div>
+
+    <div class="tpl-section">
+      <h3>Magento</h3>
+      <div class="tpl-card" draggable="true" data-tpl="widget-cat">
+        <div class="tpl-name">Widget lien catégorie</div>
+        <div class="tpl-desc">Lien interne Magento</div>
+        <div class="tpl-preview">{{widget Category\Widget\Link}}</div>
+      </div>
+      <div class="tpl-card" draggable="true" data-tpl="widget-product">
+        <div class="tpl-name">Widget lien produit</div>
+        <div class="tpl-desc">Lien produit Magento</div>
+        <div class="tpl-preview">{{widget Product\Widget\Link}}</div>
+      </div>
+      <div class="tpl-card" draggable="true" data-tpl="widget-product-list">
+        <div class="tpl-name">Widget liste produits</div>
+        <div class="tpl-desc">Grille produits catégorie</div>
+        <div class="tpl-preview">{{widget product_list}}</div>
+      </div>
+    </div>
+
+    <div class="tpl-section">
+      <h3>FAQ</h3>
+      <div class="tpl-card" draggable="true" data-tpl="faq-block">
+        <div class="tpl-name">Bloc FAQ complet</div>
+        <div class="tpl-desc">ws-faq + 3 questions + JSON-LD</div>
+        <div class="tpl-preview">FAQ + Schema</div>
+      </div>
+      <div class="tpl-card" draggable="true" data-tpl="faq-item">
+        <div class="tpl-name">Question FAQ</div>
+        <div class="tpl-desc">1 question + réponse</div>
+        <div class="tpl-preview">faq-item</div>
+      </div>
+    </div>
+
+    <div class="tpl-section">
+      <h3>Visuels</h3>
+      <div class="tpl-card" draggable="true" data-tpl="banner">
+        <div class="tpl-name">Bannière marque</div>
+        <div class="tpl-desc">Image + lien page marque</div>
+        <div class="tpl-preview">figure + figcaption</div>
+      </div>
+      <div class="tpl-card" draggable="true" data-tpl="cta">
+        <div class="tpl-name">Call to action</div>
+        <div class="tpl-desc">Texte + bouton devis</div>
+        <div class="tpl-preview">CTA devis pro</div>
+      </div>
+    </div>
   </div>
 </div>
 
+<!-- TOKEN MODAL -->
+<div class="modal-overlay" id="tokenModal">
+  <div class="modal">
+    <h3>Token GitHub</h3>
+    <p>Token avec permission <code>repo</code> pour sauvegarder les modifications. Stocké en localStorage uniquement.</p>
+    <input type="password" id="tokenInput" placeholder="ghp_xxxxxxxxxxxx">
+    <div class="modal-actions">
+      <button class="btn" onclick="hideTokenModal()">Annuler</button>
+      <button class="btn btn-primary" onclick="saveToken()">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
 <script>
-const BLACKLIST_VERBS = /\b(offre|permet|propose|assure|dispose de|bénéficie de|se distingue|séduit|accompagne|facilite|optimise)\b/gi;
-const BLACKLIST_ADJ = /\b(idéal|parfait|optimal|performant|polyvalent|ergonomique|robuste|fiable|innovant|premium|incontournable|exceptionnel|remarquable|essentiel|indispensable)\b/gi;
-const BLACKLIST_EXPR = /(découvrez|n'hésitez pas|conçu pour|que vous soyez|grâce à|large gamme|vaste choix|en effet|de plus,|par ailleurs,|néanmoins|toutefois|cependant)/gi;
-const EM_DASH = /—/g;
+// === CONFIG ===
+const REPO = 'Ltaunais/wynstor-content-preview';
+const BRANCH = 'main';
 
+// === STATE ===
+let currentFile = null;
+let currentRawHtml = '';
+let currentSha = null;
+let dirty = false;
+
+// === TEMPLATES ===
+const TEMPLATES = {
+  'h2-section': `<h2 class="ws-h2">Votre titre ici</h2>\n<p>Votre texte ici.</p>`,
+  'h2-2p': `<h2 class="ws-h2">Votre titre ici</h2>\n<p>Premier paragraphe.</p>\n<p>Deuxième paragraphe.</p>`,
+  'paragraph': `<p>Votre texte ici.</p>`,
+  'widget-cat': `{{widget type="Magento\\Catalog\\Block\\Category\\Widget\\Link" anchor_text="texte ancre" id_path="category/ID"}}`,
+  'widget-product': `{{widget type="Magento\\Catalog\\Block\\Product\\Widget\\Link" anchor_text="texte ancre" id_path="product/ID"}}`,
+  'widget-product-list': `<!-- {{widget type="catalog/product_list" category_id="ID" products_count="4" template="product/widget/new/content/new_grid.phtml"}} -->`,
+  'faq-block': `<div class="ws-faq">\n<h2 class="ws-h2">Questions fréquentes</h2>\n\n<div class="faq-item">\n<h3 class="ws-h3">Votre question\u00a0?</h3>\n<p>Votre réponse.</p>\n</div>\n\n<div class="faq-item">\n<h3 class="ws-h3">Deuxième question\u00a0?</h3>\n<p>Réponse.</p>\n</div>\n\n<div class="faq-item">\n<h3 class="ws-h3">Troisième question\u00a0?</h3>\n<p>Réponse.</p>\n</div>\n\n</div>\n\n<script type="application/ld+json">\n{\n  "@context": "https://schema.org",\n  "@type": "FAQPage",\n  "mainEntity": []\n}\n<\/script>`,
+  'faq-item': `<div class="faq-item">\n<h3 class="ws-h3">Votre question\u00a0?</h3>\n<p>Réponse.</p>\n</div>`,
+  'banner': `<figure style="margin:20px 0">\n  <img src="/media/banner/marque.jpg" alt="Description" loading="lazy" width="100%" />\n  <figcaption>Légende de l'image</figcaption>\n</figure>`,
+  'cta': `<div style="background:#f8f9fa;padding:20px;border-radius:8px;margin:24px 0;text-align:center">\n  <p style="font-size:1.1rem;margin-bottom:12px"><strong>Besoin d'un devis pour votre établissement\u00a0?</strong></p>\n  <p>Réponse sous 24h, livraison sur site.</p>\n</div>`
+};
+
+// === BLACKLIST ===
+const BL_VERBS = /\b(offre|permet|propose|assure|dispose de|bénéficie de|se distingue|séduit|accompagne|facilite|optimise)\b/gi;
+const BL_ADJ = /\b(idéal|parfait|optimal|performant|polyvalent|ergonomique|robuste|fiable|innovant|premium|incontournable|exceptionnel|remarquable|essentiel|indispensable)\b/gi;
+const BL_EXPR = /(découvrez|n'hésitez pas|conçu pour|que vous soyez|grâce à|large gamme|vaste choix|en effet|de plus,|par ailleurs,|néanmoins|toutefois|cependant)/gi;
+
+// === TOKEN ===
+function getToken() { return localStorage.getItem('gh_token') || ''; }
+function showTokenModal() { document.getElementById('tokenModal').classList.add('visible'); document.getElementById('tokenInput').value = getToken(); }
+function hideTokenModal() { document.getElementById('tokenModal').classList.remove('visible'); }
+function saveToken() { localStorage.setItem('gh_token', document.getElementById('tokenInput').value.trim()); hideTokenModal(); toast('Token enregistré'); }
+
+// === TOAST ===
+function toast(msg, duration=2500) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('visible');
+  setTimeout(() => t.classList.remove('visible'), duration);
+}
+
+// === LOAD FILE ===
 async function loadFile(filename) {
+  currentFile = filename;
+  document.getElementById('pageTitle').textContent = filename.replace('.html','');
+  document.querySelectorAll('.file-list a').forEach(a => a.classList.remove('active'));
+  document.querySelector(`[data-file="${filename}"]`)?.classList.add('active');
+
+  // Fetch from GitHub API to get SHA
+  const token = getToken();
   try {
-    const res = await fetch(filename);
-    const html = await res.text();
-    renderContent(html, filename);
-    
-    document.querySelectorAll('.file-list a').forEach(a => a.classList.remove('active'));
-    document.querySelector(`[data-file="${filename}"]`)?.classList.add('active');
+    const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${filename}?ref=${BRANCH}`, {
+      headers: token ? { 'Authorization': `token ${token}` } : {}
+    });
+    const data = await res.json();
+    currentSha = data.sha;
+    currentRawHtml = atob(data.content.replace(/\n/g, ''));
   } catch(e) {
-    document.getElementById('contentPreview').innerHTML = '<p>Fichier non trouvé.</p>';
+    // Fallback: fetch raw
+    const res = await fetch(filename);
+    currentRawHtml = await res.text();
+    currentSha = null;
   }
+
+  renderMeta();
+  renderEditor();
+  updateStats();
+  dirty = false;
+  document.getElementById('saveStatus').textContent = '';
 }
 
-function renderContent(html, filename) {
-  // Extract meta from comments
-  const metaMatch = html.match(/Title: (.+)\n\s+Meta: (.+)\n\s+H1: (.+)/);
-  const metaBar = document.getElementById('metaBar');
-  if (metaMatch) {
-    const titleLen = metaMatch[1].match(/\((\d+ chars)\)/)?.[1] || metaMatch[1].length + ' chars';
-    const metaLen = metaMatch[2].match(/\((\d+ chars)\)/)?.[1] || metaMatch[2].length + ' chars';
-    metaBar.innerHTML = `
-      <div class="meta-row"><span class="meta-label">Title</span><span class="meta-value">${metaMatch[1]}</span></div>
-      <div class="meta-row"><span class="meta-label">Meta</span><span class="meta-value">${metaMatch[2]}</span></div>
-      <div class="meta-row"><span class="meta-label">H1</span><span class="meta-value">${metaMatch[3]}</span></div>
-    `;
+// === RENDER META ===
+function renderMeta() {
+  const m = currentRawHtml.match(/Title: (.+)\n\s+Meta: (.+)\n\s+H1: (.+)/);
+  const bar = document.getElementById('metaBar');
+  if (m) {
+    bar.innerHTML = `
+      <div class="meta-row">
+        <span class="meta-label">Title</span>
+        <input class="meta-input" id="metaTitle" value="${m[1].replace(/\(\d+ chars\)/,'').trim()}" oninput="onMetaChange()">
+        <span class="meta-chars" id="metaTitleChars"></span>
+      </div>
+      <div class="meta-row">
+        <span class="meta-label">Meta</span>
+        <input class="meta-input" id="metaDesc" value="${m[2].replace(/\(\d+ chars\)/,'').trim()}" oninput="onMetaChange()">
+        <span class="meta-chars" id="metaDescChars"></span>
+      </div>
+      <div class="meta-row">
+        <span class="meta-label">H1</span>
+        <input class="meta-input" id="metaH1" value="${m[3].trim()}" oninput="onMetaChange()">
+      </div>`;
+    updateMetaChars();
   } else {
-    metaBar.innerHTML = '<em>Pas de meta trouvé dans les commentaires</em>';
+    bar.innerHTML = '<em style="font-size:13px;color:var(--gray)">Ajoutez les meta dans un commentaire HTML en tête de fichier</em>';
   }
-  
-  // Clean HTML for display (remove comments, script tags for display)
-  let displayHtml = html
-    .replace(/<!--[\s\S]*?-->/g, '')
-    .replace(/<script[\s\S]*?<\/script>/g, '')
-    .trim();
-  
-  // Replace widget tags with visual markers
-  displayHtml = displayHtml.replace(
+}
+
+function updateMetaChars() {
+  const t = document.getElementById('metaTitle');
+  const d = document.getElementById('metaDesc');
+  if (t) document.getElementById('metaTitleChars').textContent = t.value.length + ' chars';
+  if (d) document.getElementById('metaDescChars').textContent = d.value.length + ' chars';
+}
+
+function onMetaChange() { updateMetaChars(); markDirty(); }
+
+// === RENDER EDITOR ===
+function renderEditor() {
+  let html = currentRawHtml.replace(/<!--[\s\S]*?-->/g, '').replace(/<script[\s\S]*?<\/script>/g, '').trim();
+
+  // Replace widgets with visual markers
+  html = html.replace(
     /\{\{widget[^}]*anchor_text="([^"]+)"[^}]*id_path="([^"]+)"[^}]*\}\}/g,
-    '<span class="widget-link" title="$2">$1</span>'
+    '<span class="widget-link" title="$2" contenteditable="false">$1</span>'
   );
-  
-  // Wrap each h2+content in bloc-wrapper
-  let blocIndex = 0;
-  displayHtml = displayHtml.replace(/<h2/g, () => {
-    blocIndex++;
-    return `</div><div class="bloc-wrapper"><span class="bloc-label">Bloc ${blocIndex}</span><h2`;
+
+  // Wrap blocs around h2 sections
+  let idx = 0;
+  const blocs = html.split(/(?=<h2|<div class="ws-faq)/);
+
+  const editor = document.getElementById('editor');
+  editor.innerHTML = '';
+
+  blocs.forEach((b, i) => {
+    if (!b.trim()) return;
+    const div = document.createElement('div');
+    div.className = 'bloc';
+    div.innerHTML = `
+      <div class="bloc-toolbar">
+        <button onclick="moveBloc(this,-1)" title="Monter">&#8593;</button>
+        <button onclick="moveBloc(this,1)" title="Descendre">&#8595;</button>
+        <button onclick="deleteBloc(this)" title="Supprimer">&#10005;</button>
+      </div>
+      <div class="bloc-content" contenteditable="true" oninput="markDirty()">${b.trim()}</div>
+    `;
+    // Insert bar before each bloc
+    const insertBar = document.createElement('div');
+    insertBar.className = 'insert-bar';
+    insertBar.innerHTML = '<button onclick="showInsertMenu(this)" title="Insérer un bloc">+</button>';
+    editor.appendChild(insertBar);
+    editor.appendChild(div);
   });
-  displayHtml = displayHtml + '</div>';
-  displayHtml = displayHtml.replace(/^<\/div>/, '');
-  
-  document.getElementById('contentPreview').innerHTML = displayHtml;
-  
-  // Source code
-  document.getElementById('sourceCode').textContent = html;
-  document.getElementById('sourceCode').classList.remove('visible');
-  
-  // Stats
-  const textOnly = html.replace(/<[^>]+>/g, '').replace(/\{\{[^}]+\}\}/g, '').replace(/<!--[\s\S]*?-->/g, '');
-  const wordCount = textOnly.trim().split(/\s+/).filter(w => w.length > 0).length;
-  const widgetCount = (html.match(/\{\{widget/g) || []).length;
-  const h2Count = (html.match(/<h2/g) || []).length;
-  const faqCount = (html.match(/faq-item/g) || []).length;
-  
-  // Blacklist check
-  const verbHits = (textOnly.match(BLACKLIST_VERBS) || []);
-  const adjHits = (textOnly.match(BLACKLIST_ADJ) || []);
-  const exprHits = (textOnly.match(BLACKLIST_EXPR) || []);
-  const emDashHits = (html.match(EM_DASH) || []);
-  const totalHits = verbHits.length + adjHits.length + exprHits.length + emDashHits.length;
-  
-  const ratio = wordCount > 0 ? Math.round(wordCount / widgetCount) : 0;
-  const ratioClass = ratio >= 100 ? 'stat-ok' : ratio >= 50 ? 'stat-warn' : 'stat-bad';
-  const blClass = totalHits === 0 ? 'stat-ok' : 'stat-bad';
-  const blDetail = totalHits > 0 ? ` (${[...verbHits, ...adjHits, ...exprHits, ...emDashHits].join(', ')})` : '';
-  
-  document.getElementById('statsBar').innerHTML = `
-    <div class="stat">Mots : <span class="stat-value">${wordCount}</span></div>
-    <div class="stat">H2 : <span class="stat-value">${h2Count}</span></div>
-    <div class="stat">Widgets liens : <span class="stat-value">${widgetCount}</span></div>
-    <div class="stat">FAQ : <span class="stat-value">${faqCount}</span></div>
-    <div class="stat">Ratio mots/lien : <span class="stat-value ${ratioClass}">${ratio}</span></div>
-    <div class="stat">Blacklist : <span class="stat-value ${blClass}">${totalHits}${blDetail}</span></div>
+
+  // Final insert bar
+  const finalBar = document.createElement('div');
+  finalBar.className = 'insert-bar';
+  finalBar.innerHTML = '<button onclick="showInsertMenu(this)" title="Insérer un bloc">+</button>';
+  editor.appendChild(finalBar);
+}
+
+// === BLOC ACTIONS ===
+function moveBloc(btn, dir) {
+  const bloc = btn.closest('.bloc');
+  const insertBar = bloc.previousElementSibling;
+  if (dir === -1 && insertBar?.previousElementSibling?.classList.contains('bloc')) {
+    const target = insertBar.previousElementSibling;
+    const targetBar = target.previousElementSibling;
+    bloc.parentNode.insertBefore(insertBar, targetBar);
+    bloc.parentNode.insertBefore(bloc, targetBar);
+  } else if (dir === 1 && bloc.nextElementSibling?.nextElementSibling?.classList.contains('bloc')) {
+    const nextBar = bloc.nextElementSibling;
+    const nextBloc = nextBar.nextElementSibling;
+    const nextNextBar = nextBloc.nextElementSibling;
+    bloc.parentNode.insertBefore(bloc, nextNextBar);
+    bloc.parentNode.insertBefore(insertBar, bloc);
+  }
+  markDirty();
+}
+
+function deleteBloc(btn) {
+  if (!confirm('Supprimer ce bloc ?')) return;
+  const bloc = btn.closest('.bloc');
+  const insertBar = bloc.previousElementSibling;
+  if (insertBar?.classList.contains('insert-bar')) insertBar.remove();
+  bloc.remove();
+  markDirty();
+}
+
+// === INSERT TEMPLATE ===
+function showInsertMenu(btn) {
+  const insertBar = btn.closest('.insert-bar');
+  // Create a simple template picker
+  const existing = document.querySelector('.insert-picker');
+  if (existing) existing.remove();
+
+  const picker = document.createElement('div');
+  picker.className = 'insert-picker';
+  picker.style.cssText = 'background:#fff;border:1px solid var(--border);border-radius:8px;padding:8px;position:absolute;z-index:50;box-shadow:0 4px 12px rgba(0,0,0,0.15);display:flex;flex-wrap:wrap;gap:4px;max-width:400px';
+
+  Object.entries(TEMPLATES).forEach(([key, html]) => {
+    const b = document.createElement('button');
+    b.className = 'btn';
+    b.style.fontSize = '11px';
+    b.textContent = key.replace(/-/g, ' ');
+    b.onclick = () => { insertTemplate(insertBar, key); picker.remove(); };
+    picker.appendChild(b);
+  });
+
+  const cancel = document.createElement('button');
+  cancel.className = 'btn';
+  cancel.style.fontSize = '11px';
+  cancel.textContent = '✕';
+  cancel.onclick = () => picker.remove();
+  picker.appendChild(cancel);
+
+  insertBar.style.position = 'relative';
+  insertBar.appendChild(picker);
+}
+
+function insertTemplate(insertBar, tplKey) {
+  const html = TEMPLATES[tplKey];
+  const bloc = document.createElement('div');
+  bloc.className = 'bloc';
+  bloc.innerHTML = `
+    <div class="bloc-toolbar">
+      <button onclick="moveBloc(this,-1)">&#8593;</button>
+      <button onclick="moveBloc(this,1)">&#8595;</button>
+      <button onclick="deleteBloc(this)">&#10005;</button>
+    </div>
+    <div class="bloc-content" contenteditable="true" oninput="markDirty()">${html}</div>
   `;
+  const newBar = document.createElement('div');
+  newBar.className = 'insert-bar';
+  newBar.innerHTML = '<button onclick="showInsertMenu(this)" title="Insérer un bloc">+</button>';
+
+  insertBar.after(newBar);
+  newBar.after(bloc);
+  markDirty();
 }
 
-function toggleSource() {
-  document.getElementById('sourceCode').classList.toggle('visible');
-}
-
-// Init
+// === DRAG & DROP TEMPLATES ===
 document.addEventListener('DOMContentLoaded', () => {
-  loadFile('65-couper-et-decouper.html');
-  
-  document.querySelectorAll('.file-list a').forEach(a => {
-    a.addEventListener('click', (e) => {
-      e.preventDefault();
-      loadFile(a.dataset.file);
+  document.querySelectorAll('.tpl-card[draggable]').forEach(card => {
+    card.addEventListener('dragstart', e => {
+      e.dataTransfer.setData('text/plain', card.dataset.tpl);
     });
   });
 });
+
+// === DIRTY STATE ===
+function markDirty() {
+  dirty = true;
+  document.getElementById('saveStatus').textContent = 'Modifications non sauvegardées';
+  document.getElementById('saveStatus').style.color = 'var(--warn)';
+  updateStats();
+}
+
+// === COLLECT HTML ===
+function collectHtml() {
+  // Rebuild meta comment
+  const title = document.getElementById('metaTitle')?.value || '';
+  const desc = document.getElementById('metaDesc')?.value || '';
+  const h1 = document.getElementById('metaH1')?.value || '';
+
+  let html = `<!-- ============================================\n`;
+  html += `     ${currentFile?.replace('.html','') || 'page'}\n`;
+  html += `     Bloc CMS Magento\n`;
+  html += `     Lucas Wynstor — ${new Date().toISOString().split('T')[0]}\n\n`;
+  html += `     Title: ${title} (${title.length} chars)\n`;
+  html += `     Meta: ${desc} (${desc.length} chars)\n`;
+  html += `     H1: ${h1}\n`;
+  html += `     ============================================ -->\n\n`;
+
+  // Collect blocs
+  document.querySelectorAll('.bloc .bloc-content').forEach(bc => {
+    let blocHtml = bc.innerHTML;
+    // Restore widget markers to real widgets
+    blocHtml = blocHtml.replace(
+      /<span class="widget-link"[^>]*title="([^"]+)"[^>]*>([^<]+)<\/span>/g,
+      (_, path, text) => `{{widget type="Magento\\Catalog\\Block\\Category\\Widget\\Link" anchor_text="${text}" id_path="${path}"}}`
+    );
+    html += blocHtml.trim() + '\n\n';
+  });
+
+  return html;
+}
+
+// === SOURCE VIEW ===
+function toggleSource() {
+  const area = document.getElementById('sourceArea');
+  if (area.classList.contains('visible')) {
+    area.classList.remove('visible');
+  } else {
+    document.getElementById('sourceCode').value = collectHtml();
+    area.classList.add('visible');
+  }
+}
+
+function applySource() {
+  currentRawHtml = document.getElementById('sourceCode').value;
+  renderMeta();
+  renderEditor();
+  updateStats();
+  document.getElementById('sourceArea').classList.remove('visible');
+  markDirty();
+  toast('Source appliquée');
+}
+
+// === SAVE TO GITHUB ===
+async function saveToGithub() {
+  const token = getToken();
+  if (!token) { showTokenModal(); return; }
+
+  const content = collectHtml();
+  const encoded = btoa(unescape(encodeURIComponent(content)));
+
+  document.getElementById('saveStatus').textContent = 'Sauvegarde...';
+  document.getElementById('saveStatus').style.color = 'var(--pr)';
+
+  try {
+    const body = {
+      message: `update: ${currentFile} — ${new Date().toISOString().split('T')[0]}`,
+      content: encoded,
+      branch: BRANCH
+    };
+    if (currentSha) body.sha = currentSha;
+
+    const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${currentFile}`, {
+      method: 'PUT',
+      headers: { 'Authorization': `token ${token}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      currentSha = data.content.sha;
+      currentRawHtml = content;
+      dirty = false;
+      document.getElementById('saveStatus').textContent = 'Sauvegardé';
+      document.getElementById('saveStatus').style.color = 'var(--ok)';
+      toast('Sauvegardé sur GitHub');
+    } else {
+      const err = await res.json();
+      document.getElementById('saveStatus').textContent = 'Erreur';
+      document.getElementById('saveStatus').style.color = 'var(--bad)';
+      toast('Erreur: ' + (err.message || res.status), 4000);
+    }
+  } catch(e) {
+    document.getElementById('saveStatus').textContent = 'Erreur réseau';
+    document.getElementById('saveStatus').style.color = 'var(--bad)';
+    toast('Erreur réseau: ' + e.message, 4000);
+  }
+}
+
+// === STATS ===
+function updateStats() {
+  const html = collectHtml();
+  const text = html.replace(/<[^>]+>/g, '').replace(/\{\{[^}]+\}\}/g, '').replace(/<!--[\s\S]*?-->/g, '');
+  const words = text.trim().split(/\s+/).filter(w => w.length > 0).length;
+  const widgets = (html.match(/\{\{widget/g) || []).length;
+  const h2s = (html.match(/<h2/g) || []).length;
+  const faqs = (html.match(/faq-item/g) || []).length;
+  const ratio = widgets > 0 ? Math.round(words / widgets) : 0;
+  const ratioClass = ratio >= 100 ? 'stat-ok' : ratio >= 50 ? '' : 'stat-bad';
+
+  const vHits = (text.match(BL_VERBS) || []);
+  const aHits = (text.match(BL_ADJ) || []);
+  const eHits = (text.match(BL_EXPR) || []);
+  const dashHits = (html.match(/\u2014/g) || []);
+  const total = vHits.length + aHits.length + eHits.length + dashHits.length;
+  const blClass = total === 0 ? 'stat-ok' : 'stat-bad';
+  const blWords = total > 0 ? ` (${[...vHits,...aHits,...eHits].join(', ')})` : '';
+
+  document.getElementById('statsBar').innerHTML = `
+    <div class="stat">Mots: <span class="stat-value">${words}</span></div>
+    <div class="stat">H2: <span class="stat-value">${h2s}</span></div>
+    <div class="stat">Liens: <span class="stat-value">${widgets}</span></div>
+    <div class="stat">FAQ: <span class="stat-value">${faqs}</span></div>
+    <div class="stat">Ratio: <span class="stat-value ${ratioClass}">${ratio} mots/lien</span></div>
+    <div class="stat">Blacklist: <span class="stat-value ${blClass}">${total}${blWords}</span></div>
+  `;
+}
+
+// === INIT ===
+document.addEventListener('DOMContentLoaded', () => {
+  loadFile('65-couper-et-decouper.html');
+  document.querySelectorAll('.file-list a').forEach(a => {
+    a.addEventListener('click', e => { e.preventDefault(); loadFile(a.dataset.file); });
+  });
+});
+
+// Warn before leaving with unsaved changes
+window.addEventListener('beforeunload', e => { if (dirty) { e.preventDefault(); e.returnValue = ''; } });
 </script>
 
 </body>
