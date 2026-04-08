@@ -774,32 +774,69 @@ function renderMeta() {
   const m = currentRawHtml.match(/Title:\s*(.+)\n\s*Meta[^:]*:\s*(.+)\n\s*H1:\s*(.+)/);
   const bar = document.getElementById('metaBar');
   if (m) {
-    bar.innerHTML = `
-      <div class="meta-row">
-        <span class="meta-label">Title</span>
-        <input class="meta-input" id="metaTitle" value="${m[1].replace(/\(\d+ chars\)/,'').trim()}" oninput="onMetaChange()">
-        <span class="meta-chars" id="metaTitleChars"></span>
-      </div>
-      <div class="meta-row">
-        <span class="meta-label">Meta</span>
-        <input class="meta-input" id="metaDesc" value="${m[2].replace(/\(\d+ chars\)/,'').trim()}" oninput="onMetaChange()">
-        <span class="meta-chars" id="metaDescChars"></span>
-      </div>
-      <div class="meta-row">
-        <span class="meta-label">H1</span>
-        <input class="meta-input" id="metaH1" value="${m[3].trim()}" oninput="onMetaChange()">
-      </div>`;
+    // Accroche optionnelle (peut être sur plusieurs lignes, jusqu'au prochain === ou fin de commentaire)
+    const accrocheMatch = currentRawHtml.match(/Accroche:\s*([\s\S]*?)(?=\n\s*={3,}|\s*-->)/);
+    const accrocheValue = accrocheMatch ? accrocheMatch[1].trim() : '';
+
+    bar.textContent = '';
+
+    const rows = [
+      { label: 'Title', id: 'metaTitle', value: m[1].replace(/\(\d+ chars\)/,'').trim(), type: 'input', counter: true },
+      { label: 'Meta', id: 'metaDesc', value: m[2].replace(/\(\d+ chars\)/,'').trim(), type: 'input', counter: true },
+      { label: 'H1', id: 'metaH1', value: m[3].trim(), type: 'input', counter: false },
+      { label: 'Accroche', id: 'metaAccroche', value: accrocheValue, type: 'textarea', counter: true }
+    ];
+
+    rows.forEach(r => {
+      const row = document.createElement('div');
+      row.className = 'meta-row';
+
+      const label = document.createElement('span');
+      label.className = 'meta-label';
+      label.textContent = r.label;
+      row.appendChild(label);
+
+      let field;
+      if (r.type === 'textarea') {
+        field = document.createElement('textarea');
+        field.rows = 2;
+        field.style.cssText = 'resize:vertical;min-height:36px';
+      } else {
+        field = document.createElement('input');
+      }
+      field.className = 'meta-input';
+      field.id = r.id;
+      field.value = r.value;
+      field.addEventListener('input', onMetaChange);
+      row.appendChild(field);
+
+      if (r.counter) {
+        const chars = document.createElement('span');
+        chars.className = 'meta-chars';
+        chars.id = r.id + 'Chars';
+        row.appendChild(chars);
+      }
+
+      bar.appendChild(row);
+    });
+
     updateMetaChars();
   } else {
-    bar.innerHTML = '<em style="font-size:13px;color:var(--gray)">Ajoutez les meta dans un commentaire HTML en tête de fichier</em>';
+    bar.textContent = '';
+    const em = document.createElement('em');
+    em.style.cssText = 'font-size:13px;color:var(--gray)';
+    em.textContent = 'Ajoutez les meta dans un commentaire HTML en tête de fichier';
+    bar.appendChild(em);
   }
 }
 
 function updateMetaChars() {
   const t = document.getElementById('metaTitle');
   const d = document.getElementById('metaDesc');
+  const a = document.getElementById('metaAccroche');
   if (t) document.getElementById('metaTitleChars').textContent = t.value.length + ' chars';
   if (d) document.getElementById('metaDescChars').textContent = d.value.length + ' chars';
+  if (a) document.getElementById('metaAccrocheChars').textContent = a.value.length + ' chars';
 }
 
 function onMetaChange() { updateMetaChars(); markDirty(); }
@@ -1622,6 +1659,7 @@ function collectHtml() {
   const title = document.getElementById('metaTitle')?.value || '';
   const desc = document.getElementById('metaDesc')?.value || '';
   const h1 = document.getElementById('metaH1')?.value || '';
+  const accroche = document.getElementById('metaAccroche')?.value || '';
 
   let html = `<!-- ============================================\n`;
   html += `     ${currentFile?.replace('.html','') || 'page'}\n`;
@@ -1630,6 +1668,7 @@ function collectHtml() {
   html += `     Title: ${title} (${title.length} chars)\n`;
   html += `     Meta: ${desc} (${desc.length} chars)\n`;
   html += `     H1: ${h1}\n`;
+  if (accroche) html += `     Accroche: ${accroche}\n`;
   html += `     ============================================ -->\n\n`;
 
   // Collect blocs
@@ -3449,6 +3488,7 @@ async function pushToMagento() {
   if (metaTitle && metaTitle.value) parts.push('Title');
   if (metaDesc && metaDesc.value) parts.push('Meta');
   if (metaH1 && metaH1.value) parts.push('H1');
+  if (metaAccroche && metaAccroche.value) parts.push('Accroche');
   if (contentHtml.trim()) parts.push('Contenu');
   if (subcatsImages.length) parts.push(subcatsImages.length + ' images sous-cat');
 
@@ -3458,10 +3498,13 @@ async function pushToMagento() {
 
   toast('Push Magento en cours...');
 
+  const metaAccroche = document.getElementById('metaAccroche');
+
   const payload = { category_id: catId };
   if (metaTitle && metaTitle.value) payload.meta_title = metaTitle.value;
   if (metaDesc && metaDesc.value) payload.meta_description = metaDesc.value;
   if (metaH1 && metaH1.value) payload.h1 = metaH1.value;
+  if (metaAccroche && metaAccroche.value) payload.accroche = metaAccroche.value;
   if (contentHtml.trim()) payload.content = contentHtml;
   if (subcatsImages.length) payload.subcats_images = subcatsImages;
 
