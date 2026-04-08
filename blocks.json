@@ -1,0 +1,160 @@
+{
+  "categories": [
+    {
+      "name": "Hero & Headers",
+      "blocks": [
+        {
+          "id": "hero-split",
+          "name": "Hero split image + texte",
+          "desc": "Image à gauche, H2 + texte + CTA à droite",
+          "html": "<div class=\"row g-0 align-items-center\" style=\"background:var(--ws-gray-100);border-radius:12px;overflow:hidden;margin:32px 0\">\n  <div class=\"col-md-6\">\n    <img src=\"https://placehold.co/800x500/e9ecef/6c757d?text=Image+produit\" alt=\"Description\" class=\"w-100\" style=\"object-fit:cover;height:100%;min-height:300px\" loading=\"lazy\">\n  </div>\n  <div class=\"col-md-6 p-4 p-md-5\">\n    <h2 class=\"ws-h2\" style=\"border:none;font-size:2rem\">Votre titre accrocheur ici</h2>\n    <p class=\"mb-4\" style=\"font-size:1.1rem;line-height:1.7;color:var(--ws-gray-700)\">Votre texte de mise en situation. Adressez-vous directement au lecteur, projetez-le dans son quotidien professionnel.</p>\n    <a href=\"#\" class=\"btn btn-primary btn-lg\" style=\"background:var(--bs-primary);border:none;border-radius:8px;padding:12px 28px\">Demander un devis</a>\n  </div>\n</div>"
+        },
+        {
+          "id": "hero-fullwidth",
+          "name": "Hero pleine largeur + overlay",
+          "desc": "Image fond, texte centré en overlay",
+          "html": "<div style=\"position:relative;background:url('https://placehold.co/1440x400/212529/ffffff?text=Banniere') center/cover;border-radius:12px;overflow:hidden;margin:32px 0;min-height:350px;display:flex;align-items:center;justify-content:center\">\n  <div style=\"position:absolute;inset:0;background:rgba(33,37,41,0.65)\"></div>\n  <div style=\"position:relative;text-align:center;color:#fff;padding:40px 20px;max-width:700px\">\n    <h2 style=\"font-size:2.2rem;font-weight:700;margin-bottom:16px\">Votre titre sur fond image</h2>\n    <p style=\"font-size:1.1rem;opacity:0.9;margin-bottom:24px\">Sous-titre descriptif. Une phrase qui donne envie de scroller.</p>\n    <a href=\"#\" style=\"display:inline-block;background:#fff;color:var(--bs-primary);padding:12px 32px;border-radius:8px;text-decoration:none;font-weight:600\">Voir la gamme</a>\n  </div>\n</div>"
+        },
+        {
+          "id": "hero-gradient",
+          "name": "Hero dégradé moderne",
+          "desc": "Fond dégradé violet, texte blanc, forme géométrique",
+          "html": "<div style=\"background:linear-gradient(135deg, var(--ws-purple-700) 0%, var(--ws-blue-550) 100%);border-radius:16px;padding:48px 40px;margin:32px 0;position:relative;overflow:hidden\">\n  <div style=\"position:absolute;right:-60px;top:-60px;width:250px;height:250px;background:rgba(255,255,255,0.05);border-radius:50%\"></div>\n  <div style=\"position:absolute;right:40px;bottom:-40px;width:180px;height:180px;background:rgba(255,255,255,0.03);border-radius:50%\"></div>\n  <div style=\"position:relative;max-width:600px\">\n    <h2 style=\"color:#fff;font-size:2rem;font-weight:700;margin-bottom:12px;border:none\">Titre percutant sur fond dégradé</h2>\n    <p style=\"color:rgba(255,255,255,0.85);font-size:1.1rem;line-height:1.7;margin-bottom:24px\">Texte de présentation. Court, direct, orienté bénéfice client.</p>\n    <a href=\"#\" style=\"display:inline-block;background:#fff;color:var(--ws-purple-700);padding:12px 28px;border-radius:8px;text-decoration:none;font-weight:600\">Découvrir</a>\n  </div>\n</div>"
+        }
+      ]
+    },
+    {
+      "name": "Grilles & Cards",
+      "blocks": [
+        {
+          "id": "grid-3-cards",
+          "name": "Grille 3 cards avec icône",
+          "desc": "3 colonnes, icône + titre + texte",
+          "html": "<div class=\"row g-4\" style=\"margin:32px 0\">\n  <div class=\"col-md-4\">\n    <div style=\"background:var(--ws-gray-100);border-radius:12px;padding:28px;height:100%;transition:transform 0.2s\">\n      <div style=\"width:48px;height:48px;background:var(--bs-primary);border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:16px\">\n        <span style=\"color:#fff;font-size:20px;font-weight:700\">1</span>\n      </div>\n      <h3 style=\"font-size:1.1rem;font-weight:600;margin-bottom:8px\">Premier avantage</h3>\n      <p style=\"font-size:0.9rem;color:var(--ws-gray-600);margin:0;line-height:1.6\">Description courte de l'avantage. Chiffre concret si possible.</p>\n    </div>\n  </div>\n  <div class=\"col-md-4\">\n    <div style=\"background:var(--ws-gray-100);border-radius:12px;padding:28px;height:100%;transition:transform 0.2s\">\n      <div style=\"width:48px;height:48px;background:var(--ws-green-500);border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:16px\">\n        <span style=\"color:#fff;font-size:20px;font-weight:700\">2</span>\n      </div>\n      <h3 style=\"font-size:1.1rem;font-weight:600;margin-bottom:8px\">Deuxième avantage</h3>\n      <p style=\"font-size:0.9rem;color:var(--ws-gray-600);margin:0;line-height:1.6\">Description courte. Un fait vérifiable.</p>\n    </div>\n  </div>\n  <div class=\"col-md-4\">\n    <div style=\"background:var(--ws-gray-100);border-radius:12px;padding:28px;height:100%;transition:transform 0.2s\">\n      <div style=\"width:48px;height:48px;background:var(--ws-orange-500);border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:16px\">\n        <span style=\"color:#fff;font-size:20px;font-weight:700\">3</span>\n      </div>\n      <h3 style=\"font-size:1.1rem;font-weight:600;margin-bottom:8px\">Troisième avantage</h3>\n      <p style=\"font-size:0.9rem;color:var(--ws-gray-600);margin:0;line-height:1.6\">Description courte. Pas de superlatif, des faits.</p>\n    </div>\n  </div>\n</div>"
+        },
+        {
+          "id": "grid-4-stats",
+          "name": "Bande 4 chiffres clés",
+          "desc": "4 stats en ligne, fond sombre",
+          "html": "<div style=\"background:var(--ws-gray-900);border-radius:12px;padding:32px;margin:32px 0\">\n  <div class=\"row g-4 text-center\">\n    <div class=\"col-6 col-md-3\">\n      <div style=\"color:var(--bs-primary);font-size:2.5rem;font-weight:700;line-height:1\">20+</div>\n      <div style=\"color:rgba(255,255,255,0.6);font-size:0.85rem;margin-top:4px\">années d'expertise</div>\n    </div>\n    <div class=\"col-6 col-md-3\">\n      <div style=\"color:var(--ws-green-400);font-size:2.5rem;font-weight:700;line-height:1\">48h</div>\n      <div style=\"color:rgba(255,255,255,0.6);font-size:0.85rem;margin-top:4px\">livraison standard</div>\n    </div>\n    <div class=\"col-6 col-md-3\">\n      <div style=\"color:var(--ws-gold);font-size:2.5rem;font-weight:700;line-height:1\">24h</div>\n      <div style=\"color:rgba(255,255,255,0.6);font-size:0.85rem;margin-top:4px\">devis personnalisé</div>\n    </div>\n    <div class=\"col-6 col-md-3\">\n      <div style=\"color:var(--ws-orange-400);font-size:2.5rem;font-weight:700;line-height:1\">200€</div>\n      <div style=\"color:rgba(255,255,255,0.6);font-size:0.85rem;margin-top:4px\">livraison offerte dès</div>\n    </div>\n  </div>\n</div>"
+        },
+        {
+          "id": "grid-2-image-text",
+          "name": "2 colonnes image + texte",
+          "desc": "Image à gauche, contenu à droite (ou inversé)",
+          "html": "<div class=\"row g-4 align-items-center\" style=\"margin:32px 0\">\n  <div class=\"col-md-5\">\n    <img src=\"https://placehold.co/600x400/e9ecef/6c757d?text=Photo+produit\" alt=\"Description\" class=\"w-100\" style=\"border-radius:12px\" loading=\"lazy\">\n  </div>\n  <div class=\"col-md-7\">\n    <h2 class=\"ws-h2\">Titre de la section</h2>\n    <p style=\"font-size:1rem;line-height:1.75;color:var(--ws-gray-700)\">Premier paragraphe. Mise en situation du lecteur dans son contexte professionnel. Vous + verbe d'action.</p>\n    <p style=\"font-size:1rem;line-height:1.75;color:var(--ws-gray-700)\">Deuxième paragraphe. Donnée chiffrée, cas d'usage concret avec secteur nommé.</p>\n  </div>\n</div>"
+        }
+      ]
+    },
+    {
+      "name": "Réassurance & Trust",
+      "blocks": [
+        {
+          "id": "trust-badges",
+          "name": "Barre de réassurance 5 badges",
+          "desc": "5 badges horizontaux : gamme, qualité, livraison, devis, conseil",
+          "html": "<div style=\"display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin:32px 0;text-align:center\">\n  <div style=\"background:var(--ws-gray-100);border-radius:10px;padding:20px 12px\">\n    <div style=\"font-size:1.8rem;margin-bottom:6px\">&#128230;</div>\n    <div style=\"font-size:0.8rem;font-weight:600;color:var(--ws-gray-800)\">Large gamme</div>\n    <div style=\"font-size:0.7rem;color:var(--ws-gray-500)\">+1000 références</div>\n  </div>\n  <div style=\"background:var(--ws-gray-100);border-radius:10px;padding:20px 12px\">\n    <div style=\"font-size:1.8rem;margin-bottom:6px\">&#9989;</div>\n    <div style=\"font-size:0.8rem;font-weight:600;color:var(--ws-gray-800)\">Marques pro</div>\n    <div style=\"font-size:0.7rem;color:var(--ws-gray-500)\">Dahle, Ideal, Fellowes</div>\n  </div>\n  <div style=\"background:var(--ws-gray-100);border-radius:10px;padding:20px 12px\">\n    <div style=\"font-size:1.8rem;margin-bottom:6px\">&#128666;</div>\n    <div style=\"font-size:0.8rem;font-weight:600;color:var(--ws-gray-800)\">Livraison 48h</div>\n    <div style=\"font-size:0.7rem;color:var(--ws-gray-500)\">Offerte dès 200€ HT</div>\n  </div>\n  <div style=\"background:var(--ws-gray-100);border-radius:10px;padding:20px 12px\">\n    <div style=\"font-size:1.8rem;margin-bottom:6px\">&#128196;</div>\n    <div style=\"font-size:0.8rem;font-weight:600;color:var(--ws-gray-800)\">Devis 24h</div>\n    <div style=\"font-size:0.7rem;color:var(--ws-gray-500)\">Personnalisé, gratuit</div>\n  </div>\n  <div style=\"background:var(--ws-gray-100);border-radius:10px;padding:20px 12px\">\n    <div style=\"font-size:1.8rem;margin-bottom:6px\">&#128222;</div>\n    <div style=\"font-size:0.8rem;font-weight:600;color:var(--ws-gray-800)\">Conseil expert</div>\n    <div style=\"font-size:0.7rem;color:var(--ws-gray-500)\">04 99 54 50 00</div>\n  </div>\n</div>"
+        },
+        {
+          "id": "trust-banner-cta",
+          "name": "Bannière CTA devis",
+          "desc": "Fond violet, texte + bouton, pleine largeur",
+          "html": "<div style=\"background:linear-gradient(90deg, var(--ws-purple-800), var(--ws-blue-550));border-radius:12px;padding:32px 40px;margin:32px 0;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px\">\n  <div>\n    <div style=\"color:#fff;font-size:1.3rem;font-weight:700\">Besoin d'un devis pour votre établissement ?</div>\n    <div style=\"color:rgba(255,255,255,0.75);font-size:0.95rem;margin-top:4px\">Réponse sous 24h, livraison sur site, facturation administrative.</div>\n  </div>\n  <a href=\"#\" style=\"display:inline-block;background:#fff;color:var(--ws-purple-800);padding:12px 28px;border-radius:8px;text-decoration:none;font-weight:600;white-space:nowrap\">Demander un devis</a>\n</div>"
+        },
+        {
+          "id": "trust-marques",
+          "name": "Bandeau logos marques",
+          "desc": "Logos marques en ligne sur fond gris",
+          "html": "<div style=\"background:var(--ws-gray-100);border-radius:12px;padding:24px 32px;margin:32px 0;text-align:center\">\n  <div style=\"font-size:0.75rem;text-transform:uppercase;letter-spacing:2px;color:var(--ws-gray-500);margin-bottom:16px\">Nos marques partenaires</div>\n  <div style=\"display:flex;align-items:center;justify-content:center;gap:40px;flex-wrap:wrap;opacity:0.6;filter:grayscale(100%)\">\n    <img src=\"https://placehold.co/120x40/e9ecef/6c757d?text=DAHLE\" alt=\"Dahle\" height=\"35\" loading=\"lazy\">\n    <img src=\"https://placehold.co/120x40/e9ecef/6c757d?text=IDEAL\" alt=\"Ideal\" height=\"35\" loading=\"lazy\">\n    <img src=\"https://placehold.co/120x40/e9ecef/6c757d?text=FELLOWES\" alt=\"Fellowes\" height=\"35\" loading=\"lazy\">\n    <img src=\"https://placehold.co/120x40/e9ecef/6c757d?text=LEITZ\" alt=\"Leitz\" height=\"35\" loading=\"lazy\">\n    <img src=\"https://placehold.co/120x40/e9ecef/6c757d?text=RAPID\" alt=\"Rapid\" height=\"35\" loading=\"lazy\">\n  </div>\n</div>"
+        }
+      ]
+    },
+    {
+      "name": "Contenu SEO",
+      "blocks": [
+        {
+          "id": "seo-h2-section",
+          "name": "Section H2 + texte",
+          "desc": "H2 Wynstor + 1 paragraphe",
+          "html": "<h2 class=\"ws-h2\">Votre titre de section</h2>\n<p>Votre texte ici. Mise en situation du lecteur (vous + verbe d'action). Donnée chiffrée. Cas d'usage avec secteur nommé. Lien interne tissé dans le texte.</p>"
+        },
+        {
+          "id": "seo-h2-2p",
+          "name": "Section H2 + 2 paragraphes",
+          "desc": "H2 Wynstor + 2 blocs texte",
+          "html": "<h2 class=\"ws-h2\">Votre titre de section</h2>\n<p>Premier paragraphe. Mise en situation, donnée chiffrée.</p>\n<p>Deuxième paragraphe. Cas d'usage concret, lien interne.</p>"
+        },
+        {
+          "id": "seo-faq-block",
+          "name": "Bloc FAQ complet",
+          "desc": "ws-faq + 3 questions + JSON-LD",
+          "html": "<div class=\"ws-faq\">\n<h2 class=\"ws-h2\">Questions fréquentes</h2>\n\n<div class=\"faq-item\">\n<h3 class=\"ws-h3\">Première question\u00a0?</h3>\n<p>Réponse directe et concise.</p>\n</div>\n\n<div class=\"faq-item\">\n<h3 class=\"ws-h3\">Deuxième question\u00a0?</h3>\n<p>Réponse.</p>\n</div>\n\n<div class=\"faq-item\">\n<h3 class=\"ws-h3\">Troisième question\u00a0?</h3>\n<p>Réponse.</p>\n</div>\n\n</div>\n\n<script type=\"application/ld+json\">\n{\"@context\":\"https://schema.org\",\"@type\":\"FAQPage\",\"mainEntity\":[]}\n</script>"
+        },
+        {
+          "id": "seo-faq-item",
+          "name": "Question FAQ seule",
+          "desc": "1 question + réponse",
+          "html": "<div class=\"faq-item\">\n<h3 class=\"ws-h3\">Votre question\u00a0?</h3>\n<p>Réponse directe.</p>\n</div>"
+        }
+      ]
+    },
+    {
+      "name": "Magento Widgets",
+      "blocks": [
+        {
+          "id": "widget-cat-link",
+          "name": "Widget lien catégorie",
+          "desc": "Lien interne Magento vers catégorie",
+          "html": "{{widget type=\"Magento\\Catalog\\Block\\Category\\Widget\\Link\" anchor_text=\"texte du lien\" id_path=\"category/ID\"}}"
+        },
+        {
+          "id": "widget-product-link",
+          "name": "Widget lien produit",
+          "desc": "Lien interne Magento vers produit",
+          "html": "{{widget type=\"Magento\\Catalog\\Block\\Product\\Widget\\Link\" anchor_text=\"texte du lien\" id_path=\"product/ID\"}}"
+        },
+        {
+          "id": "widget-product-grid",
+          "name": "Widget grille produits",
+          "desc": "Grille de produits d'une catégorie",
+          "html": "<!-- {{widget type=\"catalog/product_list\" category_id=\"ID\" products_count=\"4\" template=\"product/widget/new/content/new_grid.phtml\"}} -->"
+        }
+      ]
+    },
+    {
+      "name": "Mise en page",
+      "blocks": [
+        {
+          "id": "layout-separator",
+          "name": "Séparateur",
+          "desc": "Ligne de séparation fine",
+          "html": "<hr style=\"border:none;border-top:1px solid var(--ws-gray-200);margin:32px 0\">"
+        },
+        {
+          "id": "layout-spacer",
+          "name": "Espacement",
+          "desc": "Espace vertical 40px",
+          "html": "<div style=\"height:40px\"></div>"
+        },
+        {
+          "id": "layout-callout",
+          "name": "Encadré info",
+          "desc": "Box avec bordure gauche colorée",
+          "html": "<div style=\"border-left:4px solid var(--bs-primary);background:var(--ws-gray-100);padding:20px 24px;border-radius:0 8px 8px 0;margin:24px 0\">\n  <div style=\"font-weight:600;margin-bottom:4px\">Bon à savoir</div>\n  <p style=\"margin:0;font-size:0.9rem;color:var(--ws-gray-700)\">Information complémentaire utile pour le lecteur. Donnée vérifiable.</p>\n</div>"
+        },
+        {
+          "id": "layout-quote",
+          "name": "Citation / témoignage",
+          "desc": "Bloc citation avec source",
+          "html": "<blockquote style=\"border-left:4px solid var(--ws-gold);background:var(--ws-gray-100);padding:24px 28px;border-radius:0 12px 12px 0;margin:24px 0;font-style:italic;font-size:1rem;line-height:1.7;color:var(--ws-gray-700)\">\n  \"Texte de la citation ou du témoignage client.\"\n  <footer style=\"margin-top:8px;font-style:normal;font-size:0.85rem;color:var(--ws-gray-500)\">Nom, Fonction, Entreprise</footer>\n</blockquote>"
+        },
+        {
+          "id": "layout-steps",
+          "name": "Étapes / Timeline",
+          "desc": "3 étapes numérotées verticales",
+          "html": "<div style=\"margin:32px 0\">\n  <div style=\"display:flex;gap:16px;align-items:flex-start;margin-bottom:20px\">\n    <div style=\"min-width:40px;height:40px;background:var(--bs-primary);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700\">1</div>\n    <div>\n      <div style=\"font-weight:600;margin-bottom:4px\">Première étape</div>\n      <p style=\"margin:0;font-size:0.9rem;color:var(--ws-gray-600)\">Description de l'étape. Court et concret.</p>\n    </div>\n  </div>\n  <div style=\"display:flex;gap:16px;align-items:flex-start;margin-bottom:20px\">\n    <div style=\"min-width:40px;height:40px;background:var(--ws-green-500);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700\">2</div>\n    <div>\n      <div style=\"font-weight:600;margin-bottom:4px\">Deuxième étape</div>\n      <p style=\"margin:0;font-size:0.9rem;color:var(--ws-gray-600)\">Description.</p>\n    </div>\n  </div>\n  <div style=\"display:flex;gap:16px;align-items:flex-start\">\n    <div style=\"min-width:40px;height:40px;background:var(--ws-gold);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700\">3</div>\n    <div>\n      <div style=\"font-weight:600;margin-bottom:4px\">Troisième étape</div>\n      <p style=\"margin:0;font-size:0.9rem;color:var(--ws-gray-600)\">Description.</p>\n    </div>\n  </div>\n</div>"
+        }
+      ]
+    }
+  ]
+}

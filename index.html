@@ -161,75 +161,10 @@
     </div>
   </div>
 
-  <!-- SIDEBAR DROITE : TEMPLATES -->
-  <div class="templates">
-    <h2>Templates</h2>
-
-    <div class="tpl-section">
-      <h3>Contenu</h3>
-      <div class="tpl-card" draggable="true" data-tpl="h2-section">
-        <div class="tpl-name">Section H2</div>
-        <div class="tpl-desc">Titre + paragraphe</div>
-        <div class="tpl-preview">&lt;h2&gt; + &lt;p&gt;</div>
-      </div>
-      <div class="tpl-card" draggable="true" data-tpl="h2-2p">
-        <div class="tpl-name">Section H2 + 2 paragraphes</div>
-        <div class="tpl-desc">Titre + deux blocs texte</div>
-        <div class="tpl-preview">&lt;h2&gt; + &lt;p&gt; + &lt;p&gt;</div>
-      </div>
-      <div class="tpl-card" draggable="true" data-tpl="paragraph">
-        <div class="tpl-name">Paragraphe</div>
-        <div class="tpl-desc">Bloc texte simple</div>
-        <div class="tpl-preview">&lt;p&gt;</div>
-      </div>
-    </div>
-
-    <div class="tpl-section">
-      <h3>Magento</h3>
-      <div class="tpl-card" draggable="true" data-tpl="widget-cat">
-        <div class="tpl-name">Widget lien catégorie</div>
-        <div class="tpl-desc">Lien interne Magento</div>
-        <div class="tpl-preview">{{widget Category\Widget\Link}}</div>
-      </div>
-      <div class="tpl-card" draggable="true" data-tpl="widget-product">
-        <div class="tpl-name">Widget lien produit</div>
-        <div class="tpl-desc">Lien produit Magento</div>
-        <div class="tpl-preview">{{widget Product\Widget\Link}}</div>
-      </div>
-      <div class="tpl-card" draggable="true" data-tpl="widget-product-list">
-        <div class="tpl-name">Widget liste produits</div>
-        <div class="tpl-desc">Grille produits catégorie</div>
-        <div class="tpl-preview">{{widget product_list}}</div>
-      </div>
-    </div>
-
-    <div class="tpl-section">
-      <h3>FAQ</h3>
-      <div class="tpl-card" draggable="true" data-tpl="faq-block">
-        <div class="tpl-name">Bloc FAQ complet</div>
-        <div class="tpl-desc">ws-faq + 3 questions + JSON-LD</div>
-        <div class="tpl-preview">FAQ + Schema</div>
-      </div>
-      <div class="tpl-card" draggable="true" data-tpl="faq-item">
-        <div class="tpl-name">Question FAQ</div>
-        <div class="tpl-desc">1 question + réponse</div>
-        <div class="tpl-preview">faq-item</div>
-      </div>
-    </div>
-
-    <div class="tpl-section">
-      <h3>Visuels</h3>
-      <div class="tpl-card" draggable="true" data-tpl="banner">
-        <div class="tpl-name">Bannière marque</div>
-        <div class="tpl-desc">Image + lien page marque</div>
-        <div class="tpl-preview">figure + figcaption</div>
-      </div>
-      <div class="tpl-card" draggable="true" data-tpl="cta">
-        <div class="tpl-name">Call to action</div>
-        <div class="tpl-desc">Texte + bouton devis</div>
-        <div class="tpl-preview">CTA devis pro</div>
-      </div>
-    </div>
+  <!-- SIDEBAR DROITE : TEMPLATES (chargées depuis blocks.json) -->
+  <div class="templates" id="templatesPanel">
+    <h2>Blocs</h2>
+    <div id="blocksContainer">Chargement...</div>
   </div>
 </div>
 
@@ -260,19 +195,57 @@ let currentRawHtml = '';
 let currentSha = null;
 let dirty = false;
 
-// === TEMPLATES ===
-const TEMPLATES = {
-  'h2-section': `<h2 class="ws-h2">Votre titre ici</h2>\n<p>Votre texte ici.</p>`,
-  'h2-2p': `<h2 class="ws-h2">Votre titre ici</h2>\n<p>Premier paragraphe.</p>\n<p>Deuxième paragraphe.</p>`,
-  'paragraph': `<p>Votre texte ici.</p>`,
-  'widget-cat': `{{widget type="Magento\\Catalog\\Block\\Category\\Widget\\Link" anchor_text="texte ancre" id_path="category/ID"}}`,
-  'widget-product': `{{widget type="Magento\\Catalog\\Block\\Product\\Widget\\Link" anchor_text="texte ancre" id_path="product/ID"}}`,
-  'widget-product-list': `<!-- {{widget type="catalog/product_list" category_id="ID" products_count="4" template="product/widget/new/content/new_grid.phtml"}} -->`,
-  'faq-block': `<div class="ws-faq">\n<h2 class="ws-h2">Questions fréquentes</h2>\n\n<div class="faq-item">\n<h3 class="ws-h3">Votre question\u00a0?</h3>\n<p>Votre réponse.</p>\n</div>\n\n<div class="faq-item">\n<h3 class="ws-h3">Deuxième question\u00a0?</h3>\n<p>Réponse.</p>\n</div>\n\n<div class="faq-item">\n<h3 class="ws-h3">Troisième question\u00a0?</h3>\n<p>Réponse.</p>\n</div>\n\n</div>\n\n<script type="application/ld+json">\n{\n  "@context": "https://schema.org",\n  "@type": "FAQPage",\n  "mainEntity": []\n}\n<\/script>`,
-  'faq-item': `<div class="faq-item">\n<h3 class="ws-h3">Votre question\u00a0?</h3>\n<p>Réponse.</p>\n</div>`,
-  'banner': `<figure style="margin:20px 0">\n  <img src="/media/banner/marque.jpg" alt="Description" loading="lazy" width="100%" />\n  <figcaption>Légende de l'image</figcaption>\n</figure>`,
-  'cta': `<div style="background:#f8f9fa;padding:20px;border-radius:8px;margin:24px 0;text-align:center">\n  <p style="font-size:1.1rem;margin-bottom:12px"><strong>Besoin d'un devis pour votre établissement\u00a0?</strong></p>\n  <p>Réponse sous 24h, livraison sur site.</p>\n</div>`
-};
+// === TEMPLATES (chargés depuis blocks.json) ===
+let TEMPLATES = {};
+let blocksData = null;
+
+async function loadBlocks() {
+  try {
+    const res = await fetch('blocks.json');
+    blocksData = await res.json();
+    const container = document.getElementById('blocksContainer');
+    container.textContent = '';
+
+    blocksData.categories.forEach(cat => {
+      const section = document.createElement('div');
+      section.className = 'tpl-section';
+
+      const h3 = document.createElement('h3');
+      h3.textContent = cat.name;
+      section.appendChild(h3);
+
+      cat.blocks.forEach(block => {
+        TEMPLATES[block.id] = block.html;
+
+        const card = document.createElement('div');
+        card.className = 'tpl-card';
+        card.draggable = true;
+        card.dataset.tpl = block.id;
+
+        const name = document.createElement('div');
+        name.className = 'tpl-name';
+        name.textContent = block.name;
+        card.appendChild(name);
+
+        const desc = document.createElement('div');
+        desc.className = 'tpl-desc';
+        desc.textContent = block.desc;
+        card.appendChild(desc);
+
+        card.addEventListener('dragstart', e => {
+          e.dataTransfer.setData('text/plain', block.id);
+        });
+
+        section.appendChild(card);
+      });
+
+      container.appendChild(section);
+    });
+  } catch(e) {
+    const container = document.getElementById('blocksContainer');
+    container.textContent = 'Erreur chargement blocks.json';
+  }
+}
 
 // === BLACKLIST ===
 const BL_VERBS = /\b(offre|permet|propose|assure|dispose de|bénéficie de|se distingue|séduit|accompagne|facilite|optimise)\b/gi;
@@ -627,6 +600,7 @@ function updateStats() {
 
 // === INIT ===
 async function initApp() {
+  await loadBlocks();
   try {
     const res = await fetch('pages.json');
     const data = await res.json();
