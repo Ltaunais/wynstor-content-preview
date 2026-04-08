@@ -1672,6 +1672,35 @@ function cleanBlocHtml(blocHtml) {
   blocHtml = blocHtml.replace(/ style="transition: background[^"]*"/g, '');
   // Nettoyer contenteditable
   blocHtml = blocHtml.replace(/ contenteditable="[^"]*"/g, '');
+
+  // FAQ : transformer structure simple → accordion CSS pur avec <section>
+  if (blocHtml.indexOf('faq-item') !== -1) {
+    var faqCounter = 0;
+    // Retirer le wrapper ws-faq vide s'il existe
+    blocHtml = blocHtml.replace(/<div class="ws-faq"><\/div>/g, '');
+    // Transformer chaque faq-item
+    blocHtml = blocHtml.replace(
+      /<div class="faq-item">\s*<h3[^>]*>([\s\S]*?)<\/h3>\s*<p[^>]*>([\s\S]*?)<\/p>\s*<\/div>/g,
+      function(_, question, answer) {
+        faqCounter++;
+        var id = 'faq-' + Date.now() + '-' + faqCounter;
+        return '<div class="faq-item">' +
+          '<input type="checkbox" id="' + id + '">' +
+          '<label class="faq-label" for="' + id + '">' +
+            '<h3 class="faq-label-text">' + question.trim() + '</h3>' +
+          '</label>' +
+          '<div class="faq-body"><div class="faq-body-inner">' +
+            '<p>' + answer.trim() + '</p>' +
+          '</div></div>' +
+        '</div>';
+      }
+    );
+    // Wrapper section si pas déjà wrappé
+    if (blocHtml.indexOf('<section') === -1 && blocHtml.indexOf('faq-item') !== -1) {
+      blocHtml = '<section class="faq-wrap" aria-label="Questions fréquentes">' + blocHtml + '</section>';
+    }
+  }
+
   return blocHtml;
 }
 
