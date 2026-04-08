@@ -1654,6 +1654,27 @@ function markDirty() {
 }
 
 // === COLLECT HTML ===
+function cleanBlocHtml(blocHtml) {
+  // Widget markers → vrais widgets Magento
+  blocHtml = blocHtml.replace(
+    /<span class="widget-link"[^>]*title="([^"]+)"[^>]*>([^<]+)<\/span>/g,
+    (_, path, text) => '{{widget type="Magento\\Catalog\\Block\\Category\\Widget\\Link" anchor_text="' + text + '" id_path="' + path + '"}}'
+  );
+  // Unwrap img-drop-target wrappers
+  blocHtml = blocHtml.replace(/<div class="img-drop-target"[^>]*>([\s\S]*?)<\/div>/g, '$1');
+  // Retirer boutons éditeur (H3+IA, FAQ remove, FAQ add)
+  blocHtml = blocHtml.replace(/<button class="p-h3-btn"[^>]*>[^<]*<\/button>/g, '');
+  blocHtml = blocHtml.replace(/<button class="faq-remove-btn"[^>]*>[^<]*<\/button>/g, '');
+  blocHtml = blocHtml.replace(/<div class="faq-add-btn"[^>]*>[\s\S]*?<\/div>/g, '');
+  // Retirer texte "H3+IA" orphelin (pas dans un bouton)
+  blocHtml = blocHtml.replace(/H3\+IA/g, '');
+  // Retirer styles inline d'éditeur (transition, background temporaire)
+  blocHtml = blocHtml.replace(/ style="transition: background[^"]*"/g, '');
+  // Nettoyer contenteditable
+  blocHtml = blocHtml.replace(/ contenteditable="[^"]*"/g, '');
+  return blocHtml;
+}
+
 function collectHtml() {
   // Rebuild meta comment
   const title = document.getElementById('metaTitle')?.value || '';
@@ -1673,19 +1694,7 @@ function collectHtml() {
 
   // Collect blocs
   document.querySelectorAll('.bloc .bloc-content').forEach(bc => {
-    let blocHtml = bc.innerHTML;
-    // Restore widget markers to real widgets
-    // Restore widget markers to real widgets
-    blocHtml = blocHtml.replace(
-      /<span class="widget-link"[^>]*title="([^"]+)"[^>]*>([^<]+)<\/span>/g,
-      (_, path, text) => `{{widget type="Magento\\Catalog\\Block\\Category\\Widget\\Link" anchor_text="${text}" id_path="${path}"}}`
-    );
-    // Unwrap img-drop-target wrappers (garder juste le <img>)
-    blocHtml = blocHtml.replace(/<div class="img-drop-target"[^>]*>([\s\S]*?)<\/div>/g, '$1');
-    // Retirer les boutons FAQ interactifs
-    blocHtml = blocHtml.replace(/<button class="faq-remove-btn"[^>]*>[^<]*<\/button>/g, '');
-    blocHtml = blocHtml.replace(/<div class="faq-add-btn"[^>]*>[\s\S]*?<\/div>/g, '');
-    html += blocHtml.trim() + '\n\n';
+    html += cleanBlocHtml(bc.innerHTML).trim() + '\n\n';
   });
 
   return html;
@@ -3467,10 +3476,10 @@ async function pushToMagento() {
   const metaDesc = document.getElementById('metaDesc');
   const metaH1 = document.getElementById('metaH1');
 
-  // Collecter le contenu HTML
+  // Collecter le contenu HTML (nettoyé)
   const blocs = document.querySelectorAll('#editor .bloc-content');
   let contentHtml = '';
-  blocs.forEach(b => { contentHtml += b.innerHTML; });
+  blocs.forEach(b => { contentHtml += cleanBlocHtml(b.innerHTML); });
 
   // Collecter les images sous-cat
   const subcatsImages = [];
