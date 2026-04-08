@@ -311,11 +311,13 @@
       "url": "65-couper-et-decouper",
       "slug": "65-couper-et-decouper",
       "type": "regen-bloc",
-      "status": "processing",
+      "status": "done",
       "h2": "Identifiez d'abord la marque et le modèle de votre appareil,",
       "instruction": "Rédige un sous-paragraphe de 2-3 phrases pour le H3 \"Identifiez d'abord la marque et le modèle de votre appareil,\". Contexte du paragraphe original : \"Identifiez d'abord la marque et le modèle de votre appareil, qu'il s'agisse d'une cisaille, d'un massicot ou d'une rogneuse. Chaque constructeur conço\". Développe ce point spécifique.",
       "createdAt": "2026-04-08T15:37:00.805Z",
-      "startedAt": "2026-04-08T15:37:02.645Z"
+      "startedAt": "2026-04-08T15:37:02.645Z",
+      "result": "<p>Avant de commander une lame ou un accessoire de rechange, repérez la référence exacte de votre cisaille, massicot ou rogneuse. Cette information figure sur l'étiquette collée au châssis, dans la notice d'origine ou sur la facture d'achat. Une simple erreur de référence suffit à recevoir une pièce incompatible, ce qui retarde vos travaux de coupe et immobilise votre poste de travail.</p>\n\n<p>Chaque constructeur conçoit ses lames et contre-lames selon des dimensions et des fixations qui lui sont propres. Vous ne pouvez donc pas interchanger librement les consommables d'une marque à l'autre. Notez le nom du fabricant, la désignation commerciale et, si elle est visible, la référence de la lame actuellement en place. Avec ces éléments en main, vous sélectionnez directement la pièce compatible dans notre rubrique {{widget type=\"Magento\\Catalog\\Block\\Category\\Widget\\Link\" anchor_text=\"couper et découper\" id_path=\"category/65\"}} et vous évitez tout retour inutile.</p>\n\n<p>Si la plaque signalétique est effacée ou absente, consultez le site du fabricant en renseignant le numéro de série de votre appareil. Vous obtiendrez la fiche technique complète ainsi que la liste des consommables compatibles, ce qui sécurise votre commande dès la première tentative.</p>",
+      "finishedAt": "2026-04-08T15:37:24.303Z"
     },
     {
       "id": "h3-1775662629380",
