@@ -349,12 +349,14 @@
       "url": "65-couper-et-decouper",
       "slug": "65-couper-et-decouper",
       "type": "reword",
-      "status": "processing",
+      "status": "done",
       "sentence": "Pour les volumes plus importants, par exemple lorsque vous préparez une campagne promotionnelle avec plusieurs centaines de flyers, un massicot vous fait gagner un temps considérable. Vous empilez les feuilles, ajustez la butée arrière et tranchez en une seule pression. Le résultat est régulier d'une pile à l'autre, ce qui compte quand vos supports sont exposés côte à côte sur un stand ou un linéaire.",
       "bannedWord": "__h3_generate__",
       "h2Context": "Vous préparez des supports visuels ou de la PLV en interne",
       "createdAt": "2026-04-08T15:42:03.324Z",
-      "startedAt": "2026-04-08T15:42:10.628Z"
+      "startedAt": "2026-04-08T15:42:10.628Z",
+      "result": "Massicot : des coupes nettes pour les grandes séries",
+      "finishedAt": "2026-04-08T15:42:20.867Z"
     }
   ]
 }
