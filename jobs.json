@@ -292,6 +292,16 @@
       "startedAt": "2026-04-08T15:28:10.007Z",
       "result": "Avant de choisir, évaluez le format maximal que vous traitez au quotidien. Un massicot A4 couvre la majorité des besoins bureautiques, tandis qu'un format A3 s'impose si vous manipulez des affiches ou des plans. Vérifiez aussi la capacité de coupe en nombre de feuilles par passe : sous-dimensionner cet aspect vous obligerait à multiplier les passages et ralentirait votre production. La présence d'une règle graduée et d'un guide de coupe angulaire vous fera gagner en précision, surtout si vous réalisez des découpes répétitives.",
       "finishedAt": "2026-04-08T15:28:21.651Z"
+    },
+    {
+      "id": "reword-1775662165692",
+      "url": "65-couper-et-decouper",
+      "slug": "65-couper-et-decouper",
+      "type": "reword",
+      "status": "pending",
+      "sentence": "Vous découpez régulièrement des documents en petite quantité et cherchez un outil maniable, facile à ranger ? Une cisaille à lame rotative conviendra à la plupart des travaux courants : elle glisse le long d'un rail et donne une coupe nette sans effort. Pour des découpes plus franches sur des papiers épais ou cartonnés, tournez-vous vers une cisaille à lame à levier, dont le mécanisme concentre la pression sur toute la longueur de coupe.",
+      "bannedWord": "outil",
+      "createdAt": "2026-04-08T15:29:25.692Z"
     }
   ]
 }
