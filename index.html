@@ -217,6 +217,15 @@
 
   /* Mots exclus */
   .excluded-word { background: rgba(240,61,61,0.15); text-decoration: line-through; text-decoration-color: var(--bad); cursor: help; }
+  .bl-tag {
+    display: inline-flex; align-items: center; gap: 3px;
+    background: rgba(240,61,61,0.1); color: var(--bad); border: 1px solid rgba(240,61,61,0.3);
+    border-radius: 4px; padding: 2px 6px; font-size: 10px; cursor: default;
+  }
+  .bl-tag-remove {
+    cursor: pointer; font-size: 12px; opacity: 0.6; margin-left: 2px;
+  }
+  .bl-tag-remove:hover { opacity: 1; }
 
   /* Historique */
   .history-item { border: 1px solid var(--border); border-radius: 8px; margin-bottom: 8px; overflow: hidden; }
@@ -455,6 +464,11 @@
       <div style="font-size:24px;margin-bottom:4px">&#128247;</div>
       <div style="font-size:11px;color:var(--gray)">Drag & drop ou cliquer</div>
       <input type="file" id="mediaFileInput" accept="image/*" multiple style="display:none">
+    </div>
+    <!-- Blacklist visuelle -->
+    <div id="blacklistSection" style="margin-bottom:12px">
+      <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--gray);margin-bottom:6px">Mots exclus</div>
+      <div id="blacklistTags" style="display:flex;flex-wrap:wrap;gap:4px"></div>
     </div>
     <!-- Upload status -->
     <div id="mediaUploadStatus" style="font-size:11px;color:var(--gray);margin-bottom:8px;display:none"></div>
@@ -1620,6 +1634,7 @@ async function initApp() {
   await loadCustomBlocks();
   await loadFavorites();
   await loadBlacklist();
+  renderBlacklistTags();
   loadMediaGallery();
   renderHistory();
   try {
@@ -1683,6 +1698,65 @@ async function addToBlacklist(word) {
       }
     } catch(e) {}
   }
+}
+
+function renderBlacklistTags() {
+  const container = document.getElementById('blacklistTags');
+  if (!container) return;
+  container.textContent = '';
+
+  if (blacklistCache.length === 0) {
+    const empty = document.createElement('span');
+    empty.style.cssText = 'font-size:10px;color:var(--gray);font-style:italic';
+    empty.textContent = 'Aucun mot exclu';
+    container.appendChild(empty);
+    return;
+  }
+
+  blacklistCache.forEach(function(word) {
+    const tag = document.createElement('span');
+    tag.className = 'bl-tag';
+
+    const label = document.createTextNode(word);
+    tag.appendChild(label);
+
+    const remove = document.createElement('span');
+    remove.className = 'bl-tag-remove';
+    remove.textContent = '\u00d7';
+    remove.title = 'Retirer de la blacklist';
+    remove.addEventListener('click', function() {
+      removeFromBlacklist(word);
+    });
+    tag.appendChild(remove);
+
+    container.appendChild(tag);
+  });
+}
+
+async function removeFromBlacklist(word) {
+  blacklistCache = blacklistCache.filter(function(w) { return w !== word; });
+
+  const token = getToken();
+  if (token) {
+    try {
+      const content = JSON.stringify({ words: blacklistCache }, null, 2);
+      const encoded = btoa(unescape(encodeURIComponent(content)));
+      const body = { message: 'blacklist: - ' + word, content: encoded, branch: BRANCH };
+      if (blacklistSha) body.sha = blacklistSha;
+      const res = await fetch('https://api.github.com/repos/' + REPO + '/contents/blacklist.json', {
+        method: 'PUT',
+        headers: { 'Authorization': 'token ' + token, 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      if (res.ok) {
+        const data = await res.json();
+        blacklistSha = data.content.sha;
+      }
+    } catch(e) {}
+  }
+
+  renderBlacklistTags();
+  toast('Mot retiré : "' + word + '"');
 }
 
 // Barrer visuellement les mots exclus dans l'éditeur
@@ -1867,6 +1941,7 @@ document.getElementById('stExclude').addEventListener('mousedown', async (e) => 
   if (!word || word.includes(' ')) { toast('Sélectionnez un seul mot'); return; }
 
   await addToBlacklist(word);
+  renderBlacklistTags();
   toast('Mot exclu : "' + word + '"');
 
   // Barrer visuellement
