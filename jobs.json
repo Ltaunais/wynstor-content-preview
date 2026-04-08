@@ -322,10 +322,11 @@
       "url": "65-couper-et-decouper",
       "slug": "65-couper-et-decouper",
       "type": "regen-bloc",
-      "status": "pending",
+      "status": "processing",
       "h2": "En anticipant le remplacement avant que la lame ne soit trop",
       "instruction": "Rédige un sous-paragraphe de 2-3 phrases pour le H3 \"En anticipant le remplacement avant que la lame ne soit trop\". Contexte du paragraphe original : \"En anticipant le remplacement avant que la lame ne soit trop usée, vous protégez aussi vos documents : un bord de coupe émoussé froisse le papier au l\". Développe ce point spécifique.",
-      "createdAt": "2026-04-08T15:37:09.380Z"
+      "createdAt": "2026-04-08T15:37:09.380Z",
+      "startedAt": "2026-04-08T15:37:10.584Z"
     }
   ]
 }
