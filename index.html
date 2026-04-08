@@ -1348,16 +1348,14 @@ let showFullTree = false;
 function renderPagesList() {
   if (!pagesData) return;
 
-  const levels = { 'N0': 0, 'N1': 1, 'N2': 2, 'N3': 3, 'N4': 4 };
   const statusIcons = { 'done': '\u2705', 'review': '\ud83d\udfe1', 'draft': '\u270f\ufe0f', 'todo': '' };
 
-  function buildItem(p, targetList) {
+  function buildItem(p, targetList, indent) {
     const li = document.createElement('li');
     const a = document.createElement('a');
     a.href = '#';
     a.dataset.file = p.file;
-    const indent = (levels[p.level] || 0) * 12;
-    a.style.paddingLeft = (10 + indent) + 'px';
+    a.style.paddingLeft = (10 + indent * 12) + 'px';
     if (p.status === 'todo') a.style.opacity = '0.4';
 
     const catSpan = document.createElement('span');
@@ -1382,7 +1380,7 @@ function renderPagesList() {
   // Liste principale : pages travaillées uniquement
   const mainList = document.getElementById('fileList');
   mainList.textContent = '';
-  pagesData.pages.filter(p => p.status !== 'todo').forEach(p => buildItem(p, mainList));
+  pagesData.pages.filter(p => p.status !== 'todo').forEach(p => buildItem(p, mainList, 0));
 
   if (mainList.children.length === 0) {
     const li = document.createElement('li');
@@ -1391,10 +1389,75 @@ function renderPagesList() {
     mainList.appendChild(li);
   }
 
-  // Arbo complète
+  // Arbo complète — groupée par N0 dans des toggles
   const treeList = document.getElementById('treeList');
   treeList.textContent = '';
-  pagesData.pages.forEach(p => buildItem(p, treeList));
+
+  let currentN0 = null;
+  let currentGroup = null;
+  let currentContent = null;
+
+  pagesData.pages.forEach((p) => {
+    if (p.level === 'N0') {
+      // Nouveau groupe N0
+      currentGroup = document.createElement('div');
+      currentGroup.style.cssText = 'margin-bottom:4px';
+
+      // Header cliquable
+      const header = document.createElement('div');
+      header.style.cssText = 'display:flex;align-items:center;gap:6px;padding:6px 10px;cursor:pointer;border-radius:5px;font-size:13px;font-weight:600;color:#333;transition:background 0.15s';
+      header.addEventListener('mouseenter', () => { header.style.background = '#f8f9fa'; });
+      header.addEventListener('mouseleave', () => { header.style.background = ''; });
+
+      const chevron = document.createElement('span');
+      chevron.textContent = '\u25b6';
+      chevron.style.cssText = 'font-size:8px;transition:transform 0.2s;display:inline-block;color:var(--gray)';
+      header.appendChild(chevron);
+
+      // Compteur de pages travaillées dans ce groupe
+      const draftCount = countDraftsInGroup(p, pagesData.pages);
+      const badge = draftCount > 0 ? ' (' + draftCount + ')' : '';
+
+      const label = document.createTextNode(p.name + badge);
+      header.appendChild(label);
+
+      currentContent = document.createElement('ul');
+      currentContent.className = 'file-list';
+      currentContent.style.cssText = 'display:none;padding-left:0;margin:0';
+
+      header.addEventListener('click', () => {
+        const open = currentContent.style.display !== 'none';
+        currentContent.style.display = open ? 'none' : '';
+        chevron.style.transform = open ? '' : 'rotate(90deg)';
+      });
+
+      currentGroup.appendChild(header);
+      currentGroup.appendChild(currentContent);
+
+      const li = document.createElement('li');
+      li.style.listStyle = 'none';
+      li.appendChild(currentGroup);
+      treeList.appendChild(li);
+
+      // Ajouter le N0 lui-même dans le contenu
+      buildItem(p, currentContent, 0);
+    } else if (currentContent) {
+      const depth = { 'N1': 1, 'N2': 2, 'N3': 3, 'N4': 4 }[p.level] || 1;
+      buildItem(p, currentContent, depth);
+    }
+  });
+}
+
+function countDraftsInGroup(n0Page, allPages) {
+  let count = 0;
+  let inGroup = false;
+  for (const p of allPages) {
+    if (p === n0Page) { inGroup = true; continue; }
+    if (inGroup && p.level === 'N0') break;
+    if (inGroup && p.status !== 'todo') count++;
+  }
+  if (n0Page.status !== 'todo') count++;
+  return count;
 }
 
 function toggleTree() {
