@@ -29,6 +29,12 @@
       "name": "test toto",
       "desc": "Bloc personnalisé",
       "html": "<div class=\"row g-4\">\n<div class=\"col-12 col-md-6\">\n<h2 class=\"ws-h2\">Titre de section</h2>\n<div class=\"d-inline-flex align-items-center flex-wrap\" style=\"gap:8px\" style=\"width:100%\">\n<span class=\"d-inline-flex ws-ico-bg-lg bg-primary bg-opacity-10 rounded-4\"><svg class=\"ws-ico\" width=\"24\" height=\"24\" fill=\"currentColor\" aria-hidden=\"true\"><use href=\"svg/_sprite-wynstor.svg#package\"></use></svg></span>\n<p class=\"ws-text\">Votre texte ici.</p>\n</div>\n<div class=\"d-inline-flex align-items-center flex-wrap\" style=\"gap:8px\" style=\"width:100%\">\n<span class=\"d-inline-flex ws-ico-bg-lg bg-primary bg-opacity-10 rounded-4\"><svg class=\"ws-ico\" width=\"24\" height=\"24\" fill=\"currentColor\" aria-hidden=\"true\"><use href=\"svg/_sprite-wynstor.svg#package\"></use></svg></span>\n<p class=\"ws-text\">Votre texte ici.</p>\n</div>\n<a href=\"#\" class=\"btn btn-primary\" style=\"padding:1.2rem 2.8rem;border-radius:8px\">Bouton</a>\n</div>\n<div class=\"col-12 col-md-6\">\n<figure><img src=\"\" alt=\"Description\" class=\"w-100 rounded-3\" loading=\"lazy\" decoding=\"async\"><figcaption>Description</figcaption></figure>\n</div>\n</div>"
+    },
+    {
+      "id": "custom-1775728348617",
+      "name": "tututu 2",
+      "desc": "Bloc personnalisé",
+      "html": "<div class=\"row g-4\">\n<div class=\"col-12 col-md-6\">\n<h2 class=\"ws-h2\">Titre de section</h2>\n<p class=\"ws-text\">Votre texte ici.</p>\n<p class=\"ws-text\">Votre texte ici.</p>\n<a href=\"#\" class=\"btn btn-primary\" style=\"padding:1.2rem 2.8rem;border-radius:8px\">Bouton</a>\n</div>\n<div class=\"col-12 col-md-6\">\n<figure><img src=\"\" alt=\"Description\" class=\"w-100 rounded-3\" loading=\"lazy\" decoding=\"async\"><figcaption>Description</figcaption></figure>\n</div>\n</div>"
     }
   ]
 }
