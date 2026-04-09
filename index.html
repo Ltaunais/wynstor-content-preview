@@ -833,8 +833,9 @@
           <div class="bb-empty-state">Choisissez un layout ou glissez des éléments ici</div>
         </div>
         <div class="bb-canvas-actions">
-          <button class="btn" style="background:var(--ok);color:#fff;border-color:var(--ok)" onclick="insertBuiltBlock()">Insérer dans l'éditeur</button>
-          <button class="btn" onclick="saveAsPreset()">Sauvegarder comme preset</button>
+          <button class="btn" style="background:var(--ok);color:#fff;border-color:var(--ok)" onclick="insertBuiltBlock()">Insérer</button>
+          <input type="text" id="bbPresetName" placeholder="Nom du preset" style="padding:5px 10px;border:1px solid var(--border);border-radius:6px;font-size:12px;width:160px">
+          <button class="btn" onclick="saveAsPreset()">Sauvegarder</button>
           <button class="btn" onclick="clearCanvas()">Vider</button>
         </div>
       </div>
@@ -1099,7 +1100,7 @@ function renderEditor() {
         <button onclick="regenBloc(this)" title="Régénérer ce bloc">&#128260;</button>
         <button onclick="regenBlocGuided(this)" title="Régénérer avec instruction">&#128161;</button>
         <button onclick="dupeBloc(this)" title="Dupliquer ce bloc">&#128203;</button>
-        <button onclick="saveBlocAsPreset(this)" title="Enregistrer comme preset">&#128190;</button>
+        <button onclick="saveBlocAsPreset(this)" title="Enregistrer comme preset">&#128190;</button><button onclick="editInBuilder(this)" title="Éditer dans le builder">&#9998;</button>
         <button onclick="deleteBloc(this)" title="Supprimer">&#10005;</button>
       </div>
       <div class="bloc-content" contenteditable="true" oninput="markDirty()">${b.trim()}</div>
@@ -1398,7 +1399,7 @@ function dupeBloc(btn) {
       <button onclick="moveBloc(this,1)" title="Descendre">&#8595;</button>
       <button onclick="regenBloc(this)" title="Régénérer ce bloc">&#128260;</button>
       <button onclick="dupeBloc(this)" title="Dupliquer ce bloc">&#128203;</button>
-      <button onclick="saveBlocAsPreset(this)" title="Enregistrer comme preset">&#128190;</button>
+      <button onclick="saveBlocAsPreset(this)" title="Enregistrer comme preset">&#128190;</button><button onclick="editInBuilder(this)" title="Éditer dans le builder">&#9998;</button>
       <button onclick="deleteBloc(this)" title="Supprimer">&#10005;</button>
     </div>
     <div class="bloc-content" contenteditable="true" oninput="markDirty()">${content.innerHTML}</div>
@@ -5036,8 +5037,8 @@ async function savePagesJson() {
     var canvas = document.getElementById('bbCanvas');
     if (canvas.querySelector('.bb-empty-state')) { toast('Canvas vide'); return; }
 
-    var name = prompt('Nom du preset :');
-    if (!name) return;
+    var name = document.getElementById('bbPresetName').value.trim();
+    if (!name) { toast('Entrez un nom de preset'); document.getElementById('bbPresetName').focus(); return; }
 
     var clone = canvas.cloneNode(true);
     clone.querySelectorAll('.bb-el-label, .bb-el-remove, .bb-img-placeholder').forEach(function(el) { el.remove(); });
@@ -5052,11 +5053,9 @@ async function savePagesJson() {
 
     var html = clone.innerHTML;
 
-    // Charger les custom blocks
-    var customs = JSON.parse(localStorage.getItem('ws_custom_blocks') || '[]');
-    customs.push({ id: 'custom-' + Date.now(), name: name, desc: 'Preset perso', html: html });
-    localStorage.setItem('ws_custom_blocks', JSON.stringify(customs));
-    toast('Preset "' + name + '" sauvegardé');
+    // Sauvegarder sur GitHub via la fonction existante
+    saveCustomBlock(name, html);
+    toast('Preset "' + name + '" sauvegardé sur GitHub');
   };
 
   // Vider le canvas
@@ -5068,6 +5067,120 @@ async function savePagesJson() {
     empty.textContent = 'Choisissez un layout ou glissez des éléments ici';
     canvas.appendChild(empty);
     document.getElementById('bbConfigBody').innerHTML = '<div style="font-size:11px;color:var(--gray);padding:8px">Cliquez sur un élément pour le configurer</div>';
+  };
+
+  // Éditer un bloc existant dans le builder
+  window.editInBuilder = function(btn) {
+    var bloc = btn.closest('.bloc');
+    if (!bloc) return;
+    var content = bloc.querySelector('.bloc-content');
+    if (!content) return;
+
+    // Ouvrir le builder
+    document.getElementById('blockPickerOverlay').classList.add('visible');
+    switchBuilderTab('build');
+    renderPalette();
+
+    // Charger le HTML du bloc dans le canvas
+    var canvas = document.getElementById('bbCanvas');
+    canvas.textContent = '';
+    canvas.innerHTML = content.innerHTML;
+
+    // Wrapper chaque élément direct dans un bb-el pour le rendre configurable
+    Array.from(canvas.children).forEach(function(child) {
+      if (child.classList.contains('bb-el')) return;
+      var wrapper = document.createElement('div');
+      wrapper.className = 'bb-el';
+
+      // Détecter le type
+      var tag = child.tagName.toLowerCase();
+      var type = 'container';
+      if (tag === 'h2') type = 'h2';
+      else if (tag === 'h3') type = 'h3';
+      else if (tag === 'p') type = 'p';
+      else if (tag === 'img') type = 'img';
+      else if (tag === 'a' && child.classList.contains('btn')) type = 'btn';
+      else if (tag === 'hr') type = 'hr';
+      else if (tag === 'aside') type = 'aside';
+      else if (tag === 'blockquote') type = 'quote';
+      else if (tag === 'section') type = 'section';
+      else if (tag === 'div' && child.classList.contains('row')) type = 'row';
+      wrapper.dataset.type = type;
+
+      var labelSpan = document.createElement('span');
+      labelSpan.className = 'bb-el-label';
+      labelSpan.textContent = type;
+      wrapper.appendChild(labelSpan);
+
+      var removeBtn = document.createElement('button');
+      removeBtn.className = 'bb-el-remove';
+      removeBtn.textContent = '\u00d7';
+      removeBtn.onclick = function(e) { e.stopPropagation(); wrapper.remove(); };
+      wrapper.appendChild(removeBtn);
+
+      child.parentNode.insertBefore(wrapper, child);
+      wrapper.appendChild(child);
+
+      wrapper.addEventListener('click', function(e) {
+        e.stopPropagation();
+        selectElement(wrapper);
+      });
+
+      // Rendre le texte éditable
+      wrapper.querySelectorAll('h2, h3, p, span, a, div.ws-bloc-title').forEach(function(el) {
+        if (!el.querySelector('svg')) el.contentEditable = 'true';
+      });
+
+      // Setup les drop zones si c'est un row
+      if (type === 'row') {
+        child.querySelectorAll('[class*="col"]').forEach(function(col) {
+          col.classList.add('bb-col');
+          setupDropZone(col);
+        });
+      }
+    });
+
+    // Stocker la référence au bloc source pour le remplacement
+    canvas.dataset.editSource = Array.from(document.querySelectorAll('.bloc')).indexOf(bloc);
+    toast('Bloc chargé dans le builder — modifiez et cliquez Insérer');
+  };
+
+  // Override insertBuiltBlock pour remplacer le bloc source si on édite
+  var originalInsert = window.insertBuiltBlock;
+  window.insertBuiltBlock = function() {
+    var canvas = document.getElementById('bbCanvas');
+    var editIdx = canvas.dataset.editSource;
+
+    if (editIdx !== undefined && editIdx !== '') {
+      // Mode édition : remplacer le bloc existant
+      var blocs = document.querySelectorAll('#editor .bloc');
+      var targetBloc = blocs[parseInt(editIdx)];
+
+      if (targetBloc) {
+        var clone = canvas.cloneNode(true);
+        clone.querySelectorAll('.bb-el-label, .bb-el-remove, .bb-img-placeholder').forEach(function(el) { el.remove(); });
+        clone.querySelectorAll('.bb-el').forEach(function(el) { el.classList.remove('bb-el', 'selected'); el.style.border = ''; el.style.cursor = ''; });
+        clone.querySelectorAll('.bb-row').forEach(function(el) { el.className = 'row g-4'; });
+        clone.querySelectorAll('.bb-col').forEach(function(el) {
+          var flex = parseInt(el.style.flex) || 12;
+          el.className = 'col-12 col-md-' + flex;
+          el.style.flex = ''; el.style.border = ''; el.style.minHeight = ''; el.style.padding = ''; el.style.background = '';
+        });
+        clone.querySelectorAll('[contenteditable]').forEach(function(el) { el.removeAttribute('contenteditable'); });
+
+        targetBloc.querySelector('.bloc-content').innerHTML = clone.innerHTML;
+        closeBlockPicker();
+        setupImageDropTargets();
+        markDirty();
+        toast('Bloc mis à jour');
+        canvas.dataset.editSource = '';
+        return;
+      }
+    }
+
+    // Mode insertion normal
+    canvas.dataset.editSource = '';
+    originalInsert();
   };
 
   // Setup canvas drop zone
