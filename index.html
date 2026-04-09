@@ -79,7 +79,7 @@ button:hover { background: revert; border: revert; color: revert; }
 .ws-logos { display: flex; align-items: center; justify-content: center; gap: 40px; flex-wrap: wrap; filter: grayscale(100%); opacity: 0.6; }
 .ws-logos img { height: 35px; width: auto; }
 /* Tooltips CSS-only */
-[data-tooltip] { position: relative; cursor: help; }
+[data-tooltip] { position: relative; cursor: help; border-bottom: 1px dotted var(--bs-primary); }
 [data-tooltip]::after {
   content: attr(data-tooltip);
   position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%) translateY(4px);
@@ -242,7 +242,7 @@ button:hover { background: revert; border: revert; color: revert; }
   .editor { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 24px 32px; min-height: 400px; }
 
   /* Editable blocs */
-  .bloc { position: relative; margin: 20px 0; padding: 12px; border: 1px dashed transparent; border-radius: 6px; transition: all 0.2s; }
+  .bloc { position: relative; margin: 20px 0; padding: 12px; border: 1px dashed transparent; border-radius: 6px; transition: all 0.2s; overflow: visible; }
   .bloc:hover { border-color: var(--pr); background: #fdfbff; }
   .bloc.editing { border-color: var(--pr); background: #faf8fd; box-shadow: 0 0 0 3px rgba(111,66,193,0.1); }
   .bloc-toolbar { display: none; position: absolute; top: -14px; right: 8px; background: var(--pr); border-radius: 4px; overflow: hidden; z-index: 10; }
