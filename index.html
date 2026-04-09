@@ -5011,7 +5011,7 @@ async function savePagesJson() {
     });
     clone.querySelectorAll('.bb-col').forEach(function(el) {
       var flex = parseInt(el.style.flex) || 12;
-      var colClass = 'col-md-' + flex;
+      var colClass = 'col-12 col-md-' + flex;
       el.className = colClass;
       el.style.flex = ''; el.style.border = ''; el.style.minHeight = ''; el.style.padding = ''; el.style.background = '';
     });
@@ -5046,7 +5046,7 @@ async function savePagesJson() {
     clone.querySelectorAll('.bb-row').forEach(function(el) { el.className = 'row g-4'; });
     clone.querySelectorAll('.bb-col').forEach(function(el) {
       var flex = parseInt(el.style.flex) || 12;
-      el.className = 'col-md-' + flex;
+      el.className = 'col-12 col-md-' + flex;
       el.style.flex = ''; el.style.border = ''; el.style.minHeight = ''; el.style.padding = ''; el.style.background = '';
     });
 
