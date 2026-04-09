@@ -12,6 +12,11 @@
 <link rel="stylesheet" href="https://dev3.wynstor.com/media/porto/web/css/wynstor-root.css">
 <link rel="stylesheet" href="https://dev3.wynstor.com/media/porto/web/css/wynstor.css">
 <style>
+/* ═══ RESET — neutralise les styles wynstor.css sur les boutons de l'outil ═══ */
+button:not(.primary) { border: revert; color: revert; line-height: revert; padding: revert; height: revert; background-color: revert; }
+button:hover { background: revert; border: revert; color: revert; }
+.bloc-config-preset { background: var(--card, #fff); color: var(--gray, #6c757d); border: 1px solid var(--border, #dee2e6); padding: 3px 8px; border-radius: 4px; font-size: 10px; cursor: pointer; line-height: 1.4; }
+.bloc-config-preset:hover, .bloc-config-preset.active { background: var(--pr); color: #fff; border-color: var(--pr); }
 /* ═══ VARIABLES ROOT WYNSTOR (miroir de wynstor-root.css) ═══ */
 :root {
   /* Bootstrap → Wynstor mapping */
