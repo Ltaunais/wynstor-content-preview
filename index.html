@@ -4544,7 +4544,8 @@ async function savePagesJson() {
     { id: 'stat', label: 'Chiffre', ico: '#', html: '<div class="ws-stat-number" style="color:var(--bs-primary)">42</div>' },
     { id: 'span', label: 'Label', ico: 'T', html: '<span class="ws-bloc-title">Label texte</span>' },
     { id: 'icon', label: 'Ic\u00f4ne', ico: '\u2605', html: '<span class="d-inline-flex ws-ico-bg-lg bg-primary bg-opacity-10 rounded-4"><svg class="ws-ico" width="24" height="24" fill="currentColor" aria-hidden="true"><use href="/svg/_sprite-wynstor.svg#package"></use></svg></span>' },
-    { id: 'aside', label: 'Encadr\u00e9', ico: '\u25a1', html: '<aside class="ws-bg-light rounded-3 ws-p" style="border-left:4px solid var(--bs-primary)"><div class="ws-bloc-title">Titre</div><p class="ws-text-sm mb-0">Contenu.</p></aside>' }
+    { id: 'aside', label: 'Encadr\u00e9', ico: '\u25a1', html: '<aside class="ws-bg-light rounded-3 ws-p" style="border-left:4px solid var(--bs-primary)"><div class="ws-bloc-title">Titre</div><p class="ws-text-sm mb-0">Contenu.</p></aside>' },
+    { id: 'flex-group', label: 'Groupe', ico: '\u2194', html: '<div class="d-inline-flex align-items-center gap-2"></div>' }
   ];
 
   // Layouts disponibles
@@ -4700,6 +4701,13 @@ async function savePagesJson() {
     var img = content.querySelector('img');
     if (img) setupImageDrop(wrapper, img);
 
+    // Les groupes flex acceptent les drops d'éléments à l'intérieur
+    var flexGroup = content.querySelector('.d-inline-flex');
+    if (elId === 'flex-group' && flexGroup) {
+      flexGroup.style.cssText += ';min-height:40px;min-width:80px;border:1px dashed var(--border);border-radius:6px;padding:4px 8px';
+      setupDropZone(flexGroup);
+    }
+
     container.appendChild(wrapper);
   }
 
@@ -4801,8 +4809,11 @@ async function savePagesJson() {
     addConfigSection(body, 'Couleur WS', makeWsPresets(el));
     // Radius
     addConfigSection(body, 'Radius', makeRadiusPresets(el));
-    // Gap (pour les rows)
-    if (el.classList.contains('bb-row')) {
+    // Alignement
+    addConfigSection(body, 'Align horizontal', makeAlignPresets(el, 'justifyContent'));
+    addConfigSection(body, 'Align vertical', makeAlignPresets(el, 'alignItems'));
+    // Gap (pour les rows et flex groups)
+    if (el.classList.contains('bb-row') || el.querySelector('.d-inline-flex')) {
       addConfigSection(body, 'Gap', makeGapPresets(el));
     }
 
@@ -4931,6 +4942,16 @@ async function savePagesJson() {
       { label: '0', value: '0' }, { label: 'S', value: '6px' },
       { label: 'M', value: '12px' }, { label: 'L', value: '16px' }
     ], function(v) { el.style.borderRadius = v; });
+  }
+
+  function makeAlignPresets(el, prop) {
+    var options = prop === 'justifyContent'
+      ? [{ label: 'Gauche', value: 'flex-start' }, { label: 'Centre', value: 'center' }, { label: 'Droite', value: 'flex-end' }, { label: 'Space', value: 'space-between' }]
+      : [{ label: 'Haut', value: 'flex-start' }, { label: 'Centre', value: 'center' }, { label: 'Bas', value: 'flex-end' }, { label: 'Stretch', value: 'stretch' }];
+    return makePresetButtons(options, function(v) {
+      el.style.display = 'flex';
+      el.style[prop] = v;
+    });
   }
 
   function makeGapPresets(el) {
