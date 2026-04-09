@@ -1857,6 +1857,19 @@ function cleanBlocHtml(blocHtml) {
     }
   }
 
+  // Wrapper <figure> + <figcaption> autour des images autonomes (pas dans nav/card)
+  blocHtml = blocHtml.replace(
+    /<img\s([^>]*?)>/g,
+    function(match, attrs) {
+      // Ne pas wrapper les images dans les cards (ccard), nav, ou déjà dans figure
+      if (blocHtml.indexOf('<figure') !== -1) return match;
+      var altMatch = attrs.match(/alt="([^"]*)"/);
+      var alt = altMatch ? altMatch[1] : '';
+      if (!alt || alt === 'Description' || alt === 'Description du visuel') return match;
+      return '<figure><img ' + attrs + '><figcaption>' + alt + '</figcaption></figure>';
+    }
+  );
+
   // Wrapper <section> autour des blocs H2 (pas FAQ, pas ws-faq)
   if (blocHtml.indexOf('<h2') !== -1 && blocHtml.indexOf('faq-item') === -1 && blocHtml.indexOf('<section') === -1) {
     blocHtml = '<section>' + blocHtml + '</section>';
