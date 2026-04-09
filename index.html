@@ -623,11 +623,11 @@ button:hover { background: revert; border: revert; color: revert; }
   /* Token modal */
   .modal-overlay { display: none !important; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 99998; align-items: center; justify-content: center; }
   .modal-overlay.visible { display: flex !important; }
-  .modal { background: var(--card, #1e1e2e) !important; border-radius: 12px !important; padding: 24px !important; width: 420px !important; max-width: 90vw !important; z-index: 99999 !important; position: relative !important; display: block !important; opacity: 1 !important; visibility: visible !important; transform: none !important; }
-  .modal h3 { margin-bottom: 12px; font-size: 16px; }
-  .modal p { font-size: 13px; color: var(--gray); margin-bottom: 12px; }
-  .modal input { width: 100%; padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; font-size: 13px; margin-bottom: 12px; background: #fff !important; color: #212529 !important; }
-  .modal .modal-actions { display: flex; gap: 8px; justify-content: flex-end; }
+  .ws-modal { background: var(--card, #1e1e2e); border-radius: 12px; padding: 24px; width: 420px; max-width: 90vw; z-index: 99999; }
+  .ws-modal h3 { margin-bottom: 12px; font-size: 16px; }
+  .ws-modal p { font-size: 13px; color: var(--gray); margin-bottom: 12px; }
+  .ws-modal input { width: 100%; padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; font-size: 13px; margin-bottom: 12px; background: #fff !important; color: #212529 !important; }
+  .ws-modal .modal-actions { display: flex; gap: 8px; justify-content: flex-end; }
 
   /* Toast */
   .toast { position: fixed; bottom: 20px; right: 20px; background: #212529; color: #fff; padding: 10px 20px; border-radius: 8px; font-size: 13px; z-index: 200; display: none; }
@@ -924,7 +924,7 @@ button:hover { background: revert; border: revert; color: revert; }
 
 <!-- TOKEN MODAL -->
 <div class="modal-overlay" id="tokenModal">
-  <div class="modal">
+  <div class="ws-modal">
     <h3>Token GitHub</h3>
     <p>Token avec permission <code>repo</code> pour sauvegarder les modifications. Stocké en localStorage uniquement.</p>
     <input type="password" id="tokenInput" placeholder="ghp_xxxxxxxxxxxx">
@@ -940,7 +940,7 @@ button:hover { background: revert; border: revert; color: revert; }
 
 <!-- CLAUDE API KEY MODAL -->
 <div class="modal-overlay" id="claudeKeyModal">
-  <div class="modal">
+  <div class="ws-modal">
     <h3>Clé API Claude</h3>
     <p>Clé API Anthropic pour la génération de contenu SEO. Stockée en localStorage uniquement.</p>
     <input type="password" id="claudeKeyInput" placeholder="sk-ant-api03-...">
