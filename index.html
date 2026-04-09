@@ -725,17 +725,9 @@
 <div class="style-toolbar" id="styleToolbar">
   <!-- Texte -->
   <div class="tb-group">
-    <button data-cmd="bold" title="Gras"><b>B</b></button>
-    <button data-cmd="italic" title="Italique"><i>I</i></button>
+    <button data-cmd="bold" title="Gras (strong)"><b>B</b></button>
+    <button data-cmd="italic" title="Italique (em)"><i>I</i></button>
     <button data-cmd="underline" title="Souligné"><u>U</u></button>
-  </div>
-  <div class="tb-sep"></div>
-
-  <!-- Alignement -->
-  <div class="tb-group">
-    <button data-cmd="justifyLeft" title="Gauche">&#8676;</button>
-    <button data-cmd="justifyCenter" title="Centre">&#8596;</button>
-    <button data-cmd="justifyRight" title="Droite">&#8677;</button>
   </div>
   <div class="tb-sep"></div>
 
@@ -751,32 +743,11 @@
     <span class="tb-label">Txt</span>
     <input type="color" id="stColor" value="#333333" title="Couleur texte">
   </div>
-
-  <!-- Couleur fond -->
-  <div class="tb-group">
-    <span class="tb-label">Fond</span>
-    <input type="color" id="stBgColor" value="#ffffff" title="Couleur de fond">
-    <button id="stBgNone" title="Fond transparent" style="font-size:10px">&#8709;</button>
-  </div>
   <div class="tb-sep"></div>
 
-  <!-- Padding -->
+  <!-- Lien interne -->
   <div class="tb-group">
-    <span class="tb-label">Pad</span>
-    <input type="number" id="stPadding" min="0" max="80" value="12" title="Padding (px)">
-  </div>
-
-  <!-- Border radius -->
-  <div class="tb-group">
-    <span class="tb-label">Rad</span>
-    <input type="number" id="stRadius" min="0" max="50" value="0" title="Border radius (px)">
-  </div>
-  <div class="tb-sep"></div>
-
-  <!-- Presets couleurs Wynstor -->
-  <div class="tb-group">
-    <span class="tb-label">WS</span>
-    <div class="color-presets" id="colorPresets"></div>
+    <button id="stWidgetLink" title="Insérer lien catégorie/produit" style="font-size:10px">&#128279; Lien</button>
   </div>
   <div class="tb-sep"></div>
 
@@ -2376,23 +2347,7 @@ const WS_COLORS = [
   '#ff6f3c','#f03d3d'
 ];
 
-// Init color presets
-(function initPresets() {
-  const container = document.getElementById('colorPresets');
-  WS_COLORS.forEach(c => {
-    const dot = document.createElement('div');
-    dot.className = 'color-preset';
-    dot.style.background = c;
-    dot.title = c;
-    dot.addEventListener('click', () => {
-      if (!stActiveEl) return;
-      stActiveEl.style.backgroundColor = c;
-      document.getElementById('stBgColor').value = c;
-      markDirty();
-    });
-    container.appendChild(dot);
-  });
-})();
+// Color presets déplacés dans l'onglet Config du panneau droit
 
 function rgbToHex(rgb) {
   if (!rgb || rgb === 'transparent' || rgb === 'rgba(0, 0, 0, 0)') return '#ffffff';
@@ -2409,9 +2364,6 @@ function showStyleToolbar(el) {
   // Lire les valeurs actuelles
   document.getElementById('stFontSize').value = parseInt(cs.fontSize) || 14;
   document.getElementById('stColor').value = rgbToHex(cs.color);
-  document.getElementById('stBgColor').value = rgbToHex(cs.backgroundColor);
-  document.getElementById('stPadding').value = parseInt(cs.padding) || 0;
-  document.getElementById('stRadius').value = parseInt(cs.borderRadius) || 0;
 
   stToolbar.classList.add('visible');
   requestAnimationFrame(() => positionStyleToolbar(el));
@@ -2513,29 +2465,23 @@ document.getElementById('stColor').addEventListener('input', (e) => {
   markDirty();
 });
 
-document.getElementById('stBgColor').addEventListener('input', (e) => {
-  if (!stActiveEl) return;
-  stActiveEl.style.backgroundColor = e.target.value;
+// Bouton Lien interne — transforme la sélection en widget-link
+document.getElementById('stWidgetLink').addEventListener('click', function() {
+  var sel = window.getSelection();
+  if (!sel.rangeCount || sel.isCollapsed) { toast('Sélectionnez du texte d\'abord'); return; }
+  var range = sel.getRangeAt(0);
+  var text = range.toString().trim();
+  if (!text) return;
+  var span = document.createElement('span');
+  span.className = 'widget-link';
+  span.setAttribute('title', 'category/ID');
+  span.setAttribute('contenteditable', 'false');
+  span.textContent = text;
+  range.deleteContents();
+  range.insertNode(span);
+  sel.removeAllRanges();
   markDirty();
-});
-
-document.getElementById('stBgNone').addEventListener('click', () => {
-  if (!stActiveEl) return;
-  stActiveEl.style.backgroundColor = 'transparent';
-  markDirty();
-});
-
-document.getElementById('stPadding').addEventListener('input', (e) => {
-  if (!stActiveEl) return;
-  stActiveEl.style.padding = e.target.value + 'px';
-  markDirty();
-  requestAnimationFrame(() => positionStyleToolbar(stActiveEl));
-});
-
-document.getElementById('stRadius').addEventListener('input', (e) => {
-  if (!stActiveEl) return;
-  stActiveEl.style.borderRadius = e.target.value + 'px';
-  markDirty();
+  toast('Lien créé — modifiez l\'ID dans Config');
 });
 
 // Clic sur un mot exclu → régénérer la phrase
