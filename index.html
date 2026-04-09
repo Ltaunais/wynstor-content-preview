@@ -907,6 +907,7 @@
   <div class="tb-group">
     <button id="stWidgetLink" title="Insérer lien catégorie/produit" style="font-size:10px">&#128279; Lien</button>
     <button id="stUnlink" title="Supprimer le lien (garder le texte)" style="font-size:10px">&#128279; &#10005;</button>
+    <button id="stTooltip" title="Ajouter un tooltip sur la sélection" style="font-size:10px">&#128172; Tooltip</button>
   </div>
   <div class="tb-sep"></div>
 
@@ -2700,6 +2701,70 @@ document.getElementById('stUnlink').addEventListener('click', function() {
   link.parentNode.replaceChild(text, link);
   markDirty();
   toast('Lien supprime, texte conserve');
+});
+
+// Bouton Tooltip — wrap la selection dans un span[data-tooltip]
+document.getElementById('stTooltip').addEventListener('click', function() {
+  var sel = window.getSelection();
+  if (!sel.rangeCount || sel.isCollapsed) { toast('Selectionnez du texte d\'abord'); return; }
+  var range = sel.getRangeAt(0);
+  var text = range.toString().trim();
+  if (!text) return;
+  // Check si deja un tooltip
+  var parent = sel.anchorNode.nodeType === 3 ? sel.anchorNode.parentElement : sel.anchorNode;
+  if (parent && parent.hasAttribute('data-tooltip')) {
+    // Modifier le tooltip existant
+    var current = parent.getAttribute('data-tooltip');
+    var input = document.createElement('input');
+    input.type = 'text';
+    input.value = current;
+    input.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:100000;padding:8px 16px;border:2px solid var(--pr);border-radius:8px;font-size:14px;width:300px;background:#fff;color:#212529';
+    input.placeholder = 'Texte du tooltip (vide = supprimer)';
+    var overlay = document.createElement('div');
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:99999';
+    overlay.onclick = function() { overlay.remove(); input.remove(); };
+    document.body.appendChild(overlay);
+    document.body.appendChild(input);
+    input.focus();
+    input.select();
+    input.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
+        var val = input.value.trim();
+        if (val) { parent.setAttribute('data-tooltip', val); }
+        else { parent.removeAttribute('data-tooltip'); parent.removeAttribute('data-tooltip-pos'); parent.style.cursor = ''; }
+        overlay.remove(); input.remove(); markDirty();
+        toast(val ? 'Tooltip mis a jour' : 'Tooltip supprime');
+      }
+      if (e.key === 'Escape') { overlay.remove(); input.remove(); }
+    });
+    return;
+  }
+  // Creer un nouveau tooltip
+  var input = document.createElement('input');
+  input.type = 'text';
+  input.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:100000;padding:8px 16px;border:2px solid var(--pr);border-radius:8px;font-size:14px;width:300px;background:#fff;color:#212529';
+  input.placeholder = 'Texte du tooltip';
+  var overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:99999';
+  overlay.onclick = function() { overlay.remove(); input.remove(); };
+  document.body.appendChild(overlay);
+  document.body.appendChild(input);
+  input.focus();
+  input.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+      var val = input.value.trim();
+      if (!val) { overlay.remove(); input.remove(); return; }
+      var span = document.createElement('span');
+      span.setAttribute('data-tooltip', val);
+      span.textContent = text;
+      range.deleteContents();
+      range.insertNode(span);
+      sel.removeAllRanges();
+      overlay.remove(); input.remove(); markDirty();
+      toast('Tooltip ajoute');
+    }
+    if (e.key === 'Escape') { overlay.remove(); input.remove(); }
+  });
 });
 
 // Clic sur un mot exclu → régénérer la phrase
