@@ -884,6 +884,7 @@
   <!-- Lien interne -->
   <div class="tb-group">
     <button id="stWidgetLink" title="Insérer lien catégorie/produit" style="font-size:10px">&#128279; Lien</button>
+    <button id="stUnlink" title="Supprimer le lien (garder le texte)" style="font-size:10px">&#128279; &#10005;</button>
   </div>
   <div class="tb-sep"></div>
 
@@ -2664,6 +2665,21 @@ document.getElementById('stWidgetLink').addEventListener('click', function() {
   toast('Lien créé — modifiez l\'ID dans Config');
 });
 
+// Bouton Supprimer lien — unwrap <a> ou .widget-link, garde le texte
+document.getElementById('stUnlink').addEventListener('click', function() {
+  var sel = window.getSelection();
+  if (!sel.rangeCount) return;
+  var node = sel.anchorNode;
+  if (node.nodeType === 3) node = node.parentElement;
+  // Remonter jusqu'au lien le plus proche
+  var link = node.closest('a, .widget-link');
+  if (!link) { toast('Placez le curseur sur un lien'); return; }
+  var text = document.createTextNode(link.textContent);
+  link.parentNode.replaceChild(text, link);
+  markDirty();
+  toast('Lien supprime, texte conserve');
+});
+
 // Clic sur un mot exclu → régénérer la phrase
 document.addEventListener('click', function(e) {
   var target = e.target;
@@ -4184,9 +4200,21 @@ async function savePagesJson() {
     // === LIENS WIDGET ===
     var widgets = content.querySelectorAll('.widget-link');
     widgets.forEach(function(w, i) {
+      var unlinkBtn = document.createElement('button');
+      unlinkBtn.textContent = '\u00d7 Supprimer le lien';
+      unlinkBtn.className = 'bloc-config-preset';
+      unlinkBtn.style.cssText = 'color:#dc3545;border-color:#dc3545;margin-top:4px';
+      unlinkBtn.onclick = function() {
+        var text = document.createTextNode(w.textContent);
+        w.parentNode.replaceChild(text, w);
+        markDirty();
+        openBlocConfig(bloc);
+        toast('Lien supprime, texte conserve');
+      };
       addSection('Lien interne ' + (i + 1), [
         makeTextInput('Texte', w.textContent.trim(), function(val) { w.textContent = val; markDirty(); }),
-        makeTextInput('ID path', w.getAttribute('title') || '', function(val) { w.setAttribute('title', val); markDirty(); })
+        makeTextInput('ID path', w.getAttribute('title') || '', function(val) { w.setAttribute('title', val); markDirty(); }),
+        unlinkBtn
       ]);
     });
 
