@@ -4077,7 +4077,7 @@ async function savePagesJson() {
     label.textContent = title;
     section.appendChild(label);
     controls.forEach(function(c) { if (c) section.appendChild(c); });
-    body.appendChild(section);
+    document.getElementById('blocConfigBody').appendChild(section);
   }
 
   function makeTextInput(label, value, onChange) {
