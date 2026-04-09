@@ -922,6 +922,7 @@
 
 <script>
 // === CONFIG ===
+const DEMO_MODE = true; // true = coupe les appels Magento (demo), false = prod
 const REPO = 'Ltaunais/wynstor-content-preview';
 const BRANCH = 'main';
 
@@ -2389,7 +2390,14 @@ async function initApp() {
   }
 }
 
-document.addEventListener('DOMContentLoaded', initApp);
+document.addEventListener('DOMContentLoaded', function() {
+  initApp();
+  // Mode demo : masquer les elements Magento
+  if (DEMO_MODE) {
+    var btnPush = document.getElementById('btnPushMagento');
+    if (btnPush) btnPush.style.display = 'none';
+  }
+});
 
 // === BLACKLIST (mots exclus persistants sur GitHub) ===
 let blacklistCache = [];
@@ -3533,6 +3541,7 @@ function launchGuidedRegen(bloc, instruction) {
 
 // === PANNEAU MÉDIA ===
 function getMediaApiUrl() {
+  if (DEMO_MODE) return ''; // pas d'upload en mode demo
   var token = getToken();
   return 'https://dev3.wynstor.com/media/wysiwyg/smartwave/porto/category/upload.php' + (token ? '?token=' + encodeURIComponent(token) : '');
 }
@@ -3777,6 +3786,7 @@ document.getElementById('editor').addEventListener('drop', (e) => {
 
 // === PUSH MAGENTO ===
 async function pushToMagento() {
+  if (DEMO_MODE) { toast('Push Magento desactive (mode demo)'); return; }
   const token = getToken();
   if (!token) { toast('Token GitHub requis'); return; }
   if (!currentFile || !pagesData) { toast('Aucune page chargée'); return; }
@@ -3890,6 +3900,7 @@ async function onDesignKeyChange(value) {
   if (value) { page.design = value; } else { delete page.design; }
 
   // Sync Magento
+  if (DEMO_MODE) { toast('Design key sauvegarde localement (mode demo)'); markDirty(); return; }
   const token = getToken();
   if (!token) { toast('Token requis'); return; }
 
@@ -4508,6 +4519,7 @@ async function savePagesJson() {
     var filename = url.split('/').pop();
     if (!filename) return;
 
+    if (DEMO_MODE) { toast('Suppression desactivee (mode demo)'); draggedUrl = null; return; }
     toast('Suppression: ' + filename + '...');
     var token = getToken();
     if (!token) { toast('Token requis'); return; }
