@@ -4035,6 +4035,8 @@ async function savePagesJson() {
         makePaddingControl(target),
         makeGapControl(target),
         makeBgControl(target),
+        makeBgColorPicker(target),
+        makeWsColorPresets(target),
         makeRadiusControl(target)
       ]);
     }
@@ -4221,6 +4223,89 @@ async function savePagesJson() {
       };
       presets.appendChild(btn);
     });
+    row.appendChild(presets);
+    return row;
+  }
+
+  function makeBgColorPicker(el) {
+    var row = document.createElement('div');
+    row.className = 'bloc-config-row';
+    var lbl = document.createElement('label');
+    lbl.textContent = 'Couleur';
+    row.appendChild(lbl);
+
+    var picker = document.createElement('input');
+    picker.type = 'color';
+    picker.value = '#ffffff';
+    // Lire la couleur actuelle
+    var cs = window.getComputedStyle(el);
+    if (cs.backgroundColor && cs.backgroundColor !== 'rgba(0, 0, 0, 0)') {
+      var match = cs.backgroundColor.match(/\d+/g);
+      if (match && match.length >= 3) {
+        picker.value = '#' + match.slice(0, 3).map(function(c) { return parseInt(c).toString(16).padStart(2, '0'); }).join('');
+      }
+    }
+    picker.addEventListener('input', function() {
+      el.style.background = picker.value;
+      el.style.color = '';
+      markDirty();
+    });
+    row.appendChild(picker);
+
+    var clearBtn = document.createElement('button');
+    clearBtn.className = 'bloc-config-preset';
+    clearBtn.textContent = 'Transparent';
+    clearBtn.onclick = function() {
+      el.style.background = 'transparent';
+      el.style.color = '';
+      markDirty();
+    };
+    row.appendChild(clearBtn);
+    return row;
+  }
+
+  function makeWsColorPresets(el) {
+    var row = document.createElement('div');
+    row.className = 'bloc-config-row';
+    var lbl = document.createElement('label');
+    lbl.textContent = 'Wynstor';
+    row.appendChild(lbl);
+
+    var presets = document.createElement('div');
+    presets.className = 'bloc-config-presets';
+    presets.style.cssText = 'display:flex;gap:3px;flex-wrap:wrap';
+
+    var colors = [
+      { label: '', value: '#0061E2', title: 'Primary' },
+      { label: '', value: '#084298', title: 'Blue 700' },
+      { label: '', value: '#052c65', title: 'Blue 800' },
+      { label: '', value: '#5a32a3', title: 'Purple' },
+      { label: '', value: '#198754', title: 'Success' },
+      { label: '', value: '#e65100', title: 'Orange' },
+      { label: '', value: '#E7B25C', title: 'Gold' },
+      { label: '', value: '#f8f9fa', title: 'Gray 100' },
+      { label: '', value: '#dee2e6', title: 'Gray 300' },
+      { label: '', value: '#212529', title: 'Dark' },
+      { label: '', value: '#F8F9FC', title: 'Blue 000' },
+      { label: '', value: '#e7effb', title: 'Blue 040' }
+    ];
+
+    colors.forEach(function(c) {
+      var dot = document.createElement('div');
+      dot.style.cssText = 'width:20px;height:20px;border-radius:4px;cursor:pointer;border:2px solid transparent;transition:border-color .15s;background:' + c.value;
+      dot.title = c.title + ' (' + c.value + ')';
+      dot.addEventListener('mouseenter', function() { dot.style.borderColor = '#fff'; });
+      dot.addEventListener('mouseleave', function() { dot.style.borderColor = 'transparent'; });
+      dot.addEventListener('click', function() {
+        el.style.background = c.value;
+        // Texte blanc sur fonds sombres
+        var dark = ['#0061E2', '#084298', '#052c65', '#5a32a3', '#212529'];
+        el.style.color = dark.indexOf(c.value) !== -1 ? '#fff' : '';
+        markDirty();
+      });
+      presets.appendChild(dot);
+    });
+
     row.appendChild(presets);
     return row;
   }
