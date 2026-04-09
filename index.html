@@ -2771,6 +2771,44 @@ document.getElementById('stTooltip').addEventListener('click', function() {
   });
 });
 
+// Double-clic sur un tooltip → modifier le texte
+document.addEventListener('dblclick', function(e) {
+  var target = e.target;
+  if (!target.hasAttribute || !target.hasAttribute('data-tooltip')) return;
+  if (!target.closest('.bloc-content')) return;
+  e.preventDefault();
+  e.stopPropagation();
+  var current = target.getAttribute('data-tooltip');
+  var input = document.createElement('input');
+  input.type = 'text';
+  input.value = current;
+  input.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:100000;padding:8px 16px;border:2px solid var(--pr);border-radius:8px;font-size:14px;width:300px;background:#fff;color:#212529';
+  input.placeholder = 'Texte du tooltip (vide = supprimer)';
+  var overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:99999';
+  overlay.onclick = function() { overlay.remove(); input.remove(); };
+  document.body.appendChild(overlay);
+  document.body.appendChild(input);
+  input.focus();
+  input.select();
+  input.addEventListener('keydown', function(ev) {
+    if (ev.key === 'Enter') {
+      var val = input.value.trim();
+      if (val) {
+        target.setAttribute('data-tooltip', val);
+      } else {
+        target.removeAttribute('data-tooltip');
+        target.removeAttribute('data-tooltip-pos');
+        target.style.cursor = '';
+        target.style.borderBottom = '';
+      }
+      overlay.remove(); input.remove(); markDirty();
+      toast(val ? 'Tooltip mis a jour' : 'Tooltip supprime');
+    }
+    if (ev.key === 'Escape') { overlay.remove(); input.remove(); }
+  });
+});
+
 // Clic sur un mot exclu → régénérer la phrase
 document.addEventListener('click', function(e) {
   var target = e.target;
@@ -4306,6 +4344,29 @@ async function savePagesJson() {
         makeTextInput('Texte', w.textContent.trim(), function(val) { w.textContent = val; markDirty(); }),
         makeTextInput('ID path', w.getAttribute('title') || '', function(val) { w.setAttribute('title', val); markDirty(); }),
         unlinkBtn
+      ]);
+    });
+
+    // === TOOLTIPS ===
+    var tooltips = content.querySelectorAll('[data-tooltip]');
+    tooltips.forEach(function(t, i) {
+      var removeTooltipBtn = document.createElement('button');
+      removeTooltipBtn.textContent = '\u00d7 Supprimer tooltip';
+      removeTooltipBtn.className = 'bloc-config-preset';
+      removeTooltipBtn.style.cssText = 'color:#dc3545;border-color:#dc3545;margin-top:4px';
+      removeTooltipBtn.onclick = function() {
+        t.removeAttribute('data-tooltip');
+        t.removeAttribute('data-tooltip-pos');
+        t.style.cursor = '';
+        t.style.borderBottom = '';
+        markDirty();
+        openBlocConfig(bloc);
+        toast('Tooltip supprime');
+      };
+      addSection('Tooltip ' + (i + 1), [
+        makeTextInput('Texte', t.textContent.trim(), function(val) { t.textContent = val; markDirty(); }),
+        makeTextInput('Tooltip', t.getAttribute('data-tooltip'), function(val) { t.setAttribute('data-tooltip', val); markDirty(); }),
+        removeTooltipBtn
       ]);
     });
 
