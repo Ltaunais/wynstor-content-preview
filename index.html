@@ -928,9 +928,11 @@ button:hover { background: revert; border: revert; color: revert; }
     <h3>Token GitHub</h3>
     <p>Token avec permission <code>repo</code> pour sauvegarder les modifications. Stocké en localStorage uniquement.</p>
     <input type="password" id="tokenInput" placeholder="ghp_xxxxxxxxxxxx">
-    <h3 style="margin-top:16px">API Magento</h3>
-    <p>Secret pour les appels Push/Upload vers dev3. Separe du token GitHub.</p>
-    <input type="password" id="apiSecretInput" placeholder="Secret API Magento">
+    <div id="apiSecretSection" style="display:none">
+      <h3 style="margin-top:16px">API Magento</h3>
+      <p>Secret pour les appels Push/Upload vers dev3. Separe du token GitHub.</p>
+      <input type="password" id="apiSecretInput" placeholder="Secret API Magento">
+    </div>
     <div class="modal-actions">
       <button class="btn" onclick="hideTokenModal()">Annuler</button>
       <button class="btn btn-primary" onclick="saveToken()">Enregistrer</button>
@@ -991,7 +993,7 @@ const BL_EXPR = /(découvrez|n'hésitez pas|conçu pour|que vous soyez|grâce à
 // === TOKEN ===
 function getToken() { return localStorage.getItem('gh_token') || ''; }
 function getApiSecret() { return localStorage.getItem('ws_api_secret') || ''; }
-function showTokenModal() { document.getElementById('tokenModal').classList.add('visible'); document.getElementById('tokenInput').value = getToken(); document.getElementById('apiSecretInput').value = getApiSecret(); }
+function showTokenModal() { document.getElementById('tokenModal').classList.add('visible'); document.getElementById('tokenInput').value = getToken(); if (!DEMO_MODE) { document.getElementById('apiSecretSection').style.display = ''; document.getElementById('apiSecretInput').value = getApiSecret(); } }
 function hideTokenModal() { document.getElementById('tokenModal').classList.remove('visible'); }
 function saveToken() { localStorage.setItem('gh_token', document.getElementById('tokenInput').value.trim()); localStorage.setItem('ws_api_secret', (document.getElementById('apiSecretInput').value || '').trim()); hideTokenModal(); toast('Tokens enregistres'); }
 
