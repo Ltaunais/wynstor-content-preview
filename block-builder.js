@@ -234,6 +234,7 @@
     // Drop indicator at end
     canvas.appendChild(makeDropIndicator(model.id, model.children.length));
     setupCanvasDrop(canvas);
+    renderConfig();
     // Reapply preview mode
     setPreviewMode(previewMode);
   }
