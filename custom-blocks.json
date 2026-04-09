@@ -17,6 +17,12 @@
       "name": "test toto",
       "desc": "Bloc personnalisé",
       "html": "<h2 class=\"ws-h2\">Vous traitez des volumes importants en entreprise</h2>\n\n<p>En PME, vous agrafez entre 200 et 500 documents par semaine. Les rapports trimestriels, les dossiers clients, les bordereaux de livraison. Une <span class=\"widget-link\" title=\"category/162\" contenteditable=\"false\">agrafeuse électrique</span> divise par trois le temps de traitement : 0,8 seconde par agrafage contre 2,5 secondes en manuel. Sur un mois, vous économisez 4 heures de travail administratif.<button class=\"p-h3-btn\" contenteditable=\"false\">H3+IA</button></p>\n\n<p>Les services courrier des collectivités territoriales utilisent nos <span class=\"excluded-word\" title=\"Mot exclu\">modèle</span>s électriques pour les mailings mensuels. Capacité 50 feuilles 80g, rechargement automatique des <span class=\"widget-link\" title=\"category/152\" contenteditable=\"false\">agrafes</span> par barres de 5000. Le moteur silencieux (niveau sonore 45 dB) respecte l'environnement de travail en open space.<button class=\"p-h3-btn\" contenteditable=\"false\">H3+IA</button></p>"
+    },
+    {
+      "id": "custom-1775698110771",
+      "name": "test",
+      "desc": "Bloc personnalisé",
+      "html": "<div class=\"row g-4\">\n<div class=\"col-12 col-md-6\">\n<h2 class=\"ws-h2\">Titre de section</h2>\n<div class=\"d-inline-flex align-items-center\" style=\"gap:8px\">\n<span class=\"d-inline-flex ws-ico-bg-lg bg-warning bg-opacity-10 rounded-4\"><svg class=\"ws-ico\" width=\"24\" height=\"24\" fill=\"currentColor\" aria-hidden=\"true\"><use href=\"/svg/_sprite-wynstor.svg#package\"></use></svg></span>\n<p class=\"ws-text\">Votre texte ici.</p>\n</div>\n<div class=\"d-inline-flex align-items-center\" style=\"gap:8px\">\n<span class=\"d-inline-flex ws-ico-bg-lg bg-warning bg-opacity-10 rounded-4\"><svg class=\"ws-ico\" width=\"24\" height=\"24\" fill=\"currentColor\" aria-hidden=\"true\"><use href=\"/svg/_sprite-wynstor.svg#package\"></use></svg></span>\n<p class=\"ws-text\">Votre texte ici.</p>\n</div>\n<a href=\"#\" class=\"btn btn-primary\" style=\"padding:1.2rem 2.8rem;border-radius:8px\">Bouton</a>\n</div>\n<div class=\"col-12 col-md-6\">\n<figure><img src=\"\" alt=\"Description\" class=\"w-100 rounded-3\" loading=\"lazy\" decoding=\"async\"><figcaption>Description</figcaption></figure>\n</div>\n</div>"
     }
   ]
 }
