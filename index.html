@@ -3918,10 +3918,11 @@ async function loadMediaGallery() {
   const token = getApiSecret();
   const gallery = document.getElementById('mediaGallery');
   gallery.textContent = '';
+  if (DEMO_MODE || !token) { mediaLoaded = true; return; }
 
   try {
     const res = await fetch(getMediaApiUrl(), {
-      headers: token ? { 'Authorization': 'Bearer ' + token } : {},
+      headers: { 'Authorization': 'Bearer ' + token },
       cache: 'no-store'
     });
     if (res.ok) {
@@ -3929,9 +3930,7 @@ async function loadMediaGallery() {
       data.images.forEach(img => addMediaThumb(img));
       mediaLoaded = true;
     }
-  } catch(e) {
-    gallery.textContent = 'Erreur chargement galerie';
-  }
+  } catch(e) {}
 }
 
 function addMediaThumb(img) {
