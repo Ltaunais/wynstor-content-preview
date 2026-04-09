@@ -442,6 +442,73 @@
   .bp-close { background: none; border: none; font-size: 22px; cursor: pointer; color: var(--gray); padding: 4px 8px; border-radius: 6px; }
   .bp-close:hover { background: var(--border); }
   .bp-body { display: flex; flex: 1; overflow: hidden; }
+
+  /* === BLOCK BUILDER === */
+  .bb-palette {
+    width: 180px; border-right: 1px solid var(--border); padding: 12px;
+    overflow-y: auto; flex-shrink: 0;
+  }
+  .bb-palette-title { font-size: 9px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--gray); margin-bottom: 8px; }
+  .bb-palette-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 8px; }
+  .bb-palette-item {
+    padding: 8px 4px; border: 1px solid var(--border); border-radius: 6px; text-align: center;
+    font-size: 10px; cursor: grab; background: var(--card); transition: all .15s; user-select: none;
+  }
+  .bb-palette-item:hover { border-color: var(--pr); background: #faf8fd; }
+  .bb-palette-item .bb-ico { font-size: 16px; display: block; margin-bottom: 2px; }
+  .bb-layout-grid { display: flex; flex-direction: column; gap: 6px; }
+  .bb-layout-item {
+    padding: 8px; border: 1px solid var(--border); border-radius: 6px;
+    font-size: 10px; cursor: pointer; background: var(--card); transition: all .15s;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .bb-layout-item:hover { border-color: var(--pr); background: #faf8fd; }
+  .bb-layout-preview { display: flex; gap: 2px; height: 16px; flex: 1; }
+  .bb-layout-preview div { background: var(--border); border-radius: 2px; flex: 1; }
+
+  .bb-canvas-wrap { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+  .bb-canvas {
+    flex: 1; padding: 20px; overflow-y: auto; background: #fafafa;
+    border: 2px dashed transparent; transition: border-color .2s;
+    min-height: 300px;
+  }
+  .bb-canvas.dragover { border-color: var(--pr); background: #fdf8ff; }
+  .bb-canvas-actions { padding: 10px 16px; border-top: 1px solid var(--border); display: flex; gap: 8px; justify-content: center; }
+  .bb-empty-state { display: flex; align-items: center; justify-content: center; height: 100%; color: var(--gray); font-size: 13px; }
+
+  /* Éléments dans le canvas */
+  .bb-el {
+    position: relative; padding: 8px; margin: 4px 0; border: 1px dashed transparent;
+    border-radius: 4px; cursor: pointer; transition: all .15s; min-height: 24px;
+  }
+  .bb-el:hover { border-color: var(--pr); background: rgba(111,66,193,0.03); }
+  .bb-el.selected { border-color: var(--pr); background: rgba(111,66,193,0.06); box-shadow: 0 0 0 2px rgba(111,66,193,0.15); }
+  .bb-el .bb-el-label {
+    position: absolute; top: -8px; left: 6px; font-size: 8px; text-transform: uppercase;
+    letter-spacing: 0.5px; background: var(--pr); color: #fff; padding: 1px 5px; border-radius: 3px;
+    display: none;
+  }
+  .bb-el:hover .bb-el-label, .bb-el.selected .bb-el-label { display: inline; }
+  .bb-el .bb-el-remove {
+    position: absolute; top: -6px; right: 4px; width: 16px; height: 16px;
+    background: var(--bad); color: #fff; border: none; border-radius: 50%;
+    font-size: 9px; cursor: pointer; display: none; align-items: center; justify-content: center;
+  }
+  .bb-el:hover .bb-el-remove { display: flex; }
+
+  /* Layout containers dans le canvas */
+  .bb-row { display: flex; gap: 12px; min-height: 60px; }
+  .bb-col {
+    flex: 1; border: 1px dashed var(--border); border-radius: 6px; padding: 8px;
+    min-height: 50px; background: #fff; transition: all .2s;
+  }
+  .bb-col.dragover { border-color: var(--pr); background: #fdf8ff; }
+
+  .bb-config {
+    width: 240px; border-left: 1px solid var(--border); padding: 12px;
+    overflow-y: auto; flex-shrink: 0;
+  }
+  .bb-config-title { font-size: 9px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--gray); margin-bottom: 8px; }
   .bp-cats { width: 180px; border-right: 1px solid var(--border); padding: 12px 0; overflow-y: auto; flex-shrink: 0; }
   .bp-cat-btn {
     display: block; width: 100%; text-align: left; padding: 8px 20px;
@@ -733,16 +800,50 @@
   </div>
 </div>
 
-<!-- BLOCK PICKER MODAL -->
+<!-- BLOCK PICKER / BUILDER MODAL -->
 <div class="block-picker-overlay" id="blockPickerOverlay">
   <div class="block-picker">
     <div class="bp-header">
-      <h3>Insérer un bloc</h3>
+      <div style="display:flex;gap:0;flex:1">
+        <button class="bp-tab active" onclick="switchBuilderTab('library')" id="bpTabLibrary" style="padding:6px 16px;border:none;background:none;font-size:13px;font-weight:600;cursor:pointer;border-bottom:2px solid var(--pr);color:var(--pr)">Bibliothèque</button>
+        <button class="bp-tab" onclick="switchBuilderTab('build')" id="bpTabBuild" style="padding:6px 16px;border:none;background:none;font-size:13px;font-weight:600;cursor:pointer;border-bottom:2px solid transparent;color:var(--gray)">Construire</button>
+      </div>
       <button class="bp-close" onclick="closeBlockPicker()">&times;</button>
     </div>
-    <div class="bp-body">
+
+    <!-- TAB: Bibliothèque (existant) -->
+    <div class="bp-body" id="bpLibrary">
       <div class="bp-cats" id="bpCats"></div>
       <div class="bp-grid" id="bpGrid"></div>
+    </div>
+
+    <!-- TAB: Construire -->
+    <div class="bp-body" id="bpBuild" style="display:none">
+      <!-- Palette éléments (gauche) -->
+      <div class="bb-palette">
+        <div class="bb-palette-title">Éléments</div>
+        <div class="bb-palette-grid" id="bbPaletteGrid"></div>
+        <div class="bb-palette-title" style="margin-top:12px">Layout</div>
+        <div class="bb-layout-grid" id="bbLayoutGrid"></div>
+      </div>
+
+      <!-- Canvas (centre) -->
+      <div class="bb-canvas-wrap">
+        <div class="bb-canvas" id="bbCanvas">
+          <div class="bb-empty-state">Choisissez un layout ou glissez des éléments ici</div>
+        </div>
+        <div class="bb-canvas-actions">
+          <button class="btn" style="background:var(--ok);color:#fff;border-color:var(--ok)" onclick="insertBuiltBlock()">Insérer dans l'éditeur</button>
+          <button class="btn" onclick="saveAsPreset()">Sauvegarder comme preset</button>
+          <button class="btn" onclick="clearCanvas()">Vider</button>
+        </div>
+      </div>
+
+      <!-- Config élément (droite) -->
+      <div class="bb-config">
+        <div class="bb-config-title">Configuration</div>
+        <div id="bbConfigBody"><div style="font-size:11px;color:var(--gray);padding:8px">Cliquez sur un élément pour le configurer</div></div>
+      </div>
     </div>
   </div>
 </div>
@@ -4423,6 +4524,534 @@ async function savePagesJson() {
     }).catch(function() { toast('Erreur réseau', 3000); });
     draggedUrl = null;
   });
+})();
+
+// === BLOCK BUILDER ===
+(function() {
+  var selectedEl = null;
+  var insertTarget = null; // Le insert-bar qui a déclenché l'ouverture
+
+  // Éléments disponibles dans la palette
+  var ELEMENTS = [
+    { id: 'h2', label: 'H2', ico: 'H', html: '<h2 class="ws-h2">Titre de section</h2>' },
+    { id: 'h3', label: 'H3', ico: 'h', html: '<h3 class="ws-h3">Sous-titre</h3>' },
+    { id: 'p', label: 'Texte', ico: '\u00b6', html: '<p class="ws-text">Votre texte ici.</p>' },
+    { id: 'img', label: 'Image', ico: '\ud83d\uddbc', html: '<img src="" alt="Description" class="w-100 rounded-3" loading="lazy" decoding="async">' },
+    { id: 'btn', label: 'Bouton', ico: '\u25a2', html: '<a href="#" class="btn btn-primary" style="padding:1.2rem 2.8rem;border-radius:8px">Bouton</a>' },
+    { id: 'widget', label: 'Lien int.', ico: '\ud83d\udd17', html: '<span class="widget-link" title="category/ID">lien interne</span>' },
+    { id: 'hr', label: 'S\u00e9parateur', ico: '\u2500', html: '<hr style="border:none;border-top:1px solid #e5e5e5;margin:1.6rem 0">' },
+    { id: 'badge', label: 'Pastille', ico: '\u2460', html: '<div class="ws-badge-num" style="background:var(--bs-primary)">1</div>' },
+    { id: 'stat', label: 'Chiffre', ico: '#', html: '<div class="ws-stat-number" style="color:var(--bs-primary)">42</div>' },
+    { id: 'span', label: 'Label', ico: 'T', html: '<span class="ws-bloc-title">Label texte</span>' },
+    { id: 'icon', label: 'Ic\u00f4ne', ico: '\u2605', html: '<span class="d-inline-flex ws-ico-bg-lg bg-primary bg-opacity-10 rounded-4"><svg class="ws-ico" width="24" height="24" fill="currentColor" aria-hidden="true"><use href="/svg/_sprite-wynstor.svg#package"></use></svg></span>' },
+    { id: 'aside', label: 'Encadr\u00e9', ico: '\u25a1', html: '<aside class="ws-bg-light rounded-3 ws-p" style="border-left:4px solid var(--bs-primary)"><div class="ws-bloc-title">Titre</div><p class="ws-text-sm mb-0">Contenu.</p></aside>' }
+  ];
+
+  // Layouts disponibles
+  var LAYOUTS = [
+    { id: '1col', label: '1 colonne', cols: [12] },
+    { id: '2col-equal', label: '2 col (50/50)', cols: [6, 6] },
+    { id: '2col-left', label: '2 col (33/66)', cols: [4, 8] },
+    { id: '2col-right', label: '2 col (66/33)', cols: [8, 4] },
+    { id: '3col', label: '3 colonnes', cols: [4, 4, 4] },
+    { id: 'flex', label: 'Flex horizontal', cols: [] }
+  ];
+
+  // Rendre la palette
+  function renderPalette() {
+    var grid = document.getElementById('bbPaletteGrid');
+    grid.textContent = '';
+    ELEMENTS.forEach(function(el) {
+      var item = document.createElement('div');
+      item.className = 'bb-palette-item';
+      item.draggable = true;
+      item.dataset.elId = el.id;
+      var ico = document.createElement('span');
+      ico.className = 'bb-ico';
+      ico.textContent = el.ico;
+      var label = document.createElement('span');
+      label.textContent = el.label;
+      item.appendChild(ico);
+      item.appendChild(label);
+      item.addEventListener('dragstart', function(e) {
+        e.dataTransfer.setData('text/plain', el.id);
+        e.dataTransfer.effectAllowed = 'copy';
+      });
+      // Double-clic = ajouter directement
+      item.addEventListener('dblclick', function() { addElementToCanvas(el.id); });
+      grid.appendChild(item);
+    });
+
+    var layoutGrid = document.getElementById('bbLayoutGrid');
+    layoutGrid.textContent = '';
+    LAYOUTS.forEach(function(layout) {
+      var item = document.createElement('div');
+      item.className = 'bb-layout-item';
+      var preview = document.createElement('div');
+      preview.className = 'bb-layout-preview';
+      if (layout.cols.length === 0) {
+        // Flex
+        for (var f = 0; f < 4; f++) { var d = document.createElement('div'); preview.appendChild(d); }
+      } else {
+        layout.cols.forEach(function(c) {
+          var d = document.createElement('div');
+          d.style.flex = c;
+          preview.appendChild(d);
+        });
+      }
+      var label = document.createElement('span');
+      label.textContent = layout.label;
+      label.style.fontSize = '10px';
+      item.appendChild(preview);
+      item.appendChild(label);
+      item.addEventListener('click', function() { addLayoutToCanvas(layout); });
+      layoutGrid.appendChild(item);
+    });
+  }
+
+  // Ajouter un layout au canvas
+  function addLayoutToCanvas(layout) {
+    var canvas = document.getElementById('bbCanvas');
+    // Retirer l'empty state
+    var empty = canvas.querySelector('.bb-empty-state');
+    if (empty) empty.remove();
+
+    var row = document.createElement('div');
+    row.className = 'bb-row bb-el';
+
+    var labelSpan = document.createElement('span');
+    labelSpan.className = 'bb-el-label';
+    labelSpan.textContent = layout.label;
+    row.appendChild(labelSpan);
+
+    var removeBtn = document.createElement('button');
+    removeBtn.className = 'bb-el-remove';
+    removeBtn.textContent = '\u00d7';
+    removeBtn.onclick = function(e) { e.stopPropagation(); row.remove(); };
+    row.appendChild(removeBtn);
+
+    if (layout.cols.length === 0) {
+      // Flex
+      row.style.flexWrap = 'wrap';
+      row.style.gap = '12px';
+      row.style.alignItems = 'center';
+      setupDropZone(row);
+    } else {
+      layout.cols.forEach(function(c) {
+        var col = document.createElement('div');
+        col.className = 'bb-col';
+        col.style.flex = c;
+        setupDropZone(col);
+        row.appendChild(col);
+      });
+    }
+
+    row.addEventListener('click', function(e) {
+      if (e.target === row) selectElement(row);
+    });
+
+    canvas.appendChild(row);
+  }
+
+  // Ajouter un élément au canvas (dans la première zone dispo)
+  function addElementToCanvas(elId) {
+    var canvas = document.getElementById('bbCanvas');
+    var empty = canvas.querySelector('.bb-empty-state');
+    if (empty) empty.remove();
+
+    var target = canvas.querySelector('.bb-col') || canvas;
+    insertElement(elId, target);
+  }
+
+  // Insérer un élément dans une zone
+  function insertElement(elId, container) {
+    var elDef = ELEMENTS.find(function(e) { return e.id === elId; });
+    if (!elDef) return;
+
+    var wrapper = document.createElement('div');
+    wrapper.className = 'bb-el';
+    wrapper.dataset.type = elId;
+
+    var labelSpan = document.createElement('span');
+    labelSpan.className = 'bb-el-label';
+    labelSpan.textContent = elDef.label;
+    wrapper.appendChild(labelSpan);
+
+    var removeBtn = document.createElement('button');
+    removeBtn.className = 'bb-el-remove';
+    removeBtn.textContent = '\u00d7';
+    removeBtn.onclick = function(e) { e.stopPropagation(); wrapper.remove(); };
+    wrapper.appendChild(removeBtn);
+
+    var content = document.createElement('div');
+    content.innerHTML = elDef.html;
+    // Rendre le texte éditable directement
+    content.querySelectorAll('h2, h3, p, span, a, div.ws-bloc-title').forEach(function(el) {
+      if (!el.querySelector('svg')) el.contentEditable = 'true';
+    });
+    wrapper.appendChild(content);
+
+    wrapper.addEventListener('click', function(e) {
+      e.stopPropagation();
+      selectElement(wrapper);
+    });
+
+    // Setup image drop si c'est une image
+    var img = content.querySelector('img');
+    if (img) setupImageDrop(wrapper, img);
+
+    container.appendChild(wrapper);
+  }
+
+  // Drop zone sur les colonnes et le canvas
+  function setupDropZone(zone) {
+    zone.addEventListener('dragover', function(e) {
+      e.preventDefault();
+      zone.classList.add('dragover');
+    });
+    zone.addEventListener('dragleave', function() { zone.classList.remove('dragover'); });
+    zone.addEventListener('drop', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      zone.classList.remove('dragover');
+      var elId = e.dataTransfer.getData('text/plain');
+      if (elId && ELEMENTS.find(function(el) { return el.id === elId; })) {
+        insertElement(elId, zone);
+      }
+    });
+  }
+
+  // Image drop dans le builder
+  function setupImageDrop(wrapper, img) {
+    wrapper.style.cursor = 'pointer';
+    wrapper.style.minHeight = '80px';
+    wrapper.style.border = '2px dashed var(--border)';
+    wrapper.style.borderRadius = '8px';
+    wrapper.style.display = 'flex';
+    wrapper.style.alignItems = 'center';
+    wrapper.style.justifyContent = 'center';
+    if (!img.src || img.src === window.location.href) {
+      var ph = document.createElement('span');
+      ph.textContent = '\ud83d\udcf7 Drop ou clic';
+      ph.style.cssText = 'font-size:11px;color:var(--gray)';
+      ph.className = 'bb-img-placeholder';
+      wrapper.appendChild(ph);
+    }
+    wrapper.addEventListener('dragover', function(e) { e.preventDefault(); wrapper.style.borderColor = 'var(--pr)'; });
+    wrapper.addEventListener('dragleave', function() { wrapper.style.borderColor = 'var(--border)'; });
+    wrapper.addEventListener('drop', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      wrapper.style.borderColor = 'var(--border)';
+      var url = e.dataTransfer.getData('application/x-media-url') || e.dataTransfer.getData('text/plain');
+      if (url && url.startsWith('http')) {
+        img.src = url;
+        img.alt = url.split('/').pop().replace(/\.[^.]+$/, '').replace(/-/g, ' ');
+        var ph = wrapper.querySelector('.bb-img-placeholder');
+        if (ph) ph.remove();
+        wrapper.style.border = '1px dashed transparent';
+      }
+    });
+    wrapper.addEventListener('click', function(e) {
+      if (e.target === img || e.target.classList.contains('bb-img-placeholder')) {
+        var input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'image/*';
+        input.onchange = function() {
+          if (!input.files[0]) return;
+          var token = getToken();
+          if (!token) { toast('Token requis'); return; }
+          var formData = new FormData();
+          formData.append('image', input.files[0]);
+          fetch(getMediaApiUrl(), { method: 'POST', headers: { 'Authorization': 'Bearer ' + token }, body: formData })
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+              img.src = data.url;
+              img.alt = data.filename.replace(/\.[^.]+$/, '').replace(/-/g, ' ');
+              var ph = wrapper.querySelector('.bb-img-placeholder');
+              if (ph) ph.remove();
+              wrapper.style.border = '1px dashed transparent';
+            });
+        };
+        input.click();
+      }
+    });
+  }
+
+  // Sélectionner un élément pour la config
+  function selectElement(el) {
+    document.querySelectorAll('.bb-el.selected').forEach(function(s) { s.classList.remove('selected'); });
+    el.classList.add('selected');
+    selectedEl = el;
+    renderConfig(el);
+  }
+
+  // Rendre la config pour un élément sélectionné
+  function renderConfig(el) {
+    var body = document.getElementById('bbConfigBody');
+    body.textContent = '';
+    var type = el.dataset.type || 'container';
+    var inner = el.querySelector('div:not(.bb-el-label)') || el;
+
+    // Padding
+    addConfigSection(body, 'Padding', makePaddingPresets(el));
+    // Fond
+    addConfigSection(body, 'Fond', makeBgPresets(el));
+    // Couleur Wynstor
+    addConfigSection(body, 'Couleur WS', makeWsPresets(el));
+    // Radius
+    addConfigSection(body, 'Radius', makeRadiusPresets(el));
+    // Gap (pour les rows)
+    if (el.classList.contains('bb-row')) {
+      addConfigSection(body, 'Gap', makeGapPresets(el));
+    }
+
+    // Contrôles spécifiques selon le type
+    var h = inner.querySelector('h2, h3');
+    if (h) addConfigSection(body, 'Texte titre', makeInputControl(h, 'textContent'));
+    var p = inner.querySelector('p');
+    if (p) addConfigSection(body, 'Texte', makeInputControl(p, 'textContent'));
+    var a = inner.querySelector('a.btn');
+    if (a) {
+      addConfigSection(body, 'Bouton', [
+        makeInputRow('Texte', a.textContent.trim(), function(v) { a.textContent = v; }),
+        makeInputRow('Lien', a.getAttribute('href') || '#', function(v) { a.setAttribute('href', v); }),
+        makeBtnStylePresets(a)
+      ]);
+    }
+    var img = inner.querySelector('img');
+    if (img) {
+      addConfigSection(body, 'Image', [
+        makeInputRow('Alt', img.alt, function(v) { img.alt = v; }),
+        makeInputRow('Src', img.src, function(v) { img.src = v; })
+      ]);
+    }
+    var widget = inner.querySelector('.widget-link');
+    if (widget) {
+      addConfigSection(body, 'Lien interne', [
+        makeInputRow('Texte', widget.textContent.trim(), function(v) { widget.textContent = v; }),
+        makeInputRow('ID path', widget.getAttribute('title') || '', function(v) { widget.setAttribute('title', v); })
+      ]);
+    }
+    var svg = inner.querySelector('svg use');
+    if (svg) {
+      addConfigSection(body, 'Ic\u00f4ne', makeIconPicker(svg));
+    }
+  }
+
+  function addConfigSection(body, title, controls) {
+    var section = document.createElement('div');
+    section.style.cssText = 'margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border)';
+    var lbl = document.createElement('div');
+    lbl.style.cssText = 'font-size:9px;text-transform:uppercase;letter-spacing:1px;color:var(--gray);margin-bottom:6px';
+    lbl.textContent = title;
+    section.appendChild(lbl);
+    if (Array.isArray(controls)) {
+      controls.forEach(function(c) { if (c) section.appendChild(c); });
+    } else if (controls) {
+      section.appendChild(controls);
+    }
+    body.appendChild(section);
+  }
+
+  function makeInputRow(label, value, onChange) {
+    var row = document.createElement('div');
+    row.style.cssText = 'display:flex;align-items:center;gap:6px;margin-bottom:4px';
+    var lbl = document.createElement('label');
+    lbl.style.cssText = 'min-width:40px;font-size:10px;color:var(--gray)';
+    lbl.textContent = label;
+    var input = document.createElement('input');
+    input.type = 'text';
+    input.value = value;
+    input.style.cssText = 'flex:1;padding:3px 6px;border:1px solid var(--border);border-radius:4px;font-size:11px';
+    input.addEventListener('input', function() { onChange(input.value); });
+    row.appendChild(lbl);
+    row.appendChild(input);
+    return row;
+  }
+
+  function makeInputControl(el, prop) {
+    return makeInputRow('', el[prop] || '', function(v) { el[prop] = v; });
+  }
+
+  function makePresetButtons(presets, onClick) {
+    var wrap = document.createElement('div');
+    wrap.style.cssText = 'display:flex;gap:4px;flex-wrap:wrap';
+    presets.forEach(function(p) {
+      var btn = document.createElement('button');
+      btn.style.cssText = 'padding:3px 8px;border-radius:4px;font-size:10px;cursor:pointer;border:1px solid var(--border);background:var(--card);color:var(--gray);transition:all .15s';
+      btn.textContent = p.label;
+      btn.onmouseenter = function() { btn.style.borderColor = 'var(--pr)'; };
+      btn.onmouseleave = function() { btn.style.borderColor = 'var(--border)'; };
+      btn.onclick = function() { onClick(p.value); };
+      wrap.appendChild(btn);
+    });
+    return wrap;
+  }
+
+  function makePaddingPresets(el) {
+    return makePresetButtons([
+      { label: 'S', value: '8px 12px' }, { label: 'M', value: '16px 20px' },
+      { label: 'L', value: '24px 32px' }, { label: 'XL', value: '40px 48px' }
+    ], function(v) { el.style.padding = v; });
+  }
+
+  function makeBgPresets(el) {
+    return makePresetButtons([
+      { label: 'Aucun', value: 'transparent' }, { label: 'Clair', value: 'var(--bs-light)' },
+      { label: 'Sombre', value: 'var(--bs-dark)' }, { label: 'Gradient', value: 'linear-gradient(90deg,var(--ws-purple-800),var(--ws-blue-550))' }
+    ], function(v) {
+      el.style.background = v;
+      el.style.color = (v.indexOf('dark') !== -1 || v.indexOf('gradient') !== -1) ? '#fff' : '';
+    });
+  }
+
+  function makeWsPresets(el) {
+    var wrap = document.createElement('div');
+    wrap.style.cssText = 'display:flex;gap:3px;flex-wrap:wrap';
+    var colors = ['#0061E2','#084298','#052c65','#5a32a3','#198754','#e65100','#E7B25C','#f8f9fa','#dee2e6','#212529','#F8F9FC','#e7effb'];
+    colors.forEach(function(c) {
+      var dot = document.createElement('div');
+      dot.style.cssText = 'width:18px;height:18px;border-radius:3px;cursor:pointer;border:2px solid transparent;background:' + c;
+      dot.title = c;
+      dot.onmouseenter = function() { dot.style.borderColor = '#666'; };
+      dot.onmouseleave = function() { dot.style.borderColor = 'transparent'; };
+      dot.onclick = function() {
+        el.style.background = c;
+        var dark = ['#0061E2','#084298','#052c65','#5a32a3','#212529'];
+        el.style.color = dark.indexOf(c) !== -1 ? '#fff' : '';
+      };
+      wrap.appendChild(dot);
+    });
+    return wrap;
+  }
+
+  function makeRadiusPresets(el) {
+    return makePresetButtons([
+      { label: '0', value: '0' }, { label: 'S', value: '6px' },
+      { label: 'M', value: '12px' }, { label: 'L', value: '16px' }
+    ], function(v) { el.style.borderRadius = v; });
+  }
+
+  function makeGapPresets(el) {
+    return makePresetButtons([
+      { label: '0', value: '0' }, { label: 'S', value: '8px' },
+      { label: 'M', value: '16px' }, { label: 'L', value: '24px' }
+    ], function(v) { el.style.gap = v; });
+  }
+
+  function makeBtnStylePresets(btn) {
+    return makePresetButtons([
+      { label: 'Primary', value: 'btn-primary' }, { label: 'Light', value: 'btn-light' },
+      { label: 'Dark', value: 'btn-dark' }, { label: 'Outline', value: 'btn-outline-primary' }
+    ], function(v) { btn.className = btn.className.replace(/btn-\S+/g, '').trim() + ' btn ' + v; });
+  }
+
+  function makeIconPicker(useEl) {
+    var icons = ['package','shield-check','truck','handshake','headset','lightning','check','mail','clipboard-list','search','tools','gift','timer','rss','arrow-up-right'];
+    var wrap = document.createElement('div');
+    wrap.style.cssText = 'display:flex;gap:4px;flex-wrap:wrap';
+    icons.forEach(function(name) {
+      var btn = document.createElement('button');
+      btn.style.cssText = 'padding:4px 6px;border-radius:4px;font-size:9px;cursor:pointer;border:1px solid var(--border);background:var(--card)';
+      btn.textContent = name;
+      btn.onclick = function() { useEl.setAttribute('href', '/svg/_sprite-wynstor.svg#' + name); };
+      wrap.appendChild(btn);
+    });
+    return wrap;
+  }
+
+  // Tab switch
+  window.switchBuilderTab = function(tab) {
+    document.getElementById('bpLibrary').style.display = tab === 'library' ? 'flex' : 'none';
+    document.getElementById('bpBuild').style.display = tab === 'build' ? 'flex' : 'none';
+    document.getElementById('bpTabLibrary').style.borderBottomColor = tab === 'library' ? 'var(--pr)' : 'transparent';
+    document.getElementById('bpTabLibrary').style.color = tab === 'library' ? 'var(--pr)' : 'var(--gray)';
+    document.getElementById('bpTabBuild').style.borderBottomColor = tab === 'build' ? 'var(--pr)' : 'transparent';
+    document.getElementById('bpTabBuild').style.color = tab === 'build' ? 'var(--pr)' : 'var(--gray)';
+    if (tab === 'build') renderPalette();
+  };
+
+  // Insérer le bloc construit dans l'éditeur
+  window.insertBuiltBlock = function() {
+    var canvas = document.getElementById('bbCanvas');
+    if (canvas.querySelector('.bb-empty-state')) { toast('Canvas vide'); return; }
+
+    // Extraire le HTML propre (retirer les labels, remove btns, selected, etc.)
+    var clone = canvas.cloneNode(true);
+    clone.querySelectorAll('.bb-el-label, .bb-el-remove, .bb-img-placeholder').forEach(function(el) { el.remove(); });
+    clone.querySelectorAll('.bb-el').forEach(function(el) {
+      el.classList.remove('bb-el', 'selected');
+      el.style.border = ''; el.style.cursor = '';
+    });
+    clone.querySelectorAll('.bb-col').forEach(function(el) { el.classList.remove('dragover'); el.style.border = ''; });
+    clone.querySelectorAll('.bb-row').forEach(function(el) {
+      el.className = 'row g-4';
+    });
+    clone.querySelectorAll('.bb-col').forEach(function(el) {
+      var flex = parseInt(el.style.flex) || 12;
+      var colClass = 'col-md-' + flex;
+      el.className = colClass;
+      el.style.flex = ''; el.style.border = ''; el.style.minHeight = ''; el.style.padding = ''; el.style.background = '';
+    });
+    clone.querySelectorAll('[contenteditable]').forEach(function(el) { el.removeAttribute('contenteditable'); });
+
+    var html = clone.innerHTML;
+    closeBlockPicker();
+
+    // Insérer comme nouveau bloc dans l'éditeur
+    var editor = document.getElementById('editor');
+    var div = document.createElement('div');
+    div.className = 'bloc';
+    div.innerHTML = '<div class="bloc-toolbar"><button onclick="moveBloc(this,-1)">&#8593;</button><button onclick="moveBloc(this,1)">&#8595;</button><button onclick="regenBloc(this)">&#128260;</button><button onclick="regenBlocGuided(this)">&#128161;</button><button onclick="dupeBloc(this)">&#128203;</button><button onclick="saveBlocAsPreset(this)">&#128190;</button><button onclick="deleteBloc(this)">&#10005;</button></div><div class="bloc-content" contenteditable="true" oninput="markDirty()">' + html + '</div>';
+    editor.appendChild(div);
+    setupImageDropTargets();
+    markDirty();
+    toast('Bloc inséré');
+  };
+
+  // Sauvegarder comme preset
+  window.saveAsPreset = function() {
+    var canvas = document.getElementById('bbCanvas');
+    if (canvas.querySelector('.bb-empty-state')) { toast('Canvas vide'); return; }
+
+    var name = prompt('Nom du preset :');
+    if (!name) return;
+
+    var clone = canvas.cloneNode(true);
+    clone.querySelectorAll('.bb-el-label, .bb-el-remove, .bb-img-placeholder').forEach(function(el) { el.remove(); });
+    clone.querySelectorAll('.bb-el').forEach(function(el) { el.classList.remove('bb-el', 'selected'); el.style.border = ''; el.style.cursor = ''; });
+    clone.querySelectorAll('[contenteditable]').forEach(function(el) { el.removeAttribute('contenteditable'); });
+    clone.querySelectorAll('.bb-row').forEach(function(el) { el.className = 'row g-4'; });
+    clone.querySelectorAll('.bb-col').forEach(function(el) {
+      var flex = parseInt(el.style.flex) || 12;
+      el.className = 'col-md-' + flex;
+      el.style.flex = ''; el.style.border = ''; el.style.minHeight = ''; el.style.padding = ''; el.style.background = '';
+    });
+
+    var html = clone.innerHTML;
+
+    // Charger les custom blocks
+    var customs = JSON.parse(localStorage.getItem('ws_custom_blocks') || '[]');
+    customs.push({ id: 'custom-' + Date.now(), name: name, desc: 'Preset perso', html: html });
+    localStorage.setItem('ws_custom_blocks', JSON.stringify(customs));
+    toast('Preset "' + name + '" sauvegardé');
+  };
+
+  // Vider le canvas
+  window.clearCanvas = function() {
+    var canvas = document.getElementById('bbCanvas');
+    canvas.textContent = '';
+    var empty = document.createElement('div');
+    empty.className = 'bb-empty-state';
+    empty.textContent = 'Choisissez un layout ou glissez des éléments ici';
+    canvas.appendChild(empty);
+    document.getElementById('bbConfigBody').innerHTML = '<div style="font-size:11px;color:var(--gray);padding:8px">Cliquez sur un élément pour le configurer</div>';
+  };
+
+  // Setup canvas drop zone
+  var canvas = document.getElementById('bbCanvas');
+  if (canvas) setupDropZone(canvas);
 })();
 
 // Warn before leaving with unsaved changes
