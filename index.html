@@ -385,7 +385,7 @@
 
   /* Image drop targets dans les blocs */
   .img-drop-target {
-    position: relative; display: inline-block; cursor: pointer;
+    position: relative; display: inline-block; cursor: pointer; min-width: 100%;
   }
   .img-drop-target::after {
     content: 'Drop image ici'; position: absolute; inset: 0;
@@ -395,6 +395,32 @@
   }
   .img-drop-target.dragover::after { display: flex; }
   .img-drop-target img { display: block; max-width: 100%; }
+  /* Placeholder pour images vides (src="" ou broken) */
+  .img-drop-target.empty {
+    min-height: 140px;
+    border: 2px dashed var(--border);
+    border-radius: 8px;
+    background: var(--bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+  }
+  .img-drop-target.empty::before {
+    content: '\1f4f7  Glissez ou cliquez';
+    font-size: 12px;
+    color: var(--gray);
+    text-align: center;
+    line-height: 1.6;
+  }
+  .img-drop-target.empty::after { display: none; }
+  .img-drop-target.empty.dragover {
+    border-color: var(--pr);
+    background: rgba(111,66,193,0.05);
+  }
+  .img-drop-target.empty.dragover::before { content: 'Déposer ici'; color: var(--pr); font-weight: 600; }
+  .img-drop-target.empty.dragover::after { display: none; }
+  .img-drop-target.empty img { display: none; }
 
   /* === BLOCK PICKER MODAL === */
   .block-picker-overlay {
@@ -1152,6 +1178,18 @@ function setupImageDropTargets() {
     img.parentNode.insertBefore(wrapper, img);
     wrapper.appendChild(img);
 
+    // Détecter image vide ou broken
+    function checkEmpty() {
+      if (!img.src || img.src === window.location.href || img.src.endsWith('/')) {
+        wrapper.classList.add('empty');
+      } else {
+        wrapper.classList.remove('empty');
+      }
+    }
+    checkEmpty();
+    img.addEventListener('load', checkEmpty);
+    img.addEventListener('error', function() { wrapper.classList.add('empty'); });
+
     wrapper.addEventListener('dragover', (e) => {
       e.preventDefault();
       e.stopPropagation();
@@ -1162,9 +1200,16 @@ function setupImageDropTargets() {
       e.preventDefault();
       e.stopPropagation();
       wrapper.classList.remove('dragover');
+      // Drop depuis galerie média
       const mediaUrl = e.dataTransfer.getData('application/x-media-url') || e.dataTransfer.getData('text/plain');
       if (mediaUrl && mediaUrl.startsWith('http')) {
         img.src = mediaUrl;
+        wrapper.classList.remove('empty');
+        // Alt auto depuis le nom de fichier
+        if (!img.alt || img.alt === 'Description' || img.alt === 'Description du visuel') {
+          var fname = mediaUrl.split('/').pop().replace(/\.[^.]+$/, '').replace(/-/g, ' ');
+          img.alt = fname;
+        }
         markDirty();
       }
     });
@@ -1192,6 +1237,10 @@ function setupImageDropTargets() {
             if (res.ok) {
               const data = await res.json();
               img.src = data.url;
+              wrapper.classList.remove('empty');
+              if (!img.alt || img.alt === 'Description' || img.alt === 'Description du visuel') {
+                img.alt = data.filename.replace(/\.[^.]+$/, '').replace(/-/g, ' ');
+              }
               addMediaThumb(data);
               markDirty();
             }
