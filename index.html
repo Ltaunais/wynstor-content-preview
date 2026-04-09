@@ -509,32 +509,7 @@
   .toast.visible { display: block; animation: fadeIn 0.2s; }
   @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-  /* === CONFIGURATEUR BLOC === */
-  .bloc-config {
-    display: none;
-    position: fixed;
-    top: 80px;
-    right: 16px;
-    width: 280px;
-    max-height: calc(100vh - 100px);
-    overflow-y: auto;
-    background: #1a1a2e;
-    color: #ccc;
-    border-radius: 12px;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
-    z-index: 100;
-    font-size: 11px;
-    scrollbar-width: thin;
-  }
-  .bloc-config.visible { display: block; }
-  .bloc-config-header {
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 10px 14px; border-bottom: 1px solid #333;
-    font-weight: 600; font-size: 12px; color: #fff;
-  }
-  .bloc-config-header button { background: none; border: none; color: #888; cursor: pointer; font-size: 16px; }
-  .bloc-config-header button:hover { color: #fff; }
-  .bloc-config-body { padding: 10px 14px; }
+  /* === CONFIGURATEUR BLOC (dans panneau droit) === */
   .bloc-config-section { margin-bottom: 12px; border-bottom: 1px solid #2a2a3e; padding-bottom: 10px; }
   .bloc-config-section:last-child { border-bottom: none; }
   .bloc-config-label { font-size: 9px; text-transform: uppercase; letter-spacing: 1px; color: #888; margin-bottom: 6px; }
@@ -704,6 +679,7 @@
     <div style="display:flex;gap:0;margin-bottom:12px;border-bottom:1px solid var(--border)">
       <button class="right-tab active" onclick="switchRightTab('media')" id="rtMedia" style="flex:1;padding:8px;border:none;background:none;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1px;cursor:pointer;border-bottom:2px solid var(--pr);color:var(--pr)">Média</button>
       <button class="right-tab" onclick="switchRightTab('history')" id="rtHistory" style="flex:1;padding:8px;border:none;background:none;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1px;cursor:pointer;border-bottom:2px solid transparent;color:var(--gray)">Historique</button>
+      <button class="right-tab" onclick="switchRightTab('config')" id="rtConfig" style="flex:1;padding:8px;border:none;background:none;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1px;cursor:pointer;border-bottom:2px solid transparent;color:var(--gray)">Config</button>
     </div>
     <div id="rightPanelMedia">
     <!-- Drop zone -->
@@ -722,6 +698,11 @@
     <div id="rightPanelHistory" style="display:none">
       <div style="font-size:11px;color:var(--gray);margin-bottom:8px">Versions précédentes des blocs régénérés</div>
       <div id="historyList" style="max-height:calc(100vh - 200px);overflow-y:auto"></div>
+    </div>
+    <!-- Panel Config Bloc -->
+    <div id="rightPanelConfig" style="display:none">
+      <div style="font-size:11px;color:var(--gray);margin-bottom:8px">Cliquez sur un bloc pour le configurer</div>
+      <div id="blocConfigBody" style="max-height:calc(100vh - 200px);overflow-y:auto"></div>
     </div>
   </div>
 </div>
@@ -2500,6 +2481,21 @@ stToolbar.querySelectorAll('[data-cmd]').forEach(btn => {
     e.preventDefault(); // Empêcher la perte de focus/sélection
     if (!stActiveEl) return;
     document.execCommand(btn.dataset.cmd);
+    // Force <b> → <strong> et <i> → <em> (sémantique HTML5 SEO)
+    if (btn.dataset.cmd === 'bold') {
+      stActiveEl.querySelectorAll('b').forEach(function(b) {
+        var s = document.createElement('strong');
+        s.innerHTML = b.innerHTML;
+        b.replaceWith(s);
+      });
+    }
+    if (btn.dataset.cmd === 'italic') {
+      stActiveEl.querySelectorAll('i:not([class])').forEach(function(i) {
+        var em = document.createElement('em');
+        em.innerHTML = i.innerHTML;
+        i.replaceWith(em);
+      });
+    }
     markDirty();
   });
 });
@@ -3066,12 +3062,15 @@ function pollJobStatus(jobId) {
 
 // === TABS DROITE (Média / Historique) ===
 function switchRightTab(tab) {
-  document.getElementById('rightPanelMedia').style.display = tab === 'media' ? '' : 'none';
-  document.getElementById('rightPanelHistory').style.display = tab === 'history' ? '' : 'none';
-  document.getElementById('rtMedia').style.borderBottomColor = tab === 'media' ? 'var(--pr)' : 'transparent';
-  document.getElementById('rtMedia').style.color = tab === 'media' ? 'var(--pr)' : 'var(--gray)';
-  document.getElementById('rtHistory').style.borderBottomColor = tab === 'history' ? 'var(--pr)' : 'transparent';
-  document.getElementById('rtHistory').style.color = tab === 'history' ? 'var(--pr)' : 'var(--gray)';
+  ['media', 'history', 'config'].forEach(function(t) {
+    var panel = document.getElementById('rightPanel' + t.charAt(0).toUpperCase() + t.slice(1));
+    var btn = document.getElementById('rt' + t.charAt(0).toUpperCase() + t.slice(1));
+    if (panel) panel.style.display = t === tab ? '' : 'none';
+    if (btn) {
+      btn.style.borderBottomColor = t === tab ? 'var(--pr)' : 'transparent';
+      btn.style.color = t === tab ? 'var(--pr)' : 'var(--gray)';
+    }
+  });
 }
 
 // === HISTORIQUE DES BLOCS ===
@@ -3998,35 +3997,12 @@ async function savePagesJson() {
 
 // === CONFIGURATEUR BLOC ===
 (function() {
-  // Créer le panneau
-  var panel = document.createElement('div');
-  panel.className = 'bloc-config';
-  panel.id = 'blocConfig';
-
-  var header = document.createElement('div');
-  header.className = 'bloc-config-header';
-  var headerTitle = document.createElement('span');
-  headerTitle.textContent = 'Configurer le bloc';
-  var closeBtn = document.createElement('button');
-  closeBtn.textContent = '\u00d7';
-  closeBtn.onclick = function() { panel.classList.remove('visible'); currentConfigBloc = null; };
-  header.appendChild(headerTitle);
-  header.appendChild(closeBtn);
-  panel.appendChild(header);
-
-  var body = document.createElement('div');
-  body.className = 'bloc-config-body';
-  body.id = 'blocConfigBody';
-  panel.appendChild(body);
-  document.body.appendChild(panel);
-
   var currentConfigBloc = null;
 
   // Ouvrir le config au clic sur un bloc
   document.addEventListener('click', function(e) {
     var bloc = e.target.closest('.bloc');
-    if (!bloc) { return; }
-    // Ignore si clic sur la toolbar du bloc
+    if (!bloc) return;
     if (e.target.closest('.bloc-toolbar')) return;
     openBlocConfig(bloc);
   });
@@ -4036,7 +4012,11 @@ async function savePagesJson() {
     var content = bloc.querySelector('.bloc-content');
     if (!content) return;
 
+    var body = document.getElementById('blocConfigBody');
     body.textContent = '';
+
+    // Switch auto sur l'onglet Config
+    switchRightTab('config');
 
     // === CONTENEUR (padding, gap, background, border-radius) ===
     var wrappers = content.querySelectorAll('[class*="row"], [class*="ws-bg"], [class*="rounded"], aside, blockquote, [class*="ws-my"]');
@@ -4087,7 +4067,6 @@ async function savePagesJson() {
       ]);
     });
 
-    panel.classList.add('visible');
   }
 
   function addSection(title, controls) {
