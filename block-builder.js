@@ -388,6 +388,10 @@
     });
 
     applyContainerStyles(wrapper, node.props);
+
+    // Min-height sur tous les blocs pour qu'ils soient toujours cliquables
+    if (!wrapper.style.minHeight) wrapper.style.minHeight = '32px';
+
     return wrapper;
   }
 
@@ -407,6 +411,9 @@
     if (props.background) el.style.background = props.background;
     if (props.color) el.style.color = props.color;
     if (props.borderRadius) el.style.borderRadius = props.borderRadius;
+    if (props.width) el.style.width = props.width;
+    if (props.maxWidth) el.style.maxWidth = props.maxWidth;
+    if (props.minHeight) el.style.minHeight = props.minHeight;
     if (props.justifyContent) { el.style.display = 'flex'; el.style.justifyContent = props.justifyContent; }
     if (props.alignItems) { el.style.display = 'flex'; el.style.alignItems = props.alignItems; }
   }
@@ -425,7 +432,7 @@
     var col = document.createElement('div');
     col.className = 'bb-col';
     col.style.flex = node.props.size || 6;
-    col.style.minHeight = '60px';
+    col.style.minHeight = node.children.length === 0 ? '80px' : '40px';
     node.children.forEach(function(child, idx) {
       col.appendChild(makeDropIndicator(node.id, idx));
       col.appendChild(renderNode(child));
@@ -440,7 +447,7 @@
     g.className = 'd-inline-flex align-items-' + (node.props.align || 'center');
     g.style.gap = node.props.gap || '8px';
     if (node.props.wrap) g.style.flexWrap = 'wrap';
-    g.style.minHeight = '40px';
+    g.style.minHeight = node.children.length === 0 ? '60px' : '32px';
     g.style.minWidth = '80px';
     g.style.border = '1px dashed var(--border)';
     g.style.borderRadius = '6px';
@@ -508,7 +515,8 @@
       }
     });
     wrap.addEventListener('click', function(e) {
-      if (e.target === img || e.target === ph || e.target === wrap) {
+      // Seulement si l'image est vide (pas de src) ou si clic sur le placeholder
+      if (!node.props.src && (e.target === img || e.target === ph || e.target === wrap)) {
         e.stopPropagation();
         var input = document.createElement('input');
         input.type = 'file';
@@ -906,6 +914,14 @@
     }
 
     // Container props for all types
+    addSection(body, 'Largeur', makeControlGroup([
+      makePresetBtns(
+        [{ l: 'Auto', v: '' }, { l: '25%', v: '25%' }, { l: '33%', v: '33.33%' }, { l: '50%', v: '50%' }, { l: '75%', v: '75%' }, { l: '100%', v: '100%' }],
+        function(v) { pushHistory(); node.props.width = v; renderCanvas(); }
+      ),
+      makeInputRow('Max-W', node.props.maxWidth || '', function(v) { pushHistory(); node.props.maxWidth = v; renderCanvas(); }),
+      makeInputRow('Min-H', node.props.minHeight || '', function(v) { pushHistory(); node.props.minHeight = v; renderCanvas(); })
+    ]));
     addSection(body, 'Padding', makePresetBtns(
       [{ l: 'S', v: '8px 12px' }, { l: 'M', v: '16px 20px' }, { l: 'L', v: '24px 32px' }, { l: 'XL', v: '40px 48px' }, { l: '0', v: '0' }],
       function(v) { pushHistory(); node.props.padding = v; renderCanvas(); }
@@ -1275,6 +1291,9 @@
     if (node.props.background) parts.push('background:' + node.props.background);
     if (node.props.color) parts.push('color:' + node.props.color);
     if (node.props.borderRadius) parts.push('border-radius:' + node.props.borderRadius);
+    if (node.props.width) parts.push('width:' + node.props.width);
+    if (node.props.maxWidth) parts.push('max-width:' + node.props.maxWidth);
+    if (node.props.minHeight) parts.push('min-height:' + node.props.minHeight);
     if (node.props.justifyContent) parts.push('display:flex;justify-content:' + node.props.justifyContent);
     if (node.props.alignItems && node.type !== 'group') parts.push('align-items:' + node.props.alignItems);
     if (parts.length === 0) return '';
@@ -1418,7 +1437,7 @@
     var editor = document.getElementById('editor');
     var div = document.createElement('div');
     div.className = 'bloc';
-    div.innerHTML = '<div class="bloc-toolbar"><button onclick="moveBloc(this,-1)">&#8593;</button><button onclick="moveBloc(this,1)">&#8595;</button><button onclick="regenBloc(this)">&#128260;</button><button onclick="regenBlocGuided(this)">&#128161;</button><button onclick="dupeBloc(this)">&#128203;</button><button onclick="saveBlocAsPreset(this)">&#128190;</button><button onclick="deleteBloc(this)">&#10005;</button></div><div class="bloc-content" contenteditable="true" oninput="markDirty()">' + html + '</div>';
+    div.innerHTML = '<div class="bloc-toolbar"><button onclick="moveBloc(this,-1)">&#8593;</button><button onclick="moveBloc(this,1)">&#8595;</button><button onclick="regenBloc(this)">&#128260;</button><button onclick="regenBlocGuided(this)">&#128161;</button><button onclick="dupeBloc(this)">&#128203;</button><button onclick="saveBlocAsPreset(this)">&#128190;</button><button onclick="editInBuilder(this)" title="Editer dans le builder">&#9998;</button><button onclick="deleteBloc(this)">&#10005;</button></div><div class="bloc-content" contenteditable="true" oninput="markDirty()">' + html + '</div>';
     if (typeof insertTarget !== 'undefined' && insertTarget && insertTarget.closest) {
       var nextBloc = insertTarget.closest('.bloc, .insert-bar') ? insertTarget.nextElementSibling : null;
       if (nextBloc) editor.insertBefore(div, nextBloc);
