@@ -618,7 +618,7 @@
     svg.setAttribute('fill', 'currentColor');
     svg.setAttribute('aria-hidden', 'true');
     var use = document.createElementNS('http://www.w3.org/2000/svg', 'use');
-    use.setAttributeNS('http://www.w3.org/1999/xlink', 'href', '/svg/_sprite-wynstor.svg#' + (node.props.name || 'package'));
+    use.setAttributeNS('http://www.w3.org/1999/xlink', 'href', 'svg/_sprite-wynstor.svg#' + (node.props.name || 'package'));
     svg.appendChild(use);
     outer.appendChild(svg);
     return outer;
@@ -1279,7 +1279,7 @@
       case 'badge': return '<div class="' + (node.props.shape === 'round' ? 'ws-badge-round' : 'ws-badge-num') + '" style="background:' + (node.props.bg || 'var(--bs-primary)') + '">' + esc(node.props.value) + '</div>';
       case 'stat': return '<div class="ws-stat-number" style="color:' + (node.props.color || 'var(--bs-primary)') + '">' + esc(node.props.value) + '</div>';
       case 'span': return '<span class="' + (node.props.className || 'ws-bloc-title') + '"' + style + '>' + esc(node.props.text) + '</span>';
-      case 'icon': return '<span class="d-inline-flex ws-ico-bg-lg bg-' + (node.props.bg || 'primary') + ' bg-opacity-10 rounded-4"><svg class="ws-ico" width="' + (node.props.size || '24') + '" height="' + (node.props.size || '24') + '" fill="currentColor" aria-hidden="true"><use href="/svg/_sprite-wynstor.svg#' + (node.props.name || 'package') + '"></use></svg></span>';
+      case 'icon': return '<span class="d-inline-flex ws-ico-bg-lg bg-' + (node.props.bg || 'primary') + ' bg-opacity-10 rounded-4"><svg class="ws-ico" width="' + (node.props.size || '24') + '" height="' + (node.props.size || '24') + '" fill="currentColor" aria-hidden="true"><use href="svg/_sprite-wynstor.svg#' + (node.props.name || 'package') + '"></use></svg></span>';
       case 'aside': return '<aside class="ws-bg-light rounded-3 ws-p" style="border-left:4px solid ' + (node.props.borderColor || 'var(--bs-primary)') + '"><div class="ws-bloc-title">' + esc(node.props.title) + '</div><p class="ws-text-sm mb-0">' + esc(node.props.text) + '</p></aside>';
       default: return '<!-- unknown: ' + node.type + ' -->';
     }
