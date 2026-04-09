@@ -2771,42 +2771,138 @@ document.getElementById('stTooltip').addEventListener('click', function() {
   });
 });
 
-// Double-clic sur un tooltip → modifier le texte
+// Double-clic sur tooltip ou lien → popover edition inline
 document.addEventListener('dblclick', function(e) {
   var target = e.target;
-  if (!target.hasAttribute || !target.hasAttribute('data-tooltip')) return;
   if (!target.closest('.bloc-content')) return;
+
+  var isTooltip = target.hasAttribute && target.hasAttribute('data-tooltip');
+  var isLink = target.classList && target.classList.contains('widget-link');
+  if (!isTooltip && !isLink) return;
+
   e.preventDefault();
   e.stopPropagation();
-  var current = target.getAttribute('data-tooltip');
-  var input = document.createElement('input');
-  input.type = 'text';
-  input.value = current;
-  input.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:100000;padding:8px 16px;border:2px solid var(--pr);border-radius:8px;font-size:14px;width:300px;background:#fff;color:#212529';
-  input.placeholder = 'Texte du tooltip (vide = supprimer)';
+
+  // Fermer un popover existant
+  var old = document.getElementById('inlinePopover');
+  if (old) old.remove();
+  var oldOverlay = document.getElementById('inlinePopoverOverlay');
+  if (oldOverlay) oldOverlay.remove();
+
+  var rect = target.getBoundingClientRect();
+  var popover = document.createElement('div');
+  popover.id = 'inlinePopover';
+  popover.style.cssText = 'position:fixed;z-index:100000;background:#fff;border:1px solid #dee2e6;border-radius:8px;padding:12px;box-shadow:0 8px 24px rgba(0,0,0,.15);display:flex;flex-direction:column;gap:8px;min-width:280px;font-size:12px';
+  popover.style.top = (rect.bottom + 8) + 'px';
+  popover.style.left = Math.max(8, Math.min(rect.left, window.innerWidth - 300)) + 'px';
+
   var overlay = document.createElement('div');
-  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:99999';
-  overlay.onclick = function() { overlay.remove(); input.remove(); };
+  overlay.id = 'inlinePopoverOverlay';
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:99999';
+  overlay.onclick = function() { popover.remove(); overlay.remove(); };
+
+  function makeRow(label, value, placeholder) {
+    var row = document.createElement('div');
+    row.style.cssText = 'display:flex;align-items:center;gap:6px';
+    var lbl = document.createElement('label');
+    lbl.style.cssText = 'min-width:50px;font-size:11px;color:#6c757d;font-weight:500';
+    lbl.textContent = label;
+    var inp = document.createElement('input');
+    inp.type = 'text';
+    inp.value = value;
+    inp.placeholder = placeholder || '';
+    inp.style.cssText = 'flex:1;padding:4px 8px;border:1px solid #dee2e6;border-radius:4px;font-size:12px;background:#fff;color:#212529';
+    row.appendChild(lbl);
+    row.appendChild(inp);
+    return { row: row, input: inp };
+  }
+
+  if (isTooltip) {
+    var titleRow = document.createElement('div');
+    titleRow.style.cssText = 'font-weight:600;font-size:11px;color:#212529;text-transform:uppercase;letter-spacing:.5px';
+    titleRow.textContent = 'Tooltip';
+    popover.appendChild(titleRow);
+
+    var textField = makeRow('Texte', target.textContent.trim(), 'Texte visible');
+    var tooltipField = makeRow('Tooltip', target.getAttribute('data-tooltip'), 'Contenu du tooltip');
+    popover.appendChild(textField.row);
+    popover.appendChild(tooltipField.row);
+
+    var btnRow = document.createElement('div');
+    btnRow.style.cssText = 'display:flex;gap:6px;justify-content:flex-end;margin-top:4px';
+    var btnSave = document.createElement('button');
+    btnSave.textContent = 'OK';
+    btnSave.style.cssText = 'padding:4px 14px;border-radius:4px;font-size:11px;cursor:pointer;background:var(--pr,#0061E2);color:#fff;border:none';
+    btnSave.onclick = function() {
+      var newText = textField.input.value.trim();
+      var newTooltip = tooltipField.input.value.trim();
+      if (newText) target.textContent = newText;
+      if (newTooltip) { target.setAttribute('data-tooltip', newTooltip); }
+      else { target.removeAttribute('data-tooltip'); target.removeAttribute('data-tooltip-pos'); target.style.borderBottom = ''; }
+      popover.remove(); overlay.remove(); markDirty();
+      toast(newTooltip ? 'Tooltip mis a jour' : 'Tooltip supprime');
+    };
+    var btnDel = document.createElement('button');
+    btnDel.textContent = 'Supprimer';
+    btnDel.style.cssText = 'padding:4px 14px;border-radius:4px;font-size:11px;cursor:pointer;background:#fff;color:#dc3545;border:1px solid #dc3545';
+    btnDel.onclick = function() {
+      target.removeAttribute('data-tooltip');
+      target.removeAttribute('data-tooltip-pos');
+      target.style.borderBottom = '';
+      popover.remove(); overlay.remove(); markDirty();
+      toast('Tooltip supprime');
+    };
+    btnRow.appendChild(btnDel);
+    btnRow.appendChild(btnSave);
+    popover.appendChild(btnRow);
+
+    tooltipField.input.addEventListener('keydown', function(ev) { if (ev.key === 'Enter') btnSave.click(); if (ev.key === 'Escape') { popover.remove(); overlay.remove(); } });
+  }
+
+  if (isLink) {
+    var titleRow = document.createElement('div');
+    titleRow.style.cssText = 'font-weight:600;font-size:11px;color:#212529;text-transform:uppercase;letter-spacing:.5px';
+    titleRow.textContent = 'Lien interne';
+    popover.appendChild(titleRow);
+
+    var textField = makeRow('Texte', target.textContent.trim(), 'Texte du lien');
+    var pathField = makeRow('ID path', target.getAttribute('title') || '', 'category/ID');
+    popover.appendChild(textField.row);
+    popover.appendChild(pathField.row);
+
+    var btnRow = document.createElement('div');
+    btnRow.style.cssText = 'display:flex;gap:6px;justify-content:flex-end;margin-top:4px';
+    var btnSave = document.createElement('button');
+    btnSave.textContent = 'OK';
+    btnSave.style.cssText = 'padding:4px 14px;border-radius:4px;font-size:11px;cursor:pointer;background:var(--pr,#0061E2);color:#fff;border:none';
+    btnSave.onclick = function() {
+      var newText = textField.input.value.trim();
+      var newPath = pathField.input.value.trim();
+      if (newText) target.textContent = newText;
+      if (newPath) target.setAttribute('title', newPath);
+      popover.remove(); overlay.remove(); markDirty();
+      toast('Lien mis a jour');
+    };
+    var btnDel = document.createElement('button');
+    btnDel.textContent = 'Supprimer lien';
+    btnDel.style.cssText = 'padding:4px 14px;border-radius:4px;font-size:11px;cursor:pointer;background:#fff;color:#dc3545;border:1px solid #dc3545';
+    btnDel.onclick = function() {
+      var text = document.createTextNode(target.textContent);
+      target.parentNode.replaceChild(text, target);
+      popover.remove(); overlay.remove(); markDirty();
+      toast('Lien supprime, texte conserve');
+    };
+    btnRow.appendChild(btnDel);
+    btnRow.appendChild(btnSave);
+    popover.appendChild(btnRow);
+
+    pathField.input.addEventListener('keydown', function(ev) { if (ev.key === 'Enter') btnSave.click(); if (ev.key === 'Escape') { popover.remove(); overlay.remove(); } });
+  }
+
   document.body.appendChild(overlay);
-  document.body.appendChild(input);
-  input.focus();
-  input.select();
-  input.addEventListener('keydown', function(ev) {
-    if (ev.key === 'Enter') {
-      var val = input.value.trim();
-      if (val) {
-        target.setAttribute('data-tooltip', val);
-      } else {
-        target.removeAttribute('data-tooltip');
-        target.removeAttribute('data-tooltip-pos');
-        target.style.cursor = '';
-        target.style.borderBottom = '';
-      }
-      overlay.remove(); input.remove(); markDirty();
-      toast(val ? 'Tooltip mis a jour' : 'Tooltip supprime');
-    }
-    if (ev.key === 'Escape') { overlay.remove(); input.remove(); }
-  });
+  document.body.appendChild(popover);
+  var firstInput = popover.querySelector('input');
+  if (firstInput) firstInput.focus();
 });
 
 // Clic sur un mot exclu → régénérer la phrase
