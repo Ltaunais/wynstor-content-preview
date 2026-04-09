@@ -514,6 +514,16 @@
       "startedAt": "2026-04-08T17:58:04.702Z",
       "result": "Quand vos documents dépassent la vingtaine de feuilles ... comptes rendus de réunion, rapports mensuels, cahiers de procédures : tournez-vous vers les agrafeuses grande capacité. Vous assemblez des blocs épais en une seule pression, sans forcer et sans corner les pages. C'est le complément logique d'un poste déjà équipé pour l'agrafage courant.H3+IA",
       "finishedAt": "2026-04-08T17:58:19.603Z"
+    },
+    {
+      "id": "reword-1775758083048",
+      "url": "65-couper-et-decouper",
+      "slug": "65-couper-et-decouper",
+      "type": "reword",
+      "status": "pending",
+      "sentence": "Identifiez d'abord la marque et le modèle de votre appareil, qu'il s'agisse d'une cisaille, d'un massicot ou d'une rogneuse. Chaque constructeur conçoit ses lames selon des dimensions et des systèmes de fixation spécifiques. Monter un accessoire adapté, c'est retrouver une coupe franche dès la première utilisation et éviter d'endommager le mécanisme de guidage.H3+IA",
+      "bannedWord": "modèle",
+      "createdAt": "2026-04-09T18:08:03.048Z"
     }
   ]
 }
