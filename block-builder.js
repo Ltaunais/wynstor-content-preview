@@ -1099,7 +1099,7 @@
     var input = document.createElement('input');
     input.type = 'text';
     input.value = value;
-    input.style.cssText = 'width:100%;padding:4px 8px;border:1px solid var(--border);border-radius:4px;font-size:11px';
+    input.style.cssText = 'width:100%;padding:4px 8px;border:1px solid var(--border);border-radius:4px;font-size:11px;background:#fff;color:#212529';
     input.addEventListener('change', function() { onChange(input.value); });
     return input;
   }
@@ -1113,7 +1113,7 @@
     var input = document.createElement('input');
     input.type = 'text';
     input.value = value;
-    input.style.cssText = 'flex:1;padding:3px 6px;border:1px solid var(--border);border-radius:4px;font-size:11px';
+    input.style.cssText = 'flex:1;padding:3px 6px;border:1px solid var(--border);border-radius:4px;font-size:11px;background:#fff;color:#212529';
     input.addEventListener('change', function() { onChange(input.value); });
     row.appendChild(lbl);
     row.appendChild(input);
