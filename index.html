@@ -927,6 +927,9 @@ button:hover { background: revert; border: revert; color: revert; }
     <h3>Token GitHub</h3>
     <p>Token avec permission <code>repo</code> pour sauvegarder les modifications. Stocké en localStorage uniquement.</p>
     <input type="password" id="tokenInput" placeholder="ghp_xxxxxxxxxxxx">
+    <h3 style="margin-top:16px">API Magento</h3>
+    <p>Secret pour les appels Push/Upload vers dev3. Separe du token GitHub.</p>
+    <input type="password" id="apiSecretInput" placeholder="Secret API Magento">
     <div class="modal-actions">
       <button class="btn" onclick="hideTokenModal()">Annuler</button>
       <button class="btn btn-primary" onclick="saveToken()">Enregistrer</button>
@@ -986,9 +989,10 @@ const BL_EXPR = /(découvrez|n'hésitez pas|conçu pour|que vous soyez|grâce à
 
 // === TOKEN ===
 function getToken() { return localStorage.getItem('gh_token') || ''; }
-function showTokenModal() { document.getElementById('tokenModal').classList.add('visible'); document.getElementById('tokenInput').value = getToken(); }
+function getApiSecret() { return localStorage.getItem('ws_api_secret') || ''; }
+function showTokenModal() { document.getElementById('tokenModal').classList.add('visible'); document.getElementById('tokenInput').value = getToken(); document.getElementById('apiSecretInput').value = getApiSecret(); }
 function hideTokenModal() { document.getElementById('tokenModal').classList.remove('visible'); }
-function saveToken() { localStorage.setItem('gh_token', document.getElementById('tokenInput').value.trim()); hideTokenModal(); toast('Token enregistré'); }
+function saveToken() { localStorage.setItem('gh_token', document.getElementById('tokenInput').value.trim()); localStorage.setItem('ws_api_secret', (document.getElementById('apiSecretInput').value || '').trim()); hideTokenModal(); toast('Tokens enregistres'); }
 
 // === TOAST ===
 function toast(msg, duration=2500) {
@@ -1363,14 +1367,14 @@ function setupImageDropTargets() {
         if (!input.files.length) return;
         const file = input.files[0];
         // Upload sur Magento et remplacer l'URL
-        const token = getToken();
-        if (token) {
+        const apiSecret = getApiSecret();
+        if (apiSecret) {
           const formData = new FormData();
           formData.append('image', file);
           try {
             const res = await fetch(getMediaApiUrl(), {
               method: 'POST',
-              headers: { 'Authorization': 'Bearer ' + token },
+              headers: { 'Authorization': 'Bearer ' + apiSecret },
               body: formData
             });
             if (res.ok) {
@@ -3784,9 +3788,9 @@ function launchGuidedRegen(bloc, instruction) {
 
 // === PANNEAU MÉDIA ===
 function getMediaApiUrl() {
-  if (DEMO_MODE) return ''; // pas d'upload en mode demo
-  var token = getToken();
-  return 'https://dev3.wynstor.com/media/wysiwyg/smartwave/porto/category/upload.php' + (token ? '?token=' + encodeURIComponent(token) : '');
+  if (DEMO_MODE) return '';
+  var secret = getApiSecret();
+  return 'https://dev3.wynstor.com/media/wysiwyg/smartwave/porto/category/upload.php' + (secret ? '?token=' + encodeURIComponent(secret) : '');
 }
 const MEDIA_API = 'https://dev3.wynstor.com/media/wysiwyg/smartwave/porto/category/upload.php';
 let mediaLoaded = false;
@@ -3809,8 +3813,8 @@ fileInput.addEventListener('change', () => {
 });
 
 async function uploadFiles(files) {
-  const token = getToken();
-  if (!token) { showTokenModal(); return; }
+  const token = getApiSecret();
+  if (!token) { toast('API Secret requis'); showTokenModal(); return; }
   const status = document.getElementById('mediaUploadStatus');
   status.style.display = 'block';
 
@@ -3908,7 +3912,7 @@ async function uploadFiles(files) {
 }
 
 async function loadMediaGallery() {
-  const token = getToken();
+  const token = getApiSecret();
   const gallery = document.getElementById('mediaGallery');
   gallery.textContent = '';
 
@@ -4031,7 +4035,9 @@ document.getElementById('editor').addEventListener('drop', (e) => {
 async function pushToMagento() {
   if (DEMO_MODE) { toast('Push Magento desactive (mode demo)'); return; }
   const token = getToken();
+  const apiSecret = getApiSecret();
   if (!token) { toast('Token GitHub requis'); return; }
+  if (!apiSecret) { toast('API Secret Magento requis'); return; }
   if (!currentFile || !pagesData) { toast('Aucune page chargée'); return; }
 
   const currentPage = pagesData.pages.find(p => p.file === currentFile);
@@ -4088,7 +4094,7 @@ async function pushToMagento() {
   try {
     const res = await fetch('https://dev3.wynstor.com/media/wysiwyg/smartwave/porto/category/push-content.php', {
       method: 'POST',
-      headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+      headers: { 'Authorization': 'Bearer ' + apiSecret, 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
     });
     const data = await res.json();
@@ -4144,14 +4150,14 @@ async function onDesignKeyChange(value) {
 
   // Sync Magento
   if (DEMO_MODE) { toast('Design key sauvegarde localement (mode demo)'); markDirty(); return; }
-  const token = getToken();
-  if (!token) { toast('Token requis'); return; }
+  const apiSecret = getApiSecret();
+  if (!apiSecret) { toast('API Secret requis'); return; }
 
   toast('Sync Magento...');
   try {
     const res = await fetch('https://dev3.wynstor.com/media/wysiwyg/smartwave/porto/category/design-key.php', {
       method: 'POST',
-      headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+      headers: { 'Authorization': 'Bearer ' + apiSecret, 'Content-Type': 'application/json' },
       body: JSON.stringify({ category_id: parseInt(page.id), design_key: value })
     });
     const data = await res.json();
@@ -4298,8 +4304,8 @@ function renderSubcatsGrid() {
 }
 
 async function uploadSubcatImage(catId, file) {
-  const token = getToken();
-  if (!token) { toast('Token GitHub requis'); return; }
+  const token = getApiSecret();
+  if (!token) { toast('API Secret requis'); return; }
 
   // Renommer avec slug parent + nom sous-cat
   const childPage = pagesData.pages.find(p => p.id === catId);
@@ -4799,12 +4805,12 @@ async function savePagesJson() {
 
     if (DEMO_MODE) { toast('Suppression desactivee (mode demo)'); draggedUrl = null; return; }
     toast('Suppression: ' + filename + '...');
-    var token = getToken();
-    if (!token) { toast('Token requis'); return; }
+    var apiSecret = getApiSecret();
+    if (!apiSecret) { toast('API Secret requis'); return; }
 
-    fetch(getMediaApiUrl().split('?')[0] + '?action=delete&file=' + encodeURIComponent(filename) + '&token=' + encodeURIComponent(token), {
+    fetch(getMediaApiUrl().split('?')[0] + '?action=delete&file=' + encodeURIComponent(filename) + '&token=' + encodeURIComponent(apiSecret), {
       method: 'DELETE',
-      headers: { 'Authorization': 'Bearer ' + token }
+      headers: { 'Authorization': 'Bearer ' + apiSecret }
     }).then(function(res) {
       if (res.ok) {
         toast('Supprimé: ' + filename);
