@@ -74,6 +74,28 @@
 /* Logos */
 .ws-logos { display: flex; align-items: center; justify-content: center; gap: 40px; flex-wrap: wrap; filter: grayscale(100%); opacity: 0.6; }
 .ws-logos img { height: 35px; width: auto; }
+/* Tooltips CSS-only */
+[data-tooltip] { position: relative; cursor: help; }
+[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%) translateY(4px);
+  background: #212529; color: #fff; font-size: 12px; font-weight: 400; line-height: 1.4;
+  padding: 6px 12px; border-radius: 6px; white-space: nowrap; max-width: 280px;
+  pointer-events: none; opacity: 0; transition: opacity .2s, transform .2s;
+  z-index: 1000; font-family: 'Poppins', sans-serif;
+}
+[data-tooltip]::before {
+  content: ''; position: absolute; bottom: calc(100% + 2px); left: 50%; transform: translateX(-50%);
+  border: 5px solid transparent; border-top-color: #212529;
+  pointer-events: none; opacity: 0; transition: opacity .2s;
+  z-index: 1000;
+}
+[data-tooltip]:hover::after { opacity: 1; transform: translateX(-50%) translateY(0); }
+[data-tooltip]:hover::before { opacity: 1; }
+/* Variante bas */
+[data-tooltip-pos="bottom"]::after { bottom: auto; top: calc(100% + 8px); transform: translateX(-50%) translateY(-4px); }
+[data-tooltip-pos="bottom"]::before { bottom: auto; top: calc(100% + 2px); border-top-color: transparent; border-bottom-color: #212529; }
+[data-tooltip-pos="bottom"]:hover::after { transform: translateX(-50%) translateY(0); }
 /* Widget links (style éditeur) */
 .widget-link { color: var(--bs-primary); text-decoration: underline; text-underline-offset: 2px; cursor: default; }
 /* SVG sprite placeholder (les icônes ne chargent pas depuis GitHub Pages) */
