@@ -758,7 +758,7 @@
       "url": "65-couper-et-decouper",
       "slug": "65-couper-et-decouper",
       "type": "redaction",
-      "status": "pending",
+      "status": "processing",
       "createdAt": "2026-04-18T12:57:52.540Z",
       "structure": {
         "h2s": [
@@ -777,7 +777,8 @@
           "Pour un service reprographie ou un secrétariat, quelle famille de coupe privilégier ?",
           "Quel budget prévoir pour équiper un poste de coupe papier en entreprise ?"
         ]
-      }
+      },
+      "startedAt": "2026-04-18T12:57:58.600937+00:00"
     }
   ]
 }
