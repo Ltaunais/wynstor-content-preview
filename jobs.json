@@ -830,6 +830,32 @@
       "createdAt": "2026-04-18T13:17:39.753Z",
       "startedAt": "2026-04-18T13:17:43.286124+00:00",
       "finishedAt": "2026-04-18T13:18:29.243091+00:00"
+    },
+    {
+      "id": "job-1776518354366",
+      "url": "65-couper-et-decouper",
+      "slug": "65-couper-et-decouper",
+      "type": "redaction",
+      "status": "pending",
+      "createdAt": "2026-04-18T13:19:14.366Z",
+      "structure": {
+        "h2s": [
+          "Vous équipez un bureau, une école ou un service reprographie : quelle approche pour couper ?",
+          "Pour les coupes précises au quotidien (A4 à A2) : les cisailles",
+          "Pour les gros volumes et piles épaisses : les massicots",
+          "Pour les coupes droites en petite série et les formats photo : les rogneuses",
+          "Pour les découpes rapides et les formats atypiques : les coupeuses",
+          "Pour entretenir, remplacer les lames et sécuriser les postes : les accessoires couper et découper",
+          "Cisaille vs massicot vs rogneuse : lequel pour quel besoin ?",
+          "Au-delà de 1000 feuilles par coupe : regardez les solutions industrielles dédiées",
+          "Questions fréquentes"
+        ],
+        "faqs": [
+          "Quelle différence entre une cisaille, un massicot et une rogneuse ?",
+          "Pour un service administratif ou scolaire, quelle famille privilégier ?",
+          "Quel budget prévoir pour équiper un service reprographie complet ?"
+        ]
+      }
     }
   ]
 }
