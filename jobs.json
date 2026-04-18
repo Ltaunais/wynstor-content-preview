@@ -634,7 +634,7 @@
       "url": "65-couper-et-decouper",
       "slug": "65-couper-et-decouper",
       "type": "redaction",
-      "status": "processing",
+      "status": "error",
       "createdAt": "2026-04-18T12:08:14.036Z",
       "structure": {
         "h2s": [
@@ -654,7 +654,9 @@
           "Quel budget prévoir pour équiper un service administratif ou un atelier en outils de coupe professionnels ?"
         ]
       },
-      "startedAt": "2026-04-18T12:08:17.115586+00:00"
+      "startedAt": "2026-04-18T12:08:17.115586+00:00",
+      "finishedAt": "2026-04-18T12:08:20.312776+00:00",
+      "error_message": "OSError: [Errno 7] Argument list too long: 'claude'"
     }
   ]
 }
