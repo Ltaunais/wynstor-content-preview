@@ -864,12 +864,13 @@
       "url": "65-couper-et-decouper",
       "slug": "65-couper-et-decouper",
       "type": "reword",
-      "status": "processing",
+      "status": "done",
       "sentence": "Trois outils, trois mécaniques distinctes. La cisaille coupe au trait avec une double lame (comme des ciseaux géants) une petite pile de 10 à 50 feuilles selon la référence, du A4 au A2. Le massicot descend sa lame verticalement sur une pile entière, de 50 à 1000 feuilles en une passe, exactement comme une guillotine (étymologie : Guillaume Massiquot, brevet 1844). La rogneuse fait glisser une lame rotative carénée sur un rail métallique, pour 5 à 30 feuilles en petite série, principalement A4 à A2. La carénation de lame signe sa sécurité absolue.H3+IA",
       "bannedWord": "outils",
       "createdAt": "2026-04-18T13:24:48.149Z",
       "startedAt": "2026-04-18T13:24:52.954867+00:00",
-      "result": "Trois équipements, trois mécaniques distinctes. La cisaille coupe au trait avec une double lame (comme des ciseaux géants) une petite pile de 10 à 50 feuilles selon la référence, du A4 au A2. Le massicot descend sa lame verticalement sur une pile entière, de 50 à 1000 feuilles en une passe, exactement comme une guillotine (étymologie : Guillaume Massiquot, brevet 1844). La rogneuse fait glisser une lame rotative carénée sur un rail métallique, pour 5 à 30 feuilles en petite série, principalement A4 à A2. La carénation de lame signe sa sécurité absolue.H3+IA"
+      "result": "Trois équipements, trois mécaniques distinctes. La cisaille coupe au trait avec une double lame (comme des ciseaux géants) une petite pile de 10 à 50 feuilles selon la référence, du A4 au A2. Le massicot descend sa lame verticalement sur une pile entière, de 50 à 1000 feuilles en une passe, exactement comme une guillotine (étymologie : Guillaume Massiquot, brevet 1844). La rogneuse fait glisser une lame rotative carénée sur un rail métallique, pour 5 à 30 feuilles en petite série, principalement A4 à A2. La carénation de lame signe sa sécurité absolue.H3+IA",
+      "finishedAt": "2026-04-18T13:25:01.942974+00:00"
     }
   ]
 }
