@@ -903,7 +903,7 @@
       "url": "65-couper-et-decouper",
       "slug": "65-couper-et-decouper",
       "type": "redaction",
-      "status": "pending",
+      "status": "processing",
       "createdAt": "2026-04-18T13:37:12.952Z",
       "structure": {
         "h2s": [
@@ -917,7 +917,8 @@
           "Au-delà de 1000 feuilles par coupe : les équipements industriels dédiés"
         ],
         "faqs": []
-      }
+      },
+      "startedAt": "2026-04-18T13:37:16.057Z"
     }
   ]
 }
