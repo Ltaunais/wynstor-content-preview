@@ -935,7 +935,7 @@
       "url": "65-couper-et-decouper",
       "slug": "65-couper-et-decouper",
       "type": "redaction",
-      "status": "pending",
+      "status": "processing",
       "createdAt": "2026-04-18T15:32:02.858Z",
       "structure": {
         "h2s": [
@@ -950,7 +950,8 @@
           "Quel type d'outil de coupe pour un service courrier qui traite plusieurs centaines de documents par jour ?",
           "Les coupeuses rotatives remplacent-elles les massicots à levier dans un bureau classique ?"
         ]
-      }
+      },
+      "startedAt": "2026-04-18T15:32:05.287Z"
     }
   ]
 }
