@@ -3429,8 +3429,9 @@ function pollJobStatus(jobId) {
           loadFile('pages/' + job.slug + '.html');
         }, 2000);
       } else if (job.status === 'error') {
-        status.textContent = 'Erreur de génération';
+        status.textContent = 'Erreur : ' + (job.error_message || 'inconnue');
         status.style.color = 'var(--bad)';
+        status.title = job.error_message || '';
         clearInterval(jobPollTimer);
         currentJobId = null;
         document.getElementById('seoButtons').style.display = 'flex';
