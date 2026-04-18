@@ -903,7 +903,7 @@
       "url": "65-couper-et-decouper",
       "slug": "65-couper-et-decouper",
       "type": "redaction",
-      "status": "processing",
+      "status": "cancelled",
       "createdAt": "2026-04-18T13:37:12.952Z",
       "structure": {
         "h2s": [
