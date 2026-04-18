@@ -797,7 +797,7 @@
       "url": "65-couper-et-decouper",
       "slug": "65-couper-et-decouper",
       "type": "redaction",
-      "status": "processing",
+      "status": "error",
       "createdAt": "2026-04-18T13:03:21.369Z",
       "structure": {
         "h2s": [
@@ -817,7 +817,9 @@
           "Quel budget prévoir pour équiper 5 postes bureautiques en outils de coupe ?"
         ]
       },
-      "startedAt": "2026-04-18T13:03:28.284144+00:00"
+      "startedAt": "2026-04-18T13:03:28.284144+00:00",
+      "finishedAt": "2026-04-18T13:06:15.942600+00:00",
+      "error_message": "validate fail après 2 retries ciblés: ÉCHEC validation :\n  - blacklist: 'parfait' trouvé dans le contenu\n  - blacklist: 'robuste' trouvé dans le contenu\n  - blacklist: 'haut de gamme' trouvé dans le contenu\n  - blacklist: 'solution' trouvé dans le contenu\n  - blacklist: 'gamme' trouvé dans le contenu\n  - blacklist: 'modèle' trouvé dans le contenu\n  - blacklist: 'achetez' trouvé dans le contenu"
     }
   ]
 }
