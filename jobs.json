@@ -595,7 +595,7 @@
       "url": "65-couper-et-decouper",
       "slug": "65-couper-et-decouper",
       "type": "redaction",
-      "status": "pending",
+      "status": "processing",
       "createdAt": "2026-04-18T11:08:12.391Z",
       "structure": {
         "h2s": [
@@ -614,7 +614,8 @@
           "Pour un service reprographie de 5 à 10 postes, quelle famille privilégier ?",
           "Quel budget prévoir pour équiper un poste de coupe B2B complet ?"
         ]
-      }
+      },
+      "startedAt": "2026-04-18T11:08:15.478498+00:00"
     }
   ]
 }
