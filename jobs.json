@@ -836,7 +836,7 @@
       "url": "65-couper-et-decouper",
       "slug": "65-couper-et-decouper",
       "type": "redaction",
-      "status": "pending",
+      "status": "processing",
       "createdAt": "2026-04-18T13:19:14.366Z",
       "structure": {
         "h2s": [
@@ -855,7 +855,8 @@
           "Pour un service administratif ou scolaire, quelle famille privilégier ?",
           "Quel budget prévoir pour équiper un service reprographie complet ?"
         ]
-      }
+      },
+      "startedAt": "2026-04-18T13:19:19.116305+00:00"
     }
   ]
 }
