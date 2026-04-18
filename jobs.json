@@ -527,6 +527,14 @@
       "startedAt": "2026-04-09T18:08:04.756Z",
       "result": "Identifiez d'abord la marque et la référence de votre appareil, qu'il s'agisse d'une cisaille, d'un massicot ou d'une rogneuse. Chaque constructeur conçoit ses lames selon des dimensions et des systèmes de fixation spécifiques. Monter un accessoire adapté, c'est retrouver une coupe franche dès la première utilisation et éviter d'endommager le mécanisme de guidage.H3+IA",
       "finishedAt": "2026-04-09T18:08:16.395Z"
+    },
+    {
+      "id": "job-1776505165293",
+      "url": "142-cisailles",
+      "slug": "142-cisailles",
+      "type": "analyse",
+      "status": "pending",
+      "createdAt": "2026-04-18T09:39:25.293Z"
     }
   ]
 }
