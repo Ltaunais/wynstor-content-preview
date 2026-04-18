@@ -595,7 +595,7 @@
       "url": "65-couper-et-decouper",
       "slug": "65-couper-et-decouper",
       "type": "redaction",
-      "status": "processing",
+      "status": "error",
       "createdAt": "2026-04-18T11:08:12.391Z",
       "structure": {
         "h2s": [
@@ -615,7 +615,9 @@
           "Quel budget prévoir pour équiper un poste de coupe B2B complet ?"
         ]
       },
-      "startedAt": "2026-04-18T11:08:15.478498+00:00"
+      "startedAt": "2026-04-18T11:08:15.478498+00:00",
+      "error_message": "Job bloqué >45min, marqué stale suite refonte pipeline (savoir métier cisailles/massicots/rogneuses/coupeuses ajouté). Relance un job pour bénéficier du nouveau contexte.",
+      "finishedAt": "2026-04-18T12:02:29.455031+00:00"
     }
   ]
 }
