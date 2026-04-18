@@ -820,6 +820,14 @@
       "startedAt": "2026-04-18T13:03:28.284144+00:00",
       "finishedAt": "2026-04-18T13:06:15.942600+00:00",
       "error_message": "validate fail après 2 retries ciblés: ÉCHEC validation :\n  - blacklist: 'parfait' trouvé dans le contenu\n  - blacklist: 'robuste' trouvé dans le contenu\n  - blacklist: 'haut de gamme' trouvé dans le contenu\n  - blacklist: 'solution' trouvé dans le contenu\n  - blacklist: 'gamme' trouvé dans le contenu\n  - blacklist: 'modèle' trouvé dans le contenu\n  - blacklist: 'achetez' trouvé dans le contenu"
+    },
+    {
+      "id": "job-1776518259753",
+      "url": "65-couper-et-decouper",
+      "slug": "65-couper-et-decouper",
+      "type": "analyse",
+      "status": "pending",
+      "createdAt": "2026-04-18T13:17:39.753Z"
     }
   ]
 }
