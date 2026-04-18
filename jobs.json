@@ -826,9 +826,10 @@
       "url": "65-couper-et-decouper",
       "slug": "65-couper-et-decouper",
       "type": "analyse",
-      "status": "processing",
+      "status": "done",
       "createdAt": "2026-04-18T13:17:39.753Z",
-      "startedAt": "2026-04-18T13:17:43.286124+00:00"
+      "startedAt": "2026-04-18T13:17:43.286124+00:00",
+      "finishedAt": "2026-04-18T13:18:29.243091+00:00"
     }
   ]
 }
