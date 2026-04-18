@@ -758,7 +758,7 @@
       "url": "65-couper-et-decouper",
       "slug": "65-couper-et-decouper",
       "type": "redaction",
-      "status": "processing",
+      "status": "error",
       "createdAt": "2026-04-18T12:57:52.540Z",
       "structure": {
         "h2s": [
@@ -778,7 +778,9 @@
           "Quel budget prévoir pour équiper un poste de coupe papier en entreprise ?"
         ]
       },
-      "startedAt": "2026-04-18T12:57:58.600937+00:00"
+      "startedAt": "2026-04-18T12:57:58.600937+00:00",
+      "finishedAt": "2026-04-18T12:59:13.325049+00:00",
+      "error_message": "validate fail: ÉCHEC validation :\n  - seo.meta_description: 'Équipez votre poste de coupe avec massicots électriques ou manuels, cisailles A4 et A3, rogneuses bureau et coupeuses de plans grand format. Accessoires et lames de rechange inclus.' is too long"
     }
   ]
 }
