@@ -752,6 +752,32 @@
       "createdAt": "2026-04-18T12:54:59.452Z",
       "startedAt": "2026-04-18T12:55:01.322510+00:00",
       "finishedAt": "2026-04-18T12:56:08.038490+00:00"
+    },
+    {
+      "id": "job-1776517072540",
+      "url": "65-couper-et-decouper",
+      "slug": "65-couper-et-decouper",
+      "type": "redaction",
+      "status": "pending",
+      "createdAt": "2026-04-18T12:57:52.540Z",
+      "structure": {
+        "h2s": [
+          "Vous équipez un poste de coupe en entreprise : quelle famille choisir ?",
+          "Pour les formats bureautiques (A4-A3) et petites piles : les cisailles",
+          "Pour couper des volumes importants (jusqu'à 1000 feuilles) : les massicots",
+          "Pour des coupes nettes en petites séries et photos : les rogneuses",
+          "Pour couper droit rapidement sans effort : les coupeuses",
+          "Pour entretenir et prolonger votre matériel : les accessoires couper et découper",
+          "Cisaille, massicot, rogneuse ou coupeuse : lequel pour quel besoin ?",
+          "Au-delà de 1000 feuilles par coupe ou matériaux lourds : direction les équipements industriels spécialisés",
+          "Questions fréquentes"
+        ],
+        "faqs": [
+          "Quelle différence entre un massicot, une cisaille et une rogneuse pour couper du papier ?",
+          "Pour un service reprographie ou un secrétariat, quelle famille de coupe privilégier ?",
+          "Quel budget prévoir pour équiper un poste de coupe papier en entreprise ?"
+        ]
+      }
     }
   ]
 }
