@@ -553,9 +553,11 @@
       "url": "65-couper-et-decouper",
       "slug": "65-couper-et-decouper",
       "type": "analyse",
-      "status": "processing",
+      "status": "error",
       "createdAt": "2026-04-18T10:07:26.399Z",
-      "startedAt": "2026-04-18T10:07:29.459743+00:00"
+      "startedAt": "2026-04-18T10:07:29.459743+00:00",
+      "finishedAt": "2026-04-18T10:09:26.470229+00:00",
+      "error_message": "validate fail: ÉCHEC validation :\n  - jsonld.additional: {'@context': 'https://schema.org', '@type': 'ItemList', 'name': 'Couper et découper', 'description': 'Catégorie outils de coupe pour bureau professionnel : ciseaux, cutters, massicots, rogneurs.', 'itemListElement': []} is not of type 'array'\n  - grid_childr"
     }
   ]
 }
