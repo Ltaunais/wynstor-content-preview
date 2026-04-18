@@ -3316,6 +3316,13 @@ async function submitSeoJob(jobType) {
       headers: { 'Authorization': `token ${token}` }, cache: 'no-store'
     });
     const getData = await getRes.json();
+    if (!getRes.ok || !getData.content) {
+      const msg = getRes.status === 401 ? 'Token GitHub invalide ou expiré'
+                : getRes.status === 403 ? 'Rate-limit GitHub atteint'
+                : getRes.status === 404 ? 'jobs.json introuvable sur la branche ' + BRANCH
+                : 'GitHub API ' + getRes.status + ' — ' + (getData.message || 'réponse inattendue');
+      throw new Error(msg);
+    }
     const jobsSha = getData.sha;
     const jobsContent = JSON.parse(decodeURIComponent(escape(atob(getData.content.replace(/\n/g, '')))));
 
@@ -3396,6 +3403,7 @@ function pollJobStatus(jobId) {
       });
       if (!res.ok) return;
       const data = await res.json();
+      if (!data.content) return;
       const content = JSON.parse(decodeURIComponent(escape(atob(data.content.replace(/\n/g, '')))));
       const job = content.jobs.find(j => j.id === jobId);
 
