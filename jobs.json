@@ -797,7 +797,7 @@
       "url": "65-couper-et-decouper",
       "slug": "65-couper-et-decouper",
       "type": "redaction",
-      "status": "pending",
+      "status": "processing",
       "createdAt": "2026-04-18T13:03:21.369Z",
       "structure": {
         "h2s": [
@@ -816,7 +816,8 @@
           "Pour un service reprographie qui coupe 500 à 1000 feuilles par jour, quelle famille choisir ?",
           "Quel budget prévoir pour équiper 5 postes bureautiques en outils de coupe ?"
         ]
-      }
+      },
+      "startedAt": "2026-04-18T13:03:28.284144+00:00"
     }
   ]
 }
