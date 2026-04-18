@@ -569,6 +569,14 @@
       "startedAt": "2026-04-18T10:30:19.469877+00:00",
       "finishedAt": "2026-04-18T10:34:54.599299+00:00",
       "error_message": "validate fail après 2 essais: ÉCHEC validation :\n  - blacklist: 'offre' trouvé dans le contenu\n  - blacklist: 'propose' trouvé dans le contenu\n  - blacklist: 'parfait' trouvé dans le contenu\n  - blacklist: 'ergonomique' trouvé dans le contenu\n  - blacklist: 'robuste' trouvé dans le contenu\n  - blacklist: 'fiable' trouvé dans le "
+    },
+    {
+      "id": "job-1776509177593",
+      "url": "65-couper-et-decouper",
+      "slug": "65-couper-et-decouper",
+      "type": "analyse",
+      "status": "pending",
+      "createdAt": "2026-04-18T10:46:17.594Z"
     }
   ]
 }
