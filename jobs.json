@@ -791,6 +791,32 @@
       "createdAt": "2026-04-18T13:02:06.181Z",
       "startedAt": "2026-04-18T13:02:13.896692+00:00",
       "finishedAt": "2026-04-18T13:02:54.721926+00:00"
+    },
+    {
+      "id": "job-1776517401369",
+      "url": "65-couper-et-decouper",
+      "slug": "65-couper-et-decouper",
+      "type": "redaction",
+      "status": "pending",
+      "createdAt": "2026-04-18T13:03:21.369Z",
+      "structure": {
+        "h2s": [
+          "Vous équipez un service reprographie : par quelle famille commencer ?",
+          "Pour les coupes droites du quotidien (A4 à A2) : les cisailles",
+          "Pour les grosses piles et les finitions nettes : les massicots",
+          "Pour le façonnage précis des tirages et photos : les rogneuses",
+          "Pour la production en série et les formats longs : les coupeuses",
+          "Pour prolonger la durée de vie de vos lames : les accessoires couper et découper",
+          "Cisaille, massicot, rogneuse ou coupeuse : laquelle pour quel besoin ?",
+          "Au-delà de 1000 feuilles par coupe, regardez les solutions de façonnage industriel",
+          "Questions fréquentes"
+        ],
+        "faqs": [
+          "Quelle différence concrète entre une cisaille, un massicot et une rogneuse ?",
+          "Pour un service reprographie qui coupe 500 à 1000 feuilles par jour, quelle famille choisir ?",
+          "Quel budget prévoir pour équiper 5 postes bureautiques en outils de coupe ?"
+        ]
+      }
     }
   ]
 }
