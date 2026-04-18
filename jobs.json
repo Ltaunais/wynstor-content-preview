@@ -692,7 +692,7 @@
       "url": "65-couper-et-decouper",
       "slug": "65-couper-et-decouper",
       "type": "redaction",
-      "status": "processing",
+      "status": "error",
       "createdAt": "2026-04-18T12:26:16.232Z",
       "structure": {
         "h2s": [
@@ -712,7 +712,9 @@
           "Quel budget prévoir pour équiper un service administratif ou un atelier en outils de coupe professionnels ?"
         ]
       },
-      "startedAt": "2026-04-18T12:26:22.365477+00:00"
+      "startedAt": "2026-04-18T12:26:22.365477+00:00",
+      "finishedAt": "2026-04-18T12:38:47.877076+00:00",
+      "error_message": "validate fail après 2 essais: ÉCHEC validation :\n  - blacklist: 'de plus' trouvé dans le contenu"
     }
   ]
 }
