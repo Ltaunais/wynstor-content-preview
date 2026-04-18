@@ -686,6 +686,32 @@
       "startedAt": "2026-04-18T12:09:36.517074+00:00",
       "finishedAt": "2026-04-18T12:21:44.789055+00:00",
       "error_message": "validate fail après 2 essais: ÉCHEC validation :\n  - maillage.product_widgets.0: 'anchor' is a required property\n  - maillage.product_widgets.1: 'anchor' is a required property\n  - maillage.product_widgets.2: 'anchor' is a required property"
+    },
+    {
+      "id": "job-1776515176232",
+      "url": "65-couper-et-decouper",
+      "slug": "65-couper-et-decouper",
+      "type": "redaction",
+      "status": "pending",
+      "createdAt": "2026-04-18T12:26:16.232Z",
+      "structure": {
+        "h2s": [
+          "Vous équipez un service reprographie, une école ou un atelier : par où commencer ?",
+          "Pour les coupes bureau au quotidien (papier, carton fin, jusqu'à 50 feuilles A4-A2) : les cisailles",
+          "Pour les piles épaisses et les tirages en série (jusqu'à 1000 feuilles par coupe) : les massicots",
+          "Pour les finitions photo, carte et flyer (lame rotative, coupe nette) : les rogneuses",
+          "Pour la production atelier et la découpe en continu : les coupeuses",
+          "Pour entretenir et prolonger la durée de vie de votre matériel : les accessoires couper et découper",
+          "Cisaille, massicot, rogneuse ou coupeuse : quelle famille pour quel volume et quel format ?",
+          "Au-delà de 1000 feuilles par coupe ou de formats supérieurs au A1, regardez les presses de reprographie industrielle",
+          "Questions fréquentes"
+        ],
+        "faqs": [
+          "Quelle différence concrète entre une cisaille, un massicot et une rogneuse pour un usage B2B ?",
+          "Pour un service reprographie ou une école de plus de 20 postes, quelle famille d'équipement privilégier ?",
+          "Quel budget prévoir pour équiper un service administratif ou un atelier en outils de coupe professionnels ?"
+        ]
+      }
     }
   ]
 }
