@@ -721,7 +721,7 @@
       "url": "65-couper-et-decouper",
       "slug": "65-couper-et-decouper",
       "type": "redaction",
-      "status": "processing",
+      "status": "cancelled",
       "createdAt": "2026-04-18T12:42:17.268Z",
       "structure": {
         "h2s": [
