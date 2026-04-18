@@ -935,7 +935,7 @@
       "url": "65-couper-et-decouper",
       "slug": "65-couper-et-decouper",
       "type": "redaction",
-      "status": "processing",
+      "status": "done",
       "createdAt": "2026-04-18T15:32:02.858Z",
       "structure": {
         "h2s": [
@@ -951,7 +951,8 @@
           "Les coupeuses rotatives remplacent-elles les massicots à levier dans un bureau classique ?"
         ]
       },
-      "startedAt": "2026-04-18T15:32:05.287Z"
+      "startedAt": "2026-04-18T15:32:05.287Z",
+      "finishedAt": "2026-04-18T15:36:29.520Z"
     }
   ]
 }
