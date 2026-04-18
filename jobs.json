@@ -543,8 +543,9 @@
       "url": "142-cisailles",
       "slug": "142-cisailles",
       "type": "analyse",
-      "status": "pending",
-      "createdAt": "2026-04-18T09:44:18.778Z"
+      "status": "processing",
+      "createdAt": "2026-04-18T09:44:18.778Z",
+      "startedAt": "2026-04-18T09:44:24.068Z"
     }
   ]
 }
