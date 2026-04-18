@@ -564,9 +564,11 @@
       "url": "65-couper-et-decouper",
       "slug": "65-couper-et-decouper",
       "type": "analyse",
-      "status": "processing",
+      "status": "error",
       "createdAt": "2026-04-18T10:30:17.476Z",
-      "startedAt": "2026-04-18T10:30:19.469877+00:00"
+      "startedAt": "2026-04-18T10:30:19.469877+00:00",
+      "finishedAt": "2026-04-18T10:34:54.599299+00:00",
+      "error_message": "validate fail après 2 essais: ÉCHEC validation :\n  - blacklist: 'offre' trouvé dans le contenu\n  - blacklist: 'propose' trouvé dans le contenu\n  - blacklist: 'parfait' trouvé dans le contenu\n  - blacklist: 'ergonomique' trouvé dans le contenu\n  - blacklist: 'robuste' trouvé dans le contenu\n  - blacklist: 'fiable' trouvé dans le "
     }
   ]
 }
