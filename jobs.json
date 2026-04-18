@@ -634,7 +634,7 @@
       "url": "65-couper-et-decouper",
       "slug": "65-couper-et-decouper",
       "type": "redaction",
-      "status": "pending",
+      "status": "processing",
       "createdAt": "2026-04-18T12:08:14.036Z",
       "structure": {
         "h2s": [
@@ -653,7 +653,8 @@
           "Pour un service reprographie ou une école de plus de 20 postes, quelle famille d'équipement privilégier ?",
           "Quel budget prévoir pour équiper un service administratif ou un atelier en outils de coupe professionnels ?"
         ]
-      }
+      },
+      "startedAt": "2026-04-18T12:08:17.115586+00:00"
     }
   ]
 }
