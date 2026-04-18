@@ -929,6 +929,28 @@
       "createdAt": "2026-04-18T15:29:35.939Z",
       "startedAt": "2026-04-18T15:29:38.981Z",
       "finishedAt": "2026-04-18T15:31:30.052Z"
+    },
+    {
+      "id": "job-1776526322858",
+      "url": "65-couper-et-decouper",
+      "slug": "65-couper-et-decouper",
+      "type": "redaction",
+      "status": "pending",
+      "createdAt": "2026-04-18T15:32:02.858Z",
+      "structure": {
+        "h2s": [
+          "Vous équipez un service courrier qui ouvre plis et colis toute la journée",
+          "Vous préparez des liasses de documents à massicoter en reprographie interne",
+          "Vous découpez ponctuellement des supports d'impression sur un poste administratif",
+          "Vous gérez un atelier ou un bureau d'études qui manipule des plans grand format",
+          "Questions fréquentes"
+        ],
+        "faqs": [
+          "Quelle différence entre une cisaille, un massicot et une rogneuse ?",
+          "Quel type d'outil de coupe pour un service courrier qui traite plusieurs centaines de documents par jour ?",
+          "Les coupeuses rotatives remplacent-elles les massicots à levier dans un bureau classique ?"
+        ]
+      }
     }
   ]
 }
