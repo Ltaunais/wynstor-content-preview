@@ -958,7 +958,8 @@ button:hover { background: revert; border: revert; color: revert; }
 
 <script>
 // === CONFIG ===
-const DEMO_MODE = true; // true = coupe les appels Magento (demo), false = prod
+const MAGENTO_BASE = 'https://dev2.wynstor.com';
+const DEMO_MODE = false; // true = coupe les appels Magento (demo), false = prod
 const REPO = 'Ltaunais/wynstor-content-preview';
 const BRANCH = 'main';
 
@@ -3802,9 +3803,9 @@ function launchGuidedRegen(bloc, instruction) {
 function getMediaApiUrl() {
   if (DEMO_MODE) return '';
   var secret = getApiSecret();
-  return 'https://dev3.wynstor.com/media/wysiwyg/smartwave/porto/category/upload.php' + (secret ? '?token=' + encodeURIComponent(secret) : '');
+  return MAGENTO_BASE + '/media/wysiwyg/smartwave/porto/category/upload.php' + (secret ? '?token=' + encodeURIComponent(secret) : '');
 }
-const MEDIA_API = 'https://dev3.wynstor.com/media/wysiwyg/smartwave/porto/category/upload.php';
+const MEDIA_API = MAGENTO_BASE + '/media/wysiwyg/smartwave/porto/category/upload.php';
 let mediaLoaded = false;
 
 // Drop zone
@@ -4103,7 +4104,7 @@ async function pushToMagento() {
   if (subcatsImages.length) payload.subcats_images = subcatsImages;
 
   try {
-    const res = await fetch('https://dev3.wynstor.com/media/wysiwyg/smartwave/porto/category/push-content.php', {
+    const res = await fetch(MAGENTO_BASE + '/media/wysiwyg/smartwave/porto/category/push-content.php', {
       method: 'POST',
       headers: { 'Authorization': 'Bearer ' + apiSecret, 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
@@ -4166,7 +4167,7 @@ async function onDesignKeyChange(value) {
 
   toast('Sync Magento...');
   try {
-    const res = await fetch('https://dev3.wynstor.com/media/wysiwyg/smartwave/porto/category/design-key.php', {
+    const res = await fetch(MAGENTO_BASE + '/media/wysiwyg/smartwave/porto/category/design-key.php', {
       method: 'POST',
       headers: { 'Authorization': 'Bearer ' + apiSecret, 'Content-Type': 'application/json' },
       body: JSON.stringify({ category_id: parseInt(page.id), design_key: value })
