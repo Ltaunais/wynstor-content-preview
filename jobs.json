@@ -953,6 +953,14 @@
       },
       "startedAt": "2026-04-18T15:32:05.287Z",
       "finishedAt": "2026-04-18T15:36:29.520Z"
+    },
+    {
+      "id": "job-1777300789465",
+      "url": "168-massicots-electriques-programmables",
+      "slug": "168-massicots-electriques-programmables",
+      "type": "analyse",
+      "status": "pending",
+      "createdAt": "2026-04-27T14:39:49.465Z"
     }
   ]
 }
